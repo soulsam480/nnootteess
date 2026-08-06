@@ -1,52 +1,20 @@
-# Vue 3 + Vite + CRXJS
+### NNOOTTEESS
 
-This template helps you quickly start developing Chrome extensions with Vue 3, TypeScript and Vite. It includes the CRXJS Vite plugin for seamless Chrome extension development.
+> P2P synced note taking in all your browsers
 
-## Features
+### What's there
 
-- Vue 3 with `<script setup>` syntax
-- TypeScript support
-- Vite build tool
-- CRXJS Vite plugin integration
-- Chrome extension manifest configuration
+- P2P realtime sync for add/remove/rename notes
+- no live editing for notes, since that'd need a CRDT supported editor, too much
+  work
+- login once and store mnemonic in browser for 15 mins, login with that rest of
+  the life
+- download release
 
-## Quick Start
+### What more can be done?
 
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Start development server:
-
-```bash
-npm run dev
-```
-
-3. Open Chrome and navigate to `chrome://extensions/`, enable "Developer mode", and load the unpacked extension from the `dist` directory.
-
-4. Build for production:
-
-```bash
-npm run build
-```
-
-## Project Structure
-
-- `src/popup/` - Extension popup UI
-- `src/content/` - Content scripts
-- `manifest.config.ts` - Chrome extension manifest configuration
-
-## Documentation
-
-- [Vue 3 Documentation](https://vuejs.org/)
-- [Vite Documentation](https://vitejs.dev/)
-- [CRXJS Documentation](https://crxjs.dev/vite-plugin)
-
-## Chrome Extension Development Notes
-
-- Use `manifest.config.ts` to configure your extension
-- The CRXJS plugin automatically handles manifest generation
-- Content scripts should be placed in `src/content/`
-- Popup UI should be placed in `src/popup/`
+- maybe P2P code snippets? i'll probably do it, like put a monaco instance and
+  store any code snippet
+- Web app? since the gdb namespace is same, users can use it as long as mnemonic
+  is same
+- better UI? sure
