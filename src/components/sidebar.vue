@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
 import { setActiveNote } from "@/storage/state";
-import { ref, Suspense } from "vue";
+import { ref } from "vue";
 import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
+import { invalidateQueries } from "@/storage/query";
+import { sync } from "@/storage/directory";
 
 const isMakingNote = ref(false);
 
@@ -15,6 +17,9 @@ async function addNewNote() {
   const note = await noteAPI.create("Untitled");
 
   setActiveNote(note.id);
+
+  invalidateQueries(noteAPI.queryKeys.all());
+  sync(note, "add");
 
   isMakingNote.value = false;
 }
@@ -31,8 +36,6 @@ async function addNewNote() {
       </button>
     </div>
 
-    <Suspense>
-      <Notes />
-    </Suspense>
+    <Notes />
   </div>
 </template>

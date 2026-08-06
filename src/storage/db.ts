@@ -8,6 +8,7 @@ const db = await gdb("nnootteess", {
   sm: {
     superAdmins: [],
   },
+  debug: import.meta.env.DEV,
 });
 
 function _db() {

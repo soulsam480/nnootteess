@@ -172,6 +172,7 @@ body {
         height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px));
         overflow-y: scroll;
         border-radius: var(--mdst-radius);
+        border: 1px solid var(--mdst-color-border);
       }
     }
   }

@@ -1,4 +1,13 @@
+// NOTE:
+// The authentication and ownership works now is kinda unsafe but
+// it's fine as long as you're aware of the setup
+// 1. as soon as you register/login, you promote self to a superadmin
+// 2. the benefit of this is all of your logins across devices, can have
+//  full access to ypur data
+// 3. the mnemonic is stored in chrome.storage.local for 15 minutes
+
 import { sm } from "@/storage/db";
+import { startDirectory } from "@/storage/directory";
 import { reactive } from "vue";
 
 export interface User {
@@ -28,13 +37,24 @@ async function login(previousMemonic?: string) {
 
   await persistMnemonicUnsafe(mnemonic);
 
+  await sm().assignRole(address, "superadmin");
+
   return { address, mnemonic };
 }
+
+let directoryUnsub: (() => void) | undefined;
 
 sm().setSecurityStateChangeCallback((state) => {
   if (state.isActive && state.activeAddress) {
     user.id = state.activeAddress;
     user.state = "authenticated";
+
+    directoryUnsub?.();
+    startDirectory().then((sub) => {
+      directoryUnsub = sub;
+    });
+  } else {
+    directoryUnsub?.();
   }
 });
 

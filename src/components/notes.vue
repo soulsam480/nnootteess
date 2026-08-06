@@ -1,33 +1,52 @@
 <script setup lang="ts">
+import { directory, sync } from "@/storage/directory";
 import * as noteAPI from "@/storage/notes";
+import { invalidateQueries } from "@/storage/query";
 import { setActiveNote, state } from "@/storage/state";
+import { computed } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 
-function selectNote(id: string) {
-  setActiveNote(id);
-}
-
-async function deleteNote(event: Event, id: string) {
+async function deleteNote(
+  event: Event,
+  note: { id: string; value: { name: string } },
+) {
   event.stopPropagation();
-  await noteAPI.delete(id);
+
+  if (state.active_note === note.id) {
+    setActiveNote(null);
+  }
+
+  await noteAPI.delete(note.id);
+  sync(note, "remove");
+  invalidateQueries(noteAPI.queryKeys.all());
 }
 
-const notes = await noteAPI.all();
+const hasNotes = computed(() => {
+  if (!directory.value) {
+    return false;
+  }
+
+  for (const _k in directory.value.value.notes) {
+    return true;
+  }
+
+  return false;
+});
 </script>
 
 <template>
-  <ul class="notes">
+  <ul class="notes" v-if="directory">
     <li
-      v-for="note in notes"
+      v-for="(noteName, noteId) in directory.value.notes"
       class="link"
-      :class="{ active: state.active_note === note.id }"
-      @click="selectNote(note.id)"
+      :class="{ active: state.active_note === noteId }"
+      @click="setActiveNote(noteId)"
     >
-      {{ note.value.name }}
+      {{ noteName }}
 
       <span class="link__actions">
         <span
-          @click="deleteNote($event, note.id)"
+          @click="deleteNote($event, { id: noteId, value: { name: noteName } })"
           class="link__actions--delete"
         >
           <CarbonTrashCan />
@@ -36,7 +55,7 @@ const notes = await noteAPI.all();
     </li>
   </ul>
 
-  <p v-if="notes.length === 0" class="mdst-p--muted">
+  <p v-if="!hasNotes" class="mdst-p--muted">
     No notes yet
   </p>
 </template>

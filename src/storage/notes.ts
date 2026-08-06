@@ -10,7 +10,16 @@ export interface Note {
   meta: Record<string, string>;
 }
 
-async function all(): Promise<NodeObject<Note>[]> {
+const queryKeys = {
+  all() {
+    return "notes";
+  },
+  find(id: string) {
+    return `notes/${id}`;
+  },
+};
+
+async function all(): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
   const { results } = await sm().map({
     query: {
       type: "note",
@@ -57,4 +66,4 @@ async function delete_(id: string): Promise<void> {
   return await sm().remove(id);
 }
 
-export { all, create, find, update, delete_ as delete };
+export { all, create, find, update, delete_ as delete, queryKeys };
