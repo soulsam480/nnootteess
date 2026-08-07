@@ -2,7 +2,7 @@
 import { directory, sync } from "@/storage/directory";
 import * as noteAPI from "@/storage/notes";
 import { invalidateQueries } from "@/storage/query";
-import { setActiveNote, state } from "@/storage/state";
+import { removeOpenNote, setActiveNote, state } from "@/storage/state";
 import { computed } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 
@@ -12,9 +12,7 @@ async function deleteNote(
 ) {
   event.stopPropagation();
 
-  if (state.active_note === note.id) {
-    setActiveNote(null);
-  }
+  removeOpenNote(note.id);
 
   await noteAPI.delete(note.id);
   sync(note, "remove");
@@ -42,8 +40,9 @@ const hasNotes = computed(() => {
       :class="{ active: state.active_note === noteId }"
       @click="setActiveNote(noteId)"
     >
-      {{ noteName }}
-
+      <div class="mdst-truncate">
+        {{ noteName }}
+      </div>
       <span class="link__actions">
         <span
           @click="deleteNote($event, { id: noteId, value: { name: noteName } })"

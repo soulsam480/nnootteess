@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Header from "@/components/header.vue";
 import Login from "@/components/login.vue";
+import NoteTabs from "@/components/note-tabs.vue";
 import Sidebar from "@/components/sidebar.vue";
 import Tab from "@/components/tab.vue";
 import { state } from "@/storage/state";
@@ -16,8 +17,9 @@ import { Suspense } from "vue";
       <div class="arena">
         <Sidebar />
 
-        <template v-if="state.active_note">
-          <Suspense :key="state.active_note">
+        <div class="mdst-tabs">
+          <NoteTabs />
+          <Suspense v-if="state.active_note" :key="state.active_note">
             <Tab :id="state.active_note" />
 
             <template #fallback>
@@ -33,7 +35,7 @@ import { Suspense } from "vue";
               </div>
             </template>
           </Suspense>
-        </template>
+        </div>
       </div>
     </template>
 

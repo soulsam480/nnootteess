@@ -29,28 +29,26 @@ async function handleLogin() {
 }
 
 const { copy, copyPending } = useClipboard();
-
-function handleCancel(e: Event) {
-  e.preventDefault();
-}
 </script>
 
 <template>
-  <dialog
-    open
-    id="my-dialog"
-    class="mdst-dialog login-dialog"
-    @cancel="handleCancel"
+  <div
+    class="mdst-card login-dialog"
   >
-    <div class="mdst-dialog-header">
-      <h2 class="mdst-dialog-title">
-        Create an account to persist and sync notes
-      </h2>
-      <button class="mdst-dialog-close" commandfor="my-dialog" command="close">
-        ✕
-      </button>
-    </div>
-    <div class="mdst-dialog-body">
+    <div class="mdst-card-body">
+      <div class="login-dialog__header">
+        <h2 class="mdst-card-title">
+          Welcome to NNOOTTEESS
+        </h2>
+        <div>
+          Your notes sync P2P with E2E encryption across devices / browsers /
+          tabs
+        </div>
+      </div>
+
+      <div>
+        To Get Started
+      </div>
       <button
         v-if='loginState.state === "idle"'
         class="mdst-button mdst-button--primary"
@@ -78,18 +76,25 @@ function handleCancel(e: Event) {
         Copy Login Phrease, Don't Lose it!
       </button>
     </div>
-  </dialog>
+  </div>
 </template>
 
 <style scoped>
 .login-dialog {
   min-width: 32rem;
-  .mdst-dialog-body {
+  margin: auto;
+
+  .mdst-card-body {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: var(--mdst-space-2);
+  }
+
+  .login-dialog__header {
+    text-align: center;
+    margin-bottom: var(--mdst-space-6);
   }
 }
 </style>

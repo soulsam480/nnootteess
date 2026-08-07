@@ -41,7 +41,7 @@ watchDebounced(
 </script>
 
 <template>
-  <div class="editor-area">
+  <div class="editor-area mdst-tabs-panel" role="tabpanel" data-state="active">
     <template
       v-if="note"
     >

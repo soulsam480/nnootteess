@@ -100,8 +100,11 @@ body {
     grid-template-columns: 2fr 5fr;
     padding: calc(var(--spacing) * 2);
 
+    > * {
+      min-width: 0;
+    }
+
     .sidebar {
-      padding: 0 var(--mdst-space-2) var(--mdst-space-2) var(--mdst-space-2);
       border-right: 1px solid var(--mdst-color-border);
 
       .sidebar__actions {
@@ -114,7 +117,7 @@ body {
       }
 
       ul.notes {
-        padding: 0;
+        padding: var(--mdst-space-2);
       }
 
       .link {
@@ -128,6 +131,10 @@ body {
         transition:
           color var(--mdst-transition),
           background var(--mdst-transition);
+
+        div {
+          width: calc(100% - 32px);
+        }
 
         .link__actions {
           font-size: var(--mdst-text-sm);
@@ -158,6 +165,30 @@ body {
       }
     }
 
+    .mdst-tab {
+      position: relative;
+      max-width: calc(var(--mdst-space-8) * 6);
+
+      &:hover .tab__actions {
+        display: flex;
+      }
+
+      div:first-child {
+        padding-right: var(--mdst-space-2);
+      }
+
+      .tab__actions {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: var(--mdst-space-1);
+        display: flex;
+        align-items: center;
+        gap: var(--mdst-space-1);
+        display: none;
+      }
+    }
+
     .editor-area {
       display: flex;
       flex-direction: column;
@@ -169,7 +200,7 @@ body {
       }
 
       .milkdown {
-        height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px));
+        height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 36px));
         overflow-y: scroll;
         border-radius: var(--mdst-radius);
         border: 1px solid var(--mdst-color-border);

@@ -7,9 +7,10 @@
 // 3. the mnemonic is stored in chrome.storage.local for 15 minutes
 
 import { sm } from "@/storage/db";
-import { startDirectory } from "@/storage/directory";
-import { startState } from "@/storage/state";
-import { reactive } from "vue";
+import { Directory, directory, startDirectory } from "@/storage/directory";
+import { startState, state } from "@/storage/state";
+import { NodeObject } from "genosdb";
+import { reactive, toRaw, watch } from "vue";
 
 export interface User {
   id: string | null;
@@ -20,6 +21,54 @@ const user = reactive<User>({
   id: null,
   state: "inactive",
 });
+
+let directoryUnsub: (() => void) | undefined;
+let syncUnsub: (() => void) | undefined;
+
+function syncStateWithDirectory(dir: NodeObject<Directory> | null) {
+  if (!dir) {
+    return;
+  }
+
+  let { active_note, open_notes } = toRaw(state);
+
+  if (active_note && !dir.value.notes[active_note]) {
+    active_note = null;
+  }
+
+  const available = open_notes.filter((it) => dir.value.notes[it]);
+
+  if (available.length) {
+    open_notes = available;
+  }
+
+  state.active_note = active_note;
+  state.open_notes = open_notes;
+}
+
+sm().setSecurityStateChangeCallback((authState) => {
+  if (authState.isActive && authState.activeAddress) {
+    user.id = authState.activeAddress;
+    user.state = "authenticated";
+
+    directoryUnsub?.();
+
+    startDirectory().then((sub) => {
+      directoryUnsub = sub;
+    });
+
+    startState();
+    syncStateWithDirectory(directory.value);
+
+    const { stop } = watch(directory, syncStateWithDirectory);
+    syncUnsub = stop;
+  } else {
+    directoryUnsub?.();
+    syncUnsub?.();
+  }
+});
+
+// ============== HANDLERS ================
 
 async function login(previousMemonic?: string) {
   const identity: Record<string, string> | null = previousMemonic
@@ -42,30 +91,6 @@ async function login(previousMemonic?: string) {
 
   return { address, mnemonic };
 }
-
-let directoryUnsub: (() => void) | undefined;
-let stateUnsub: (() => void) | undefined;
-
-sm().setSecurityStateChangeCallback((state) => {
-  if (state.isActive && state.activeAddress) {
-    user.id = state.activeAddress;
-    user.state = "authenticated";
-
-    directoryUnsub?.();
-    stateUnsub?.();
-
-    startDirectory().then((sub) => {
-      directoryUnsub = sub;
-    });
-
-    startState().then((sub) => {
-      stateUnsub = sub;
-    });
-  } else {
-    directoryUnsub?.();
-    stateUnsub?.();
-  }
-});
 
 // UNSAFE persist memonic temporary
 // since web authentication is not available inside

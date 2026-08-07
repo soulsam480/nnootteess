@@ -2,7 +2,7 @@ import { sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
 import { ref } from "vue";
 
-interface Directory {
+export interface Directory {
   notes: {
     [note_id: string]: string;
   };
@@ -40,11 +40,15 @@ async function startDirectory() {
   await bootstrap();
 
   const { unsubscribe, result } = await sm().get(DIRECTORY_ID, (node) => {
+    if (!node?.value) {
+      return;
+    }
+
     directory.value = node;
   });
 
   if (result) {
-    directory.value = result.value;
+    directory.value = result;
   }
 
   return unsubscribe;
