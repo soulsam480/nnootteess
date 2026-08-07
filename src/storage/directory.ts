@@ -12,15 +12,11 @@ interface Directory {
   type: "directory";
 }
 
-let directoryId: string | null;
+const DIRECTORY_ID = "__directory__";
 
 const directory = ref<NodeObject<Directory> | null>(null);
 
 async function bootstrap() {
-  if (directoryId) {
-    return directoryId;
-  }
-
   const { results } = await sm().map({
     query: {
       type: "directory",
@@ -29,24 +25,27 @@ async function bootstrap() {
   });
 
   if (results.length === 0) {
-    directoryId = await sm().put({
-      type: "directory",
-      directories: {},
-      notes: {},
-    } satisfies Directory);
-  } else {
-    directoryId = results[0].id;
+    await sm().put(
+      {
+        type: "directory",
+        directories: {},
+        notes: {},
+      } satisfies Directory,
+      DIRECTORY_ID,
+    );
   }
-
-  return directoryId;
 }
 
 async function startDirectory() {
-  const id = await bootstrap();
+  await bootstrap();
 
-  const { unsubscribe } = await sm().get(id, (node) => {
+  const { unsubscribe, result } = await sm().get(DIRECTORY_ID, (node) => {
     directory.value = node;
   });
+
+  if (result) {
+    directory.value = result.value;
+  }
 
   return unsubscribe;
 }

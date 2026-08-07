@@ -8,6 +8,7 @@
 
 import { sm } from "@/storage/db";
 import { startDirectory } from "@/storage/directory";
+import { startState } from "@/storage/state";
 import { reactive } from "vue";
 
 export interface User {
@@ -43,6 +44,7 @@ async function login(previousMemonic?: string) {
 }
 
 let directoryUnsub: (() => void) | undefined;
+let stateUnsub: (() => void) | undefined;
 
 sm().setSecurityStateChangeCallback((state) => {
   if (state.isActive && state.activeAddress) {
@@ -50,11 +52,18 @@ sm().setSecurityStateChangeCallback((state) => {
     user.state = "authenticated";
 
     directoryUnsub?.();
+    stateUnsub?.();
+
     startDirectory().then((sub) => {
       directoryUnsub = sub;
     });
+
+    startState().then((sub) => {
+      stateUnsub = sub;
+    });
   } else {
     directoryUnsub?.();
+    stateUnsub?.();
   }
 });
 
