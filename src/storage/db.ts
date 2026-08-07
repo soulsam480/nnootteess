@@ -9,6 +9,8 @@ const db = await gdb("nnootteess", {
     superAdmins: [],
   },
   debug: import.meta.env.DEV,
+  oplogSize: 100,
+  saveDelay: 10 * 1000,
 });
 
 function _db() {

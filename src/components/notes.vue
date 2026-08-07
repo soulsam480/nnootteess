@@ -52,9 +52,8 @@ const hasNotes = computed(() => {
         </span>
       </span>
     </li>
+    <p v-if="!hasNotes" class="mdst-p--muted">
+      No notes yet
+    </p>
   </ul>
-
-  <p v-if="!hasNotes" class="mdst-p--muted">
-    No notes yet
-  </p>
 </template>

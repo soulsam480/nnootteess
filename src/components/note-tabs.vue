@@ -32,7 +32,6 @@ function handleRemove(e: MouseEvent, id: string) {
       </div>
       <div class="tab__actions">
         <CarbonClose
-          style="color: var(--mdst-color-error)"
           @click="handleRemove($event, noteId)"
         />
       </div>

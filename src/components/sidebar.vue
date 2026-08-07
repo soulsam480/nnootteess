@@ -29,8 +29,9 @@ async function addNewNote() {
   <div class="sidebar">
     <div class="sidebar__actions">
       <button
-        class="mdst-button mdst-button--ghost mdst-button--sm"
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
         @click="addNewNote"
+        data-tooltip="Add a new note"
       >
         <CarbonDocumentAdd />
       </button>

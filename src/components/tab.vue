@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
 import Editor from "./editor.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { NodeObject } from "genosdb";
 import { watchDebounced } from "@vueuse/core";
 import { invalidateQueries } from "@/storage/query";
 import { sync } from "@/storage/directory";
+import { removeOpenNote } from "@/storage/state";
 
 const props = defineProps<{
   id: string;
@@ -16,6 +17,7 @@ const note = ref<NodeObject<notesAPI.Note>>();
 try {
   note.value = await notesAPI.find(props.id);
 } catch (e) {
+  removeOpenNote(props.id);
   console.error(e);
 }
 
@@ -30,6 +32,18 @@ async function save(name = false) {
     sync(note.value, "add");
   }
 }
+
+onMounted(() => {
+  let title = document.head.querySelector("title");
+
+  if (!title) {
+    title = document.createElement("title");
+
+    document.head.appendChild(title);
+  }
+
+  title.innerText = note.value?.value.name ?? "NNOOTTEESS";
+});
 
 watchDebounced(
   () => note.value?.value.content,

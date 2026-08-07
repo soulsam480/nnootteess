@@ -17,6 +17,15 @@ export interface User {
   state: "authenticated" | "inactive";
 }
 
+interface PersistedMemonic {
+  mnemonic: string;
+  at: number;
+}
+
+const PASS_KEY = "__pass__";
+
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
 const user = reactive<User>({
   id: null,
   state: "inactive",
@@ -92,18 +101,16 @@ async function login(previousMemonic?: string) {
   return { address, mnemonic };
 }
 
+async function logout() {
+  await sm().clearSecurity();
+  await chrome.storage.local.remove(PASS_KEY);
+  user.id = null;
+  user.state = "inactive";
+}
+
 // UNSAFE persist memonic temporary
 // since web authentication is not available inside
 // chrome extensions
-
-interface PersistedMemonic {
-  mnemonic: string;
-  at: number;
-}
-
-const PASS_KEY = "__pass__";
-
-const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
 async function persistMnemonicUnsafe(mnemonic: string) {
   await chrome.storage.local.set({
@@ -131,4 +138,4 @@ async function tryRecoverAndLogin() {
   await login(mnemonic);
 }
 
-export { login, user, tryRecoverAndLogin };
+export { login, user, tryRecoverAndLogin, logout };

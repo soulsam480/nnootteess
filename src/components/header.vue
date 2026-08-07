@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { sm } from "@/storage/db";
-import { user } from "@/storage/user";
+import { logout, user } from "@/storage/user";
+import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
 </script>
 
 <template>
@@ -13,6 +14,14 @@ import { user } from "@/storage/user";
       Logged in: <span>{{
         user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN"
       }}</span>
+      <button
+        v-if="user.id"
+        class="mdst-button mdst-button--ghost mdst-button--sm user__logout tooltip tooltip--left"
+        @click="logout"
+        data-tooltip="Logout"
+      >
+        <CarbonIbmEngineeringRequirementsDoorsNext />
+      </button>
     </div>
   </div>
 </template>
