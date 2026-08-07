@@ -3,7 +3,7 @@ import pkg from "./package.json" with { type: "json" };
 
 export default defineManifest({
   manifest_version: 3,
-  name: pkg.name,
+  name: process.env.NODE_ENV === "development" ? `${pkg.name}-DEV` : pkg.name,
   version: pkg.version,
   icons: {
     48: "public/logo.png",

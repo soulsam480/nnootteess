@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import * as monaco from "monaco-editor/editor/editor.api";
+import { monaco } from "@/utils/monaco";
 import {
   onBeforeUnmount,
   onMounted,
