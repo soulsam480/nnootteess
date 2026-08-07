@@ -1,14 +1,38 @@
 import { sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
+import { camelCase, kebabCase } from "scule";
 
-export interface Note {
-  type: "note";
+interface CommonNote {
   name: string;
   content: string;
   created_at: number;
   updated_at: number;
   meta: Record<string, string>;
 }
+
+interface TextNote extends CommonNote {
+  type: "note";
+}
+
+interface CodeNote extends CommonNote {
+  type: "code";
+  language: Language;
+}
+
+export type Note = TextNote | CodeNote;
+
+const LANGUAGES = ["json"] as const;
+
+export type Language = (typeof LANGUAGES)[number];
+
+const LANGUAGE_TO_EXT = {
+  json: "json",
+  javascript: "js",
+  typescript: "ts",
+  css: "css",
+  html: "html",
+  markdown: "md",
+};
 
 const queryKeys = {
   all() {
@@ -31,6 +55,20 @@ async function all(): Promise<NodeObject<Omit<Note, "content"> & { content?: str
 
     return { ...it, value: rest };
   });
+}
+
+async function createCode(name: string, language: Language): Promise<NodeObject<Note>> {
+  const noteId = await sm().put({
+    meta: {},
+    name,
+    content: "",
+    created_at: Date.now(),
+    type: "code",
+    language,
+    updated_at: Date.now(),
+  } satisfies Note);
+
+  return await find(noteId);
 }
 
 async function create(name: string): Promise<NodeObject<Note>> {
@@ -66,4 +104,19 @@ async function delete_(id: string): Promise<void> {
   return await sm().remove(id);
 }
 
-export { all, create, find, update, delete_ as delete, queryKeys };
+function noteToFileName(note: CodeNote): string {
+  return `${camelCase(kebabCase(note.name.replaceAll(/\s+/g, "-")))}.${LANGUAGE_TO_EXT[note.language]}`;
+}
+
+export {
+  all,
+  create,
+  find,
+  update,
+  delete_ as delete,
+  queryKeys,
+  createCode,
+  LANGUAGES,
+  LANGUAGE_TO_EXT,
+  noteToFileName,
+};

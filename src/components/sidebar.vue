@@ -6,6 +6,7 @@ import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
 import { invalidateQueries } from "@/storage/query";
 import { sync } from "@/storage/directory";
+import CarbonCode from "~icons/carbon/code";
 
 const isMakingNote = ref(false);
 
@@ -15,6 +16,21 @@ async function addNewNote() {
   isMakingNote.value = true;
 
   const note = await noteAPI.create("Untitled");
+
+  setActiveNote(note.id);
+
+  invalidateQueries(noteAPI.queryKeys.all());
+  sync(note, "add");
+
+  isMakingNote.value = false;
+}
+
+async function addNewCode() {
+  if (isMakingNote.value) return;
+
+  isMakingNote.value = true;
+
+  const note = await noteAPI.createCode("Untitled snippet", "json");
 
   setActiveNote(note.id);
 
@@ -34,6 +50,14 @@ async function addNewNote() {
         data-tooltip="Add a new note"
       >
         <CarbonDocumentAdd />
+      </button>
+
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+        @click="addNewCode"
+        data-tooltip="Add code snippet"
+      >
+        <CarbonCode />
       </button>
     </div>
 

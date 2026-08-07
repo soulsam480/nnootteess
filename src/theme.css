@@ -211,11 +211,18 @@ body {
         overflow: hidden;
       }
 
-      .milkdown {
+      .milkdown,
+      .monaco-wrapper {
         height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 36px));
         overflow-y: scroll;
         border-radius: var(--mdst-radius);
         border: 1px solid var(--mdst-color-border);
+      }
+
+      &[data-note-type="code"] .editor-header {
+        display: grid;
+        grid-template-columns: 9fr 3fr;
+        gap: var(--mdst-space-2);
       }
     }
   }
