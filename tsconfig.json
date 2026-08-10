@@ -31,11 +31,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
 	},
-	"include": [
-		"apps/*",
-		"src/*",
-		"**/*.config.ts"
-	],
 	"exclude": [
 		"dist",
 		"node_modules"

@@ -80,6 +80,14 @@ const { copy, copyPending } = useClipboard();
       >
         Copy Login Phrease, Don't Lose it!
       </button>
+
+      <button
+        v-if='loginState.state === "idle" && loginState.mnemonic'
+        class="mdst-button"
+        @click="handleLogin"
+      >
+        Login
+      </button>
     </div>
   </div>
 </template>
