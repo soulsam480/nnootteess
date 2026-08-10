@@ -8,3 +8,8 @@ Cross-Origin-Opener-Policy = "same-origin"
 [build]
 command = "bun run build:app"
 publish = "apps/web/dist"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
