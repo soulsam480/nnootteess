@@ -11,6 +11,7 @@ export default defineConfig({
       "@": `${path.resolve(import.meta.dirname, "src")}`,
     },
   },
+  publicDir: "../../public",
   build: {
     rollupOptions: {
       input: {
