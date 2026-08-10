@@ -4,10 +4,17 @@ import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";
 import Sidebar from "@/components/sidebar.vue";
 import Tab from "@/components/tab.vue";
+import { LocalStorage, storageKey } from "@/storage/local";
 import { state } from "@/storage/state";
 import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
-import { Suspense } from "vue";
+import { provide, Suspense } from "vue";
+
+const props = defineProps<{
+  storage: LocalStorage;
+}>();
+
+provide(storageKey, props.storage);
 </script>
 
 <template>

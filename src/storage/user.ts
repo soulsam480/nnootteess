@@ -4,15 +4,16 @@
 // 1. as soon as you register/login, you promote self to a superadmin
 // 2. the benefit of this is all of your logins across devices, can have
 //  full access to ypur data
-// 3. the mnemonic is stored in chrome.storage.local for 15 minutes
+// 3. the mnemonic is stored in local storage for 15 minutes
 
 import { sm } from "@/storage/db";
 import { Directory, directory, startDirectory } from "@/storage/directory";
 import { startState, state } from "@/storage/state";
 import { NodeObject } from "genosdb";
 import { reactive, toRaw, watch } from "vue";
+import { LocalStorage } from "@/storage/local";
 
-export interface User {
+interface UserState {
   id: string | null;
   state: "authenticated" | "inactive";
 }
@@ -26,7 +27,7 @@ const PASS_KEY = "__pass__";
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
-const user = reactive<User>({
+const user = reactive<UserState>({
   id: null,
   state: "inactive",
 });
@@ -79,7 +80,7 @@ sm().setSecurityStateChangeCallback((authState) => {
 
 // ============== HANDLERS ================
 
-async function login(previousMemonic?: string) {
+async function login(storage: LocalStorage, previousMemonic?: string) {
   const identity: Record<string, string> | null = previousMemonic
     ? await sm().loginOrRecoverUserWithMnemonic(previousMemonic)
     : await sm().startNewUserRegistration();
@@ -94,16 +95,16 @@ async function login(previousMemonic?: string) {
     await sm().loginOrRecoverUserWithMnemonic(mnemonic);
   }
 
-  await persistMnemonicUnsafe(mnemonic);
+  await persistMnemonicUnsafe(mnemonic, storage);
 
   await sm().assignRole(address, "superadmin");
 
   return { address, mnemonic };
 }
 
-async function logout() {
+async function logout(storage: LocalStorage) {
   await sm().clearSecurity();
-  await chrome.storage.local.remove(PASS_KEY);
+  await storage.remove(PASS_KEY);
   user.id = null;
   user.state = "inactive";
 }
@@ -112,30 +113,28 @@ async function logout() {
 // since web authentication is not available inside
 // chrome extensions
 
-async function persistMnemonicUnsafe(mnemonic: string) {
-  await chrome.storage.local.set({
-    [PASS_KEY]: {
-      mnemonic,
-      at: Date.now(),
-    },
+async function persistMnemonicUnsafe(mnemonic: string, storage: LocalStorage) {
+  await storage.set(PASS_KEY, {
+    mnemonic,
+    at: Date.now(),
   });
 }
 
-async function tryRecoverAndLogin() {
-  const result = await chrome.storage.local.get(PASS_KEY);
+async function tryRecoverAndLogin(storage: LocalStorage) {
+  const result = await storage.get<Partial<PersistedMemonic>>(PASS_KEY);
 
-  const { mnemonic, at } = (result?.[PASS_KEY] ?? {}) as Partial<PersistedMemonic>;
+  const { mnemonic, at } = result ?? {};
 
   if (!mnemonic || !at) {
     return;
   }
 
   if (Date.now() - at > FIFTEEN_MINUTES) {
-    await chrome.storage.local.remove(PASS_KEY);
+    await storage.remove(PASS_KEY);
     return;
   }
 
-  await login(mnemonic);
+  await login(storage, mnemonic);
 }
 
 export { login, user, tryRecoverAndLogin, logout };

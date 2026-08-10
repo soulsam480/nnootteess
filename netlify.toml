@@ -1,0 +1,10 @@
+[[headers]]
+for = "/*"
+
+[headers.values]
+Cross-Origin-Embedder-Policy = "require-corp"
+Cross-Origin-Opener-Policy = "same-origin"
+
+[build]
+command = "bun run build:app"
+publish = "apps/web/dist"

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { storageKey } from "@/storage/local";
 import { login } from "@/storage/user";
 import { useClipboard } from "@vueuse/core";
-import { shallowReactive } from "vue";
+import { inject, shallowReactive } from "vue";
 
 interface LoginState {
   state: "generated" | "idle";
@@ -13,10 +14,14 @@ const loginState = shallowReactive<LoginState>({
   mnemonic: "",
 });
 
+const storage = inject(storageKey);
+
 async function handleLogin() {
+  if (!storage) return;
+
   const phrase = loginState.mnemonic;
 
-  const id = await login(phrase || undefined);
+  const id = await login(storage, phrase || undefined);
 
   if (!id) {
     return;

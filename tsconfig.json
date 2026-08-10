@@ -29,8 +29,13 @@
 		"noEmit": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
 	},
+	"include": [
+		"apps/*",
+		"src/*",
+		"**/*.config.ts"
+	],
 	"exclude": [
 		"dist",
 		"node_modules"

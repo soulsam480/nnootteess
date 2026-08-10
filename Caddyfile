@@ -1,0 +1,4 @@
+nnootteess.test {
+        tls internal
+	reverse_proxy localhost:5173
+}
