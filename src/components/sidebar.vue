@@ -4,8 +4,6 @@ import { setActiveNote } from "@/storage/state";
 import { ref } from "vue";
 import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
-import { invalidateQueries } from "@/storage/query";
-import { sync } from "@/storage/directory";
 import CarbonCode from "~icons/carbon/code";
 
 const isMakingNote = ref(false);
@@ -19,9 +17,6 @@ async function addNewNote() {
 
   setActiveNote(note.id);
 
-  invalidateQueries(noteAPI.queryKeys.all());
-  sync(note, "add");
-
   isMakingNote.value = false;
 }
 
@@ -33,9 +28,6 @@ async function addNewCode() {
   const note = await noteAPI.createCode("Untitled snippet", "json");
 
   setActiveNote(note.id);
-
-  invalidateQueries(noteAPI.queryKeys.all());
-  sync(note, "add");
 
   isMakingNote.value = false;
 }

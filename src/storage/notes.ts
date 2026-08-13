@@ -1,6 +1,7 @@
-import { sm } from "@/storage/db";
+import { db, sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
 import { camelCase, kebabCase } from "scule";
+import { onBeforeUnmount, Ref, ref } from "vue";
 
 interface CommonNote {
   name: string;
@@ -25,6 +26,11 @@ const LANGUAGES = ["json"] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 
+export interface INotesState {
+  notes: NodeObject<Omit<Note, "content"> & { content?: string }>[];
+  index: Set<string>;
+}
+
 const LANGUAGE_TO_EXT = {
   json: "json",
   javascript: "js",
@@ -34,19 +40,73 @@ const LANGUAGE_TO_EXT = {
   markdown: "md",
 };
 
-const queryKeys = {
-  all() {
-    return "notes";
-  },
-  find(id: string) {
-    return `notes/${id}`;
-  },
-};
+const notes = ref<INotesState>({
+  index: new Set(),
+  notes: [],
+});
+
+async function startNotes(isLoggedIn: Ref<boolean>) {
+  async function sync() {
+    if (!isLoggedIn.value) {
+      return;
+    }
+
+    const state = await all();
+
+    notes.value = {
+      index: state.reduce((acc, curr) => {
+        acc.add(curr.id);
+
+        return acc;
+      }, new Set<string>()),
+      notes: state,
+    };
+  }
+
+  await sync();
+
+  db().map({}, ({ action }) => {
+    if (action !== "initial") {
+      sync();
+    }
+  });
+
+  return notes;
+}
+
+async function useNote(id: string, onRemove: (id: string) => void) {
+  const note = ref<NodeObject<Note>>();
+
+  let unsub: (() => void) | undefined;
+
+  onBeforeUnmount(() => {
+    unsub?.();
+  });
+
+  const { unsubscribe, result } = await sm().get(id, (node) => {
+    if (!node?.value) {
+      onRemove(id);
+      return;
+    }
+
+    note.value = node;
+  });
+
+  if (result?.value) {
+    note.value = result;
+  } else {
+    onRemove(id);
+  }
+
+  unsub = unsubscribe;
+
+  return note;
+}
 
 async function all(): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
   const { results } = await sm().map({
     query: {
-      type: "note",
+      type: { $in: ["note", "code"] },
     },
   });
 
@@ -109,14 +169,14 @@ function noteToFileName(note: CodeNote): string {
 }
 
 export {
-  all,
   create,
-  find,
   update,
   delete_ as delete,
-  queryKeys,
   createCode,
+  useNote,
   LANGUAGES,
+  notes,
+  startNotes,
   LANGUAGE_TO_EXT,
   noteToFileName,
 };

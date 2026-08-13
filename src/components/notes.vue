@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { directory, sync } from "@/storage/directory";
 import * as noteAPI from "@/storage/notes";
-import { invalidateQueries } from "@/storage/query";
 import { removeOpenNote, setActiveNote, state } from "@/storage/state";
 import { computed } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
@@ -15,37 +13,27 @@ async function deleteNote(
   removeOpenNote(note.id);
 
   await noteAPI.delete(note.id);
-  sync(note, "remove");
-  invalidateQueries(noteAPI.queryKeys.all());
 }
 
 const hasNotes = computed(() => {
-  if (!directory.value) {
-    return false;
-  }
-
-  for (const _k in directory.value.value.notes) {
-    return true;
-  }
-
-  return false;
+  return noteAPI.notes.value.notes.length > 0;
 });
 </script>
 
 <template>
-  <ul class="notes" v-if="directory">
+  <ul class="notes">
     <li
-      v-for="(noteName, noteId) in directory.value.notes"
+      v-for="note in noteAPI.notes.value.notes"
       class="link"
-      :class="{ active: state.active_note === noteId }"
-      @click="setActiveNote(noteId)"
+      :class="{ active: state.active_note === note.id }"
+      @click="setActiveNote(note.id)"
     >
       <div class="mdst-truncate">
-        {{ noteName }}
+        {{ note.value.name }}
       </div>
       <span class="link__actions">
         <span
-          @click="deleteNote($event, { id: noteId, value: { name: noteName } })"
+          @click="deleteNote($event, note)"
           class="link__actions--delete"
         >
           <CarbonTrashCan />

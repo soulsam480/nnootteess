@@ -18,14 +18,9 @@ const state = shallowReactive<State>({
 const STATE_ID = "__state__";
 
 async function bootstrap() {
-  const { results } = await sm().map({
-    query: {
-      type: "directory",
-    },
-    $limit: 1,
-  });
+  const { result } = await sm().get(STATE_ID);
 
-  if (results.length === 0) {
+  if (!result) {
     await sm().put(
       {
         type: "state",

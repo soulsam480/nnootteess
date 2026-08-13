@@ -2,39 +2,28 @@
 import * as notesAPI from "@/storage/notes";
 import Editor from "./editor.vue";
 import { onMounted, ref } from "vue";
-import { NodeObject } from "genosdb";
 import { watchDebounced } from "@vueuse/core";
-import { invalidateQueries } from "@/storage/query";
-import { sync } from "@/storage/directory";
-import { removeOpenNote } from "@/storage/state";
 import MonacoEditor from "./monaco-editor.vue";
 import { titleCase } from "scule";
+import { removeOpenNote } from "@/storage/state";
 
 const props = defineProps<{
   id: string;
 }>();
 
-const note = ref<NodeObject<notesAPI.Note>>();
-
 const areDepsLoading = ref(false);
 
-try {
-  note.value = await notesAPI.find(props.id);
-} catch (e) {
-  removeOpenNote(props.id);
-  console.error(e);
-}
+const note = await notesAPI.useNote(props.id, removeOpenNote);
 
-async function save(name = false) {
+const content = ref(note.value?.value.content ?? "");
+
+async function save() {
   if (!note.value) return;
 
-  note.value = await notesAPI.update(note.value.id, { ...note.value.value });
-
-  invalidateQueries(notesAPI.queryKeys.all());
-
-  if (name) {
-    sync(note.value, "add");
-  }
+  await notesAPI.update(note.value.id, {
+    ...note.value.value,
+    content: content.value,
+  });
 }
 
 async function loadDeps() {
@@ -70,7 +59,7 @@ onMounted(() => {
 });
 
 watchDebounced(
-  () => note.value?.value.content,
+  content,
   () => {
     save();
   },
@@ -94,7 +83,7 @@ watchDebounced(
           class="mdst-input"
           placeholder="Please enter a name fo the note"
           v-model="note.value.name"
-          @keyup.enter="save(true)"
+          @keyup.enter="save()"
         />
 
         <select
@@ -110,13 +99,13 @@ watchDebounced(
 
       <Editor
         v-if='note.value.type === "note"'
-        v-model="note.value.content"
+        v-model="content"
       />
 
       <MonacoEditor
         v-else-if='note.value.type === "code" && !areDepsLoading'
         theme="nord"
-        v-model="note.value.content"
+        v-model="content"
         :language="note.value.language"
         :filename="notesAPI.noteToFileName(note.value)"
       />

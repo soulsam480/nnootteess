@@ -11,13 +11,13 @@
     "format": "bun oxfmt"
   },
   "dependencies": {
-    "@milkdown/crepe": "^7.22.0",
-    "@milkdown/kit": "^7.22.0",
-    "@milkdown/theme-nord": "^7.22.0",
-    "@milkdown/vue": "^7.22.0",
+    "@milkdown/crepe": "^7.22.1",
+    "@milkdown/kit": "^7.22.1",
+    "@milkdown/theme-nord": "^7.22.1",
+    "@milkdown/vue": "^7.22.1",
     "@shikijs/monaco": "^4.4.3",
     "@vueuse/core": "^14.4.0",
-    "genosdb": "^0.23.0",
+    "genosdb": "^0.23.1",
     "mdst-ui": "^1.0.3",
     "monaco-editor": "^0.56.0",
     "prettier": "^3.9.6",
@@ -40,5 +40,8 @@
     "vite-plugin-vue-devtools": "^8.2.1",
     "vite-plugin-zip-pack": "^1.2.4",
     "vue-tsc": "^3.2.5"
+  },
+  "patchedDependencies": {
+    "genosdb@0.23.1": "patches/genosdb@0.23.1.patch"
   }
 }

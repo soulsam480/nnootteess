@@ -7,11 +7,10 @@
 // 3. the mnemonic is stored in local storage for 15 minutes
 
 import { sm } from "@/storage/db";
-import { Directory, directory, startDirectory } from "@/storage/directory";
 import { startState, state } from "@/storage/state";
-import { NodeObject } from "genosdb";
-import { reactive, toRaw, watch } from "vue";
+import { computed, reactive, toRaw, watch } from "vue";
 import { LocalStorage } from "@/storage/local";
+import { INotesState, startNotes } from "@/storage/notes";
 
 interface UserState {
   id: string | null;
@@ -32,21 +31,18 @@ const user = reactive<UserState>({
   state: "inactive",
 });
 
-let directoryUnsub: (() => void) | undefined;
+const isLoggedIn = computed(() => user.state === "authenticated");
+
 let syncUnsub: (() => void) | undefined;
 
-function syncStateWithDirectory(dir: NodeObject<Directory> | null) {
-  if (!dir) {
-    return;
-  }
-
+function syncStateWithNotes(notes: INotesState) {
   let { active_note, open_notes } = toRaw(state);
 
-  if (active_note && !dir.value.notes[active_note]) {
+  if (active_note && !notes.index.has(active_note)) {
     active_note = null;
   }
 
-  const available = open_notes.filter((it) => dir.value.notes[it]);
+  const available = open_notes.filter((it) => notes.index.has(it));
 
   if (available.length) {
     open_notes = available;
@@ -61,19 +57,15 @@ sm().setSecurityStateChangeCallback((authState) => {
     user.id = authState.activeAddress;
     user.state = "authenticated";
 
-    directoryUnsub?.();
-
-    startDirectory().then((sub) => {
-      directoryUnsub = sub;
-    });
-
     startState();
-    syncStateWithDirectory(directory.value);
 
-    const { stop } = watch(directory, syncStateWithDirectory);
-    syncUnsub = stop;
+    startNotes(isLoggedIn).then((initial) => {
+      syncStateWithNotes(initial.value);
+
+      const { stop } = watch(initial, syncStateWithNotes);
+      syncUnsub = stop;
+    });
   } else {
-    directoryUnsub?.();
     syncUnsub?.();
   }
 });

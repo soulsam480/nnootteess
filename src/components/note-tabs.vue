@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { directory } from "@/storage/directory";
+import { notes } from "@/storage/notes";
 import { removeOpenNote, setActiveNote, state } from "@/storage/state";
 import { computed } from "vue";
 import CarbonClose from "~icons/carbon/close";
 
 const tabs = computed(() => {
-  return state.open_notes.slice().map((it) => {
-    return [it, directory.value?.value.notes[it] ?? "Deleted"];
-  }) as [string, string][];
+  return notes.value.notes.filter((it) => state.open_notes.includes(it.id));
 });
 
 function handleRemove(e: MouseEvent, id: string) {
@@ -20,7 +18,7 @@ function handleRemove(e: MouseEvent, id: string) {
 <template>
   <div class="mdst-tabs-list" role="tablist" v-if="tabs.length">
     <button
-      v-for="[noteId, noteName] in tabs"
+      v-for="{ id: noteId, value: { name: noteName } } in tabs"
       class="mdst-tab"
       role="tab"
       :data-state='state.active_note === noteId ? "active" : "inactive"'

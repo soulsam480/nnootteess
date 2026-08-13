@@ -1,3 +1,9 @@
+/**
+ * NOTE:
+ * @deprecated
+ * This library is unused for now
+ */
+
 import { sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
 import { ref } from "vue";
