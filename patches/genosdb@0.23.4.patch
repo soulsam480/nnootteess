@@ -1,3 +1,6 @@
+diff --git a/node_modules/genosdb/.bun-tag-ac000c9a16173496 b/.bun-tag-ac000c9a16173496
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/dist/sm.min.js b/dist/sm.min.js
 index 3d658b4cd1716dae0c3f9714eb65b9323a7e3f85..695bc62198486b4859a93faac3e0475a8213d921 100644
 --- a/dist/sm.min.js

@@ -52,6 +52,6 @@
     "@codemirror/view": "6.43.8"
   },
   "patchedDependencies": {
-    "genosdb@0.23.1": "patches/genosdb@0.23.1.patch"
+    "genosdb@0.23.4": "patches/genosdb@0.23.4.patch"
   }
 }

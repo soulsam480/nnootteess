@@ -44,6 +44,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "genosdb@0.23.4": "patches/genosdb@0.23.4.patch",
+  },
   "overrides": {
     "@codemirror/view": "6.43.8",
   },
