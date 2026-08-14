@@ -22,7 +22,7 @@ interface CodeNote extends CommonNote {
 
 export type Note = TextNote | CodeNote;
 
-const LANGUAGES = ["json"] as const;
+const LANGUAGES = ["json", "javascript", "typescript"] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 

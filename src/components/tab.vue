@@ -3,15 +3,13 @@ import * as notesAPI from "@/storage/notes";
 import Editor from "./editor.vue";
 import { onMounted, ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import MonacoEditor from "./monaco-editor.vue";
+import MonacoEditor from "./code-editor.vue";
 import { titleCase } from "scule";
 import { removeOpenNote } from "@/storage/state";
 
 const props = defineProps<{
   id: string;
 }>();
-
-const areDepsLoading = ref(false);
 
 const note = await notesAPI.useNote(props.id, removeOpenNote);
 
@@ -23,26 +21,6 @@ async function save() {
   await notesAPI.update(note.value.id, {
     ...note.value.value,
     content: content.value,
-  });
-}
-
-async function loadDeps() {
-  const [shiki, formatter] = await Promise.all([
-    import("@/utils/shiki"),
-    import("@/utils/prettier"),
-  ]);
-
-  await Promise.all([
-    shiki.registerHighlighter(),
-    formatter.registerFormatter(),
-  ]);
-}
-
-if (note.value?.value.type === "code") {
-  areDepsLoading.value = true;
-
-  loadDeps().finally(() => {
-    areDepsLoading.value = false;
   });
 }
 
@@ -103,17 +81,11 @@ watchDebounced(
       />
 
       <MonacoEditor
-        v-else-if='note.value.type === "code" && !areDepsLoading'
+        v-else-if='note.value.type === "code"'
         theme="nord"
         v-model="content"
         :language="note.value.language"
-        :filename="notesAPI.noteToFileName(note.value)"
       />
-
-      <div v-if="areDepsLoading">
-        <span class="mdst-spinner" role="status" aria-label="Loading"></span>
-        Loading editor dependencies...
-      </div>
     </template>
 
     <div v-else>
