@@ -1,0 +1,29 @@
+.milkdown {
+  --crepe-color-background: #282c34; /* background */
+  --crepe-color-on-background: #abb2bf; /* ivory */
+  --crepe-color-surface: #21252b; /* darkBackground */
+  --crepe-color-surface-low: #21252b; /* darkBackground */
+  --crepe-color-on-surface: #abb2bf; /* ivory */
+  --crepe-color-on-surface-variant: #7d8799; /* stone, matches CM gutter fg */
+  --crepe-color-outline: #98c379; /* stone */
+  --crepe-color-primary: #61afef; /* malibu, matches CM function/label color */
+  --crepe-color-secondary: #2c313a; /* highlightBackground */
+  --crepe-color-on-secondary: #abb2bf; /* ivory */
+  --crepe-color-inverse: #abb2bf; /* ivory */
+  --crepe-color-on-inverse: #282c34; /* background */
+  --crepe-color-inline-code: #e06c75; /* coral, matches CM name/propertyName */
+  --crepe-color-error: #e06c75; /* coral */
+  --crepe-color-hover: #2c313a; /* highlightBackground */
+  --crepe-color-selected: #3e4451; /* selection, exact CM value */
+  --crepe-color-inline-area: #21252b; /* darkBackground */
+
+  --crepe-font-code: "JetBrains Mono", Menlo, Monaco, "Courier New", Courier, monospace;
+
+  --crepe-shadow-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.45);
+  --crepe-shadow-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.45);
+}
+
+.cm-cursor,
+.cm-dropCursor {
+  border-left-color: #528bff !important; /* cursor */
+}

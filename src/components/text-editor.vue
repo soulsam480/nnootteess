@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { Crepe } from "@milkdown/crepe";
+import { oneDark } from "@codemirror/theme-one-dark";
 
 const props = defineProps<{
   modelValue: string;
@@ -14,6 +15,11 @@ useEditor((root) => {
   const crepe = new Crepe({
     root,
     defaultValue: props.modelValue,
+    featureConfigs: {
+      [Crepe.Feature.CodeMirror]: {
+        extensions: [oneDark],
+      },
+    },
   });
 
   crepe.on((listener) => {

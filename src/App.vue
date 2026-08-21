@@ -8,13 +8,20 @@ import { LocalStorage, storageKey } from "@/storage/local";
 import { state } from "@/storage/state";
 import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
-import { provide, Suspense } from "vue";
+import { computed, provide, Suspense, watch } from "vue";
 
 const props = defineProps<{
   storage: LocalStorage;
 }>();
 
 provide(storageKey, props.storage);
+
+const drawer = computed(() => state.drawer_open ?? false);
+
+watch(
+  drawer,
+  (state) => document.body.dataset.drawerOpen = state.toString(),
+);
 </script>
 
 <template>

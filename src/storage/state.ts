@@ -6,6 +6,7 @@ interface State {
   open_notes: string[];
   active_note: string | null;
   theme: string | null;
+  drawer_open: boolean;
 }
 
 const state = shallowReactive<State>({
@@ -13,6 +14,7 @@ const state = shallowReactive<State>({
   active_note: null,
   theme: null,
   open_notes: [],
+  drawer_open: false,
 });
 
 const STATE_ID = "__state__";
@@ -27,6 +29,7 @@ async function bootstrap() {
         active_note: null,
         theme: null,
         open_notes: [],
+        drawer_open: false,
       } satisfies State,
       STATE_ID,
     );
@@ -42,6 +45,7 @@ async function startState() {
     state.active_note = result.value.active_note;
     state.open_notes = result.value.open_notes;
     state.theme = result.value.theme;
+    state.drawer_open = result.value.drawer_open;
   }
 }
 
@@ -84,4 +88,10 @@ function setTheme(theme: string | null): void {
   updateState(toRaw(state));
 }
 
-export { state, setActiveNote, setTheme, startState, removeOpenNote };
+function toggleDrawer(value?: boolean) {
+  state.drawer_open = value ?? !state.drawer_open;
+
+  updateState(toRaw(state));
+}
+
+export { state, setActiveNote, setTheme, startState, removeOpenNote, toggleDrawer };

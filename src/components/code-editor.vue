@@ -1,22 +1,28 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { EditorState, type Extension, StateEffect } from "@codemirror/state";
-import { EditorView, keymap } from "@codemirror/view";
+import {
+  EditorView,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  keymap,
+} from "@codemirror/view";
 import {
   defaultKeymap,
   history,
   historyKeymap,
   indentWithTab,
 } from "@codemirror/commands";
-import { bracketMatching, indentOnInput } from "@codemirror/language";
+import {
+  bracketMatching,
+  foldGutter,
+  indentOnInput,
+} from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { lineNumbers } from "@codemirror/view";
-
-import {
-  getLanguageExtension,
-  nordHighlighting,
-  nordTheme,
-} from "@/utils/codemirror";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { getLanguageExtension } from "@/utils/codemirror";
 import { formatCode } from "@/utils/prettier";
 
 const props = defineProps<{
@@ -93,22 +99,21 @@ async function formatDocumentAsync(view: EditorView): Promise<void> {
 function buildExtensions(): Extension[] {
   const extensions: Extension[] = [
     getLanguageExtension(props.language),
-
-    nordTheme,
-    nordHighlighting,
-
     history(),
-
+    oneDark,
     bracketMatching(),
-
     closeBrackets(),
-
     indentOnInput(),
-
+    highlightActiveLine(),
+    highlightActiveLineGutter(),
+    highlightSelectionMatches(),
+    lineNumbers(),
+    foldGutter(),
     keymap.of([
       ...defaultKeymap,
       ...historyKeymap,
       ...closeBracketsKeymap,
+      ...searchKeymap,
       indentWithTab,
       {
         key: "Mod-Shift-f",
@@ -138,9 +143,6 @@ function buildExtensions(): Extension[] {
       },
     }),
   ];
-
-  extensions.push(lineNumbers());
-  extensions.push(EditorView.lineWrapping);
 
   return extensions;
 }

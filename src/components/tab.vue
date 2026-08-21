@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
-import Editor from "./editor.vue";
+import TextEditor from "./text-editor.vue";
 import { onMounted, ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import MonacoEditor from "./code-editor.vue";
+import CodeEditor from "./code-editor.vue";
 import { titleCase } from "scule";
 import { removeOpenNote } from "@/storage/state";
 
@@ -68,6 +68,7 @@ watchDebounced(
           v-if='note.value.type === "code"'
           class="mdst-dropdown"
           v-model="note.value.language"
+          @change="save()"
         >
           <option v-for="language in notesAPI.LANGUAGES" :value="language">
             {{ titleCase(language) }}
@@ -75,12 +76,12 @@ watchDebounced(
         </select>
       </div>
 
-      <Editor
+      <TextEditor
         v-if='note.value.type === "note"'
         v-model="content"
       />
 
-      <MonacoEditor
+      <CodeEditor
         v-else-if='note.value.type === "code"'
         theme="nord"
         v-model="content"

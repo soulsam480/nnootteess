@@ -15,19 +15,21 @@ interface TextNote extends CommonNote {
   type: "note";
 }
 
-interface CodeNote extends CommonNote {
+export interface CodeNote extends CommonNote {
   type: "code";
   language: Language;
 }
 
 export type Note = TextNote | CodeNote;
 
+export type TListNote = Omit<Note, "content"> & { content?: string };
+
 const LANGUAGES = ["json", "javascript", "typescript"] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 
 export interface INotesState {
-  notes: NodeObject<Omit<Note, "content"> & { content?: string }>[];
+  notes: NodeObject<TListNote>[];
   index: Set<string>;
 }
 
@@ -108,6 +110,8 @@ async function all(): Promise<NodeObject<Omit<Note, "content"> & { content?: str
     query: {
       type: { $in: ["note", "code"] },
     },
+    field: "created_at",
+    order: "desc",
   });
 
   return results.map((it: NodeObject<Note>) => {

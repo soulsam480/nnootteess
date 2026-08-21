@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
-import { removeOpenNote, setActiveNote, state } from "@/storage/state";
+import {
+  removeOpenNote,
+  setActiveNote,
+  state,
+  toggleDrawer,
+} from "@/storage/state";
 import { computed } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
+import CarbonDocument from "~icons/carbon/document";
+import CarbonCode from "~icons/carbon/code";
+import { formatDate } from "@/utils/date";
+import { useMediaQuery } from "@vueuse/core";
+import { NodeObject } from "genosdb";
+import { LANG_TO_COLOR } from "@/utils/codemirror";
 
 async function deleteNote(
   event: Event,
@@ -18,6 +29,16 @@ async function deleteNote(
 const hasNotes = computed(() => {
   return noteAPI.notes.value.notes.length > 0;
 });
+
+const isSmallScreen = useMediaQuery("(max-width: 425px)");
+
+function handleClick(note: NodeObject<noteAPI.TListNote>) {
+  setActiveNote(note.id);
+
+  if (isSmallScreen.value) {
+    toggleDrawer(false);
+  }
+}
 </script>
 
 <template>
@@ -26,11 +47,24 @@ const hasNotes = computed(() => {
       v-for="note in noteAPI.notes.value.notes"
       class="link"
       :class="{ active: state.active_note === note.id }"
-      @click="setActiveNote(note.id)"
+      @click="handleClick(note)"
+      :title="formatDate(note.value.created_at)"
     >
-      <div class="mdst-truncate">
+      <span
+        class="link__icon"
+        :style="{
+          color: LANG_TO_COLOR[(note.value as noteAPI.CodeNote).language] ??
+            LANG_TO_COLOR.md,
+        }"
+      >
+        <CarbonDocument v-if='note.value.type === "note"' />
+        <CarbonCode
+          v-else-if='note.value.type === "code"'
+        />
+      </span>
+      <span class="mdst-truncate">
         {{ note.value.name }}
-      </div>
+      </span>
       <span class="link__actions">
         <span
           @click="deleteNote($event, note)"

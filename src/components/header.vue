@@ -4,6 +4,7 @@ import { storageKey } from "@/storage/local";
 import { logout, user } from "@/storage/user";
 import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
+import DrawerToggle from "./drawer-toggle.vue";
 
 const storage = inject(storageKey);
 
@@ -16,8 +17,12 @@ function handleLogout() {
 
 <template>
   <div class="header">
-    <div class="home">
-      NNOOTTEESS
+    <div class="header-left">
+      <DrawerToggle />
+
+      <div class="home">
+        NNOOTTEESS
+      </div>
     </div>
 
     <div class="user">

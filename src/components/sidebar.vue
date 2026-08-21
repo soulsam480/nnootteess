@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
-import { setActiveNote } from "@/storage/state";
-import { ref } from "vue";
+import { setActiveNote, state } from "@/storage/state";
+import { computed, ref } from "vue";
 import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
 import CarbonCode from "~icons/carbon/code";
+import DrawerToggle from "@/components/drawer-toggle.vue";
 
 const isMakingNote = ref(false);
 
@@ -31,28 +32,38 @@ async function addNewCode() {
 
   isMakingNote.value = false;
 }
+
+const drawer = computed(() => state.drawer_open ?? false);
 </script>
 
 <template>
-  <div class="sidebar">
-    <div class="sidebar__actions">
-      <button
-        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
-        @click="addNewNote"
-        data-tooltip="Add a new note"
-      >
-        <CarbonDocumentAdd />
-      </button>
+  <dialog
+    class="mdst-drawer mdst-drawer--left sidebar"
+    :open="drawer"
+    @close.prevent=""
+  >
+    <div class="mdst-drawer-body">
+      <div class="sidebar__actions">
+        <button
+          class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+          @click="addNewNote"
+          data-tooltip="Add a new note"
+        >
+          <CarbonDocumentAdd />
+        </button>
 
-      <button
-        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
-        @click="addNewCode"
-        data-tooltip="Add code snippet"
-      >
-        <CarbonCode />
-      </button>
+        <button
+          class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+          @click="addNewCode"
+          data-tooltip="Add code snippet"
+        >
+          <CarbonCode />
+        </button>
+
+        <DrawerToggle />
+      </div>
+
+      <Notes />
     </div>
-
-    <Notes />
-  </div>
+  </dialog>
 </template>

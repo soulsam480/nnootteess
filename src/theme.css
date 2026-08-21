@@ -71,18 +71,30 @@ body {
   width: 100vw;
 }
 
+@media screen and (min-width: 425px) {
+  [data-drawer-open="true"] .header,
+  [data-drawer-open="true"] .arena {
+    margin-left: 20rem;
+  }
+}
+
 #app {
   height: 100%;
   display: flex;
   flex-direction: column;
 
   .header {
-    min-height: var(--mdst-space-8);
     border-bottom: 1px solid var(--mdst-color-border);
     display: flex;
     align-items: center;
-    padding: 0 var(--mdst-space-2);
+    padding: var(--mdst-space-1) var(--mdst-space-2);
     justify-content: space-between;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--mdst-space-1);
+    }
 
     .home {
       display: block;
@@ -107,8 +119,6 @@ body {
 
   .arena {
     flex-grow: 1;
-    display: grid;
-    grid-template-columns: 1.5fr 5.5fr;
     padding: calc(var(--spacing) * 2);
 
     > * {
@@ -116,7 +126,21 @@ body {
     }
 
     .sidebar {
-      border-right: 1px solid var(--mdst-color-border);
+      z-index: 10;
+
+      .mdst-drawer-body {
+        padding: 0;
+      }
+
+      .drawer-toggle {
+        margin-left: auto;
+      }
+
+      @media screen and (min-width: 425px) {
+        .drawer-toggle {
+          display: none;
+        }
+      }
 
       .sidebar__actions {
         padding: var(--mdst-space-1) var(--mdst-space-2);
@@ -129,6 +153,8 @@ body {
 
       ul.notes {
         padding: var(--mdst-space-2);
+        display: flex;
+        flex-direction: column;
       }
 
       .link {
@@ -144,6 +170,9 @@ body {
         transition:
           color var(--mdst-transition),
           background var(--mdst-transition);
+        display: inline-flex;
+        gap: var(--mdst-space-1);
+        align-items: center;
 
         div {
           width: calc(100% - 32px);
@@ -175,12 +204,13 @@ body {
 
       .link.active {
         color: var(--mdst-color-fg);
+        font-weight: 600;
       }
     }
 
     .mdst-tab {
       position: relative;
-      max-width: calc(var(--mdst-space-8) * 6);
+      width: calc(var(--mdst-space-8) * 4);
 
       &:hover .tab__actions {
         display: flex;
