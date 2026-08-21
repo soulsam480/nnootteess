@@ -3,7 +3,7 @@ import * as notesAPI from "@/storage/notes";
 import TextEditor from "./text-editor.vue";
 import { onMounted, ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import CodeEditor from "./code-editor.vue";
+import CodeEditor, { editorVimEnabled } from "./code-editor.vue";
 import { titleCase } from "scule";
 import { removeOpenNote } from "@/storage/state";
 
@@ -74,6 +74,15 @@ watchDebounced(
             {{ titleCase(language) }}
           </option>
         </select>
+
+        <label class="mdst-checkbox-label">
+          Vim
+          <input
+            v-model="editorVimEnabled"
+            type="checkbox"
+            class="mdst-checkbox--toggle"
+          />
+        </label>
       </div>
 
       <TextEditor

@@ -71,13 +71,6 @@ body {
   width: 100vw;
 }
 
-@media screen and (min-width: 425px) {
-  [data-drawer-open="true"] .header,
-  [data-drawer-open="true"] .arena {
-    margin-left: 20rem;
-  }
-}
-
 #app {
   height: 100%;
   display: flex;
@@ -253,10 +246,23 @@ body {
 
       &[data-note-type="code"] .editor-header {
         display: grid;
-        grid-template-columns: 9fr 3fr;
+        grid-template-columns: 8fr 3fr 1fr;
         gap: var(--mdst-space-2);
       }
     }
+  }
+}
+
+@media screen and (min-width: 425px) {
+  [data-drawer-open="true"] .header,
+  [data-drawer-open="true"] .arena {
+    margin-left: 20rem;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .milkdown .ProseMirror {
+    padding: 30px;
   }
 }
 

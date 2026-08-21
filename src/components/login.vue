@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storageKey } from "@/storage/local";
-import { login } from "@/storage/user";
+import { login, user } from "@/storage/user";
 import { useClipboard } from "@vueuse/core";
 import { inject, shallowReactive } from "vue";
 
@@ -19,7 +19,11 @@ const storage = inject(storageKey);
 async function handleLogin() {
   if (!storage) return;
 
-  const phrase = loginState.mnemonic;
+  const phrase = loginState.mnemonic || undefined;
+
+  if (!phrase) {
+    user.state = "copying";
+  }
 
   const id = await login(storage, phrase || undefined);
 
@@ -34,6 +38,15 @@ async function handleLogin() {
 }
 
 const { copy, copyPending } = useClipboard();
+
+async function handleCopy() {
+  if (!storage) return;
+
+  await copy(loginState.mnemonic);
+
+  user.state = "inactive";
+  login(storage, loginState.mnemonic);
+}
 </script>
 
 <template>
@@ -75,7 +88,7 @@ const { copy, copyPending } = useClipboard();
       <button
         v-if='loginState.state === "generated"'
         class="mdst-button"
-        @click="copy(loginState.mnemonic)"
+        @click="handleCopy()"
         :disabled="copyPending"
       >
         Copy Login Phrease, Don't Lose it!
@@ -96,6 +109,7 @@ const { copy, copyPending } = useClipboard();
 .login-dialog {
   min-width: 32rem;
   margin: auto;
+  padding: var(--mdst-space-4);
 
   .mdst-card-body {
     display: flex;

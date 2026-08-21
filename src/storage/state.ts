@@ -2,6 +2,7 @@ import { sm } from "@/storage/db";
 import { shallowReactive, toRaw } from "vue";
 
 interface State {
+  id?: string;
   type: "state";
   open_notes: string[];
   active_note: string | null;
@@ -10,6 +11,7 @@ interface State {
 }
 
 const state = shallowReactive<State>({
+  id: undefined,
   type: "state",
   active_note: null,
   theme: null,
@@ -17,40 +19,49 @@ const state = shallowReactive<State>({
   drawer_open: false,
 });
 
-const STATE_ID = "__state__";
-
 async function bootstrap() {
-  const { result } = await sm().get(STATE_ID);
+  const { results } = await sm().map({
+    query: {
+      type: { $eq: "state" },
+    },
+    $limit: 1,
+  });
+
+  let result = results[0];
 
   if (!result) {
-    await sm().put(
-      {
-        type: "state",
-        active_note: null,
-        theme: null,
-        open_notes: [],
-        drawer_open: false,
-      } satisfies State,
-      STATE_ID,
-    );
+    const id = await sm().put({
+      type: "state",
+      active_note: null,
+      theme: null,
+      open_notes: [],
+      drawer_open: false,
+    } satisfies State);
+
+    const value = await sm().get(id);
+
+    return value.result;
   }
+
+  return result;
 }
 
 async function startState() {
-  await bootstrap();
+  const result = await bootstrap();
 
-  const { result } = await sm().get(STATE_ID);
-
-  if (result?.value) {
-    state.active_note = result.value.active_note;
-    state.open_notes = result.value.open_notes;
-    state.theme = result.value.theme;
-    state.drawer_open = result.value.drawer_open;
+  if (!result?.value) {
+    return;
   }
+
+  state.id = result.id;
+  state.active_note = result.value.active_note;
+  state.open_notes = result.value.open_notes;
+  state.theme = result.value.theme;
+  state.drawer_open = result.value.drawer_open;
 }
 
-async function updateState(state: State): Promise<void> {
-  await sm().put(state, STATE_ID);
+async function updateState({ id, ...state }: State): Promise<void> {
+  await sm().put(state, id);
 }
 
 function setActiveNote(note: string | null): void {

@@ -42,27 +42,26 @@ const drawer = computed(() => state.drawer_open ?? false);
     :open="drawer"
     @close.prevent=""
   >
+    <div class="sidebar__actions">
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+        @click="addNewNote"
+        data-tooltip="Add a new note"
+      >
+        <CarbonDocumentAdd />
+      </button>
+
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+        @click="addNewCode"
+        data-tooltip="Add code snippet"
+      >
+        <CarbonCode />
+      </button>
+
+      <DrawerToggle />
+    </div>
     <div class="mdst-drawer-body">
-      <div class="sidebar__actions">
-        <button
-          class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
-          @click="addNewNote"
-          data-tooltip="Add a new note"
-        >
-          <CarbonDocumentAdd />
-        </button>
-
-        <button
-          class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
-          @click="addNewCode"
-          data-tooltip="Add code snippet"
-        >
-          <CarbonCode />
-        </button>
-
-        <DrawerToggle />
-      </div>
-
       <Notes />
     </div>
   </dialog>

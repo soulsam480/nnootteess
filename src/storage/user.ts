@@ -14,7 +14,7 @@ import { INotesState, startNotes } from "@/storage/notes";
 
 interface UserState {
   id: string | null;
-  state: "authenticated" | "inactive";
+  state: "authenticated" | "inactive" | "copying";
 }
 
 interface PersistedMemonic {
@@ -54,6 +54,10 @@ function syncStateWithNotes(notes: INotesState) {
 
 sm().setSecurityStateChangeCallback((authState) => {
   if (authState.isActive && authState.activeAddress) {
+    if (user.state === "copying") {
+      return;
+    }
+
     user.id = authState.activeAddress;
     user.state = "authenticated";
 

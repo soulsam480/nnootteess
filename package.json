@@ -26,6 +26,7 @@
     "@milkdown/crepe": "^7.22.1",
     "@milkdown/kit": "^7.22.1",
     "@milkdown/vue": "^7.22.1",
+    "@replit/codemirror-vim": "^6.4.0",
     "@vueuse/core": "^14.4.0",
     "genosdb": "^0.25.0",
     "mdst-ui": "^1.0.3",
@@ -50,7 +51,8 @@
     "vue-tsc": "^3.3.11"
   },
   "resolutions": {
-    "@codemirror/view": "6.43.8"
+    "@codemirror/view": "6.43.8",
+    "genosdb": "0.25.0"
   },
   "patchedDependencies": {
     "genosdb@0.25.0": "patches/genosdb@0.25.0.patch"

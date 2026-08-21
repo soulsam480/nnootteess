@@ -1,7 +1,17 @@
+<script lang="ts" module>
+export const editorVimEnabled = useStorage("vim_mode", true);
+</script>
+
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { EditorState, type Extension, StateEffect } from "@codemirror/state";
 import {
+  Compartment,
+  EditorState,
+  type Extension,
+  StateEffect,
+} from "@codemirror/state";
+import {
+  drawSelection,
   EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
@@ -24,6 +34,8 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { getLanguageExtension } from "@/utils/codemirror";
 import { formatCode } from "@/utils/prettier";
+import { vim } from "@replit/codemirror-vim";
+import { useStorage } from "@vueuse/core";
 
 const props = defineProps<{
   modelValue: string;
@@ -96,11 +108,15 @@ async function formatDocumentAsync(view: EditorView): Promise<void> {
   }
 }
 
+const vimCompartment = new Compartment();
+
 function buildExtensions(): Extension[] {
   const extensions: Extension[] = [
+    vimCompartment.of(vim()),
     getLanguageExtension(props.language),
     history(),
     oneDark,
+    drawSelection(),
     bracketMatching(),
     closeBrackets(),
     indentOnInput(),
@@ -218,6 +234,12 @@ watch(
     reconfigureLanguage();
   },
 );
+
+watch(editorVimEnabled, (state) => {
+  instance?.dispatch({
+    effects: vimCompartment.reconfigure(state ? vim() : []),
+  });
+});
 
 onMounted(() => {
   createEditor();
