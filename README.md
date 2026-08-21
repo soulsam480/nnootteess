@@ -78,6 +78,6 @@ bun run build:app
 Release zip will be in `release/`.
 
 ### Screenshots
+<img width="1276" height="1114" alt="image" src="https://github.com/user-attachments/assets/d4df34f3-ecb2-4084-b65c-e84c22c4668b" />
+<img width="420" height="927" alt="image" src="https://github.com/user-attachments/assets/f7b05b64-9048-4d9b-b32e-bc7b602962e0" />
 
-<img width="1470" height="832" alt="image" src="https://github.com/user-attachments/assets/32801df4-e9e3-43dc-af0f-b0e66fea03b8" />
-<img width="1470" height="832" alt="image" src="https://github.com/user-attachments/assets/0b2fa7cc-0a60-4b79-8ba2-67755bb9a6c1" />
