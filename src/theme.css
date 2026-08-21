@@ -246,8 +246,14 @@ body {
 
       &[data-note-type="code"] .editor-header {
         display: grid;
-        grid-template-columns: 8fr 3fr 1fr;
+        grid-template-columns: 9fr 3fr;
         gap: var(--mdst-space-2);
+
+        .code-actions {
+          display: flex;
+          align-items: center;
+          gap: var(--mdst-space-2);
+        }
       }
     }
   }

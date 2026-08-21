@@ -64,25 +64,29 @@ watchDebounced(
           @keyup.enter="save()"
         />
 
-        <select
+        <div
+          class="code-actions"
           v-if='note.value.type === "code"'
-          class="mdst-dropdown"
-          v-model="note.value.language"
-          @change="save()"
         >
-          <option v-for="language in notesAPI.LANGUAGES" :value="language">
-            {{ titleCase(language) }}
-          </option>
-        </select>
+          <select
+            class="mdst-dropdown"
+            v-model="note.value.language"
+            @change="save()"
+          >
+            <option v-for="language in notesAPI.LANGUAGES" :value="language">
+              {{ titleCase(language) }}
+            </option>
+          </select>
 
-        <label class="mdst-checkbox-label">
-          Vim
-          <input
-            v-model="editorVimEnabled"
-            type="checkbox"
-            class="mdst-checkbox--toggle"
-          />
-        </label>
+          <label class="mdst-checkbox-label">
+            Vim
+            <input
+              v-model="editorVimEnabled"
+              type="checkbox"
+              class="mdst-checkbox--toggle"
+            />
+          </label>
+        </div>
       </div>
 
       <TextEditor

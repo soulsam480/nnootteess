@@ -8,7 +8,7 @@ const tabs = computed(() => {
   return notes.value.notes.filter((it) => state.open_notes.includes(it.id));
 });
 
-function handleRemove(e: MouseEvent, id: string) {
+function handleRemove(e: Event, id: string) {
   e.stopPropagation();
 
   removeOpenNote(id);

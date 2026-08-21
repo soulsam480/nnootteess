@@ -15,6 +15,10 @@ useEditor((root) => {
   const crepe = new Crepe({
     root,
     defaultValue: props.modelValue,
+    features: {
+      [Crepe.Feature.ImageBlock]: false,
+      [Crepe.Feature.Latex]: false,
+    },
     featureConfigs: {
       [Crepe.Feature.CodeMirror]: {
         extensions: [oneDark],
