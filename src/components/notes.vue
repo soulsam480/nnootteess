@@ -30,7 +30,7 @@ const hasNotes = computed(() => {
   return noteAPI.notes.value.notes.length > 0;
 });
 
-const isSmallScreen = useMediaQuery("(max-width: 425px)");
+const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
 function handleClick(note: NodeObject<noteAPI.TListNote>) {
   setActiveNote(note.id);
