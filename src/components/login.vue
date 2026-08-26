@@ -107,7 +107,6 @@ async function handleCopy() {
 
 <style scoped>
 .login-dialog {
-  min-width: 32rem;
   margin: auto;
   padding: var(--mdst-space-4);
 

@@ -67,14 +67,18 @@ body {
   color: var(--mdst-color-fg);
   margin: 0;
   padding: 0;
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 #app {
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  &:has(.login-dialog) {
+    padding: var(--mdst-space-4);
+  }
 
   .header {
     border-bottom: 1px solid var(--mdst-color-border);
@@ -175,6 +179,7 @@ body {
           font-size: var(--mdst-text-sm);
           display: none;
           align-items: center;
+          gap: var(--mdst-space-1);
           position: absolute;
           top: 0;
           bottom: 0;
@@ -201,6 +206,15 @@ body {
       }
     }
 
+    .tabs-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+
+      .mdst-tabs-list:not(:last-child) {
+        border-right: 1px solid var(--mdst-color-border);
+      }
+    }
+
     .mdst-tab {
       position: relative;
       width: calc(var(--mdst-space-8) * 4);
@@ -223,6 +237,11 @@ body {
         gap: var(--mdst-space-1);
         display: none;
       }
+    }
+
+    .panels-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     }
 
     .editor-area {

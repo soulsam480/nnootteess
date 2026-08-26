@@ -5,6 +5,7 @@ import { logout, user } from "@/storage/user";
 import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
 import DrawerToggle from "./drawer-toggle.vue";
+import { editorVimEnabled } from "./code-editor.vue";
 
 const storage = inject(storageKey);
 
@@ -26,6 +27,15 @@ function handleLogout() {
     </div>
 
     <div class="user">
+      <label class="mdst-checkbox-label">
+        Vim
+        <input
+          v-model="editorVimEnabled"
+          type="checkbox"
+          class="mdst-checkbox--toggle mdst-checkbox--toggle-rounded"
+        />
+      </label>
+
       Logged in: <span>{{
         user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN"
       }}</span>

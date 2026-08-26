@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
-import {
-  removeOpenNote,
-  setActiveNote,
-  state,
-  toggleDrawer,
-} from "@/storage/state";
+import { toggleDrawer } from "@/storage/state";
 import { computed } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
+import CarbonSplitScreen from "~icons/carbon/split-screen";
 import { formatDate } from "@/utils/date";
 import { useMediaQuery } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
+import { activeNoteIds, closeNote, openNote } from "@/storage/groups";
 
 async function deleteNote(
   event: Event,
@@ -21,7 +18,7 @@ async function deleteNote(
 ) {
   event.stopPropagation();
 
-  removeOpenNote(note.id);
+  closeNote(note.id);
 
   await noteAPI.delete(note.id);
 }
@@ -32,8 +29,18 @@ const hasNotes = computed(() => {
 
 const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
-function handleClick(note: NodeObject<noteAPI.TListNote>) {
-  setActiveNote(note.id);
+function handleClick(
+  note: NodeObject<noteAPI.TListNote>,
+  event: MouseEvent | boolean,
+) {
+  if (event instanceof Event) {
+    event.stopPropagation();
+  }
+
+  openNote(
+    note.id,
+    typeof event === "boolean" ? event : event.ctrlKey || event.metaKey,
+  );
 
   if (isSmallScreen.value) {
     toggleDrawer(false);
@@ -46,8 +53,8 @@ function handleClick(note: NodeObject<noteAPI.TListNote>) {
     <li
       v-for="note in noteAPI.notes.value.notes"
       class="link"
-      :class="{ active: state.active_note === note.id }"
-      @click="handleClick(note)"
+      :class="{ active: activeNoteIds.has(note.id) }"
+      @click="handleClick(note, $event)"
       :title="formatDate(note.value.created_at)"
     >
       <span
@@ -66,6 +73,13 @@ function handleClick(note: NodeObject<noteAPI.TListNote>) {
         {{ note.value.name }}
       </span>
       <span class="link__actions">
+        <span
+          @click="handleClick(note, true)"
+          class="link__actions--split"
+        >
+          <CarbonSplitScreen />
+        </span>
+
         <span
           @click="deleteNote($event, note)"
           class="link__actions--delete"
