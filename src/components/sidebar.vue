@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
-import { setActiveNote, state } from "@/storage/state";
+import { state } from "@/storage/state";
 import { computed, ref } from "vue";
 import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
 import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
+import { openNote } from "@/storage/tabGroups";
 
 const isMakingNote = ref(false);
 
@@ -16,7 +17,7 @@ async function addNewNote() {
 
   const note = await noteAPI.create("Untitled");
 
-  setActiveNote(note.id);
+  openNote(note.id);
 
   isMakingNote.value = false;
 }
@@ -28,7 +29,7 @@ async function addNewCode() {
 
   const note = await noteAPI.createCode("Untitled snippet", "json");
 
-  setActiveNote(note.id);
+  openNote(note.id);
 
   isMakingNote.value = false;
 }

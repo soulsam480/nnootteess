@@ -67,14 +67,23 @@ body {
   color: var(--mdst-color-fg);
   margin: 0;
   padding: 0;
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 #app {
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  .mdst-input,
+  .mdst-dropdown {
+    padding: var(--mdst-space-xs) var(--mdst-space-sm);
+  }
+
+  &:has(.login-dialog) {
+    padding: var(--mdst-space-4);
+  }
 
   .header {
     border-bottom: 1px solid var(--mdst-color-border);
@@ -99,6 +108,11 @@ body {
       display: flex;
       align-items: center;
       gap: var(--mdst-space-2);
+
+      .vim-toggle {
+        border-right: 1px solid var(--mdst-color-border);
+        padding-right: var(--mdst-space-2);
+      }
 
       .user__logout {
         color: var(--mdst-color-error);
@@ -175,6 +189,7 @@ body {
           font-size: var(--mdst-text-sm);
           display: none;
           align-items: center;
+          gap: var(--mdst-space-1);
           position: absolute;
           top: 0;
           bottom: 0;
@@ -201,9 +216,19 @@ body {
       }
     }
 
+    .tabs-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+
+      .mdst-tabs-list:not(:last-child) {
+        border-right: 1px solid var(--mdst-color-border);
+      }
+    }
+
     .mdst-tab {
       position: relative;
-      width: calc(var(--mdst-space-8) * 4);
+      width: max-content;
+      max-width: calc(var(--mdst-space-8) * 4);
 
       &:hover .tab__actions {
         display: flex;
@@ -222,6 +247,21 @@ body {
         align-items: center;
         gap: var(--mdst-space-1);
         display: none;
+
+        &:hover {
+          color: var(--mdst-color-error);
+        }
+      }
+    }
+
+    .panels-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+      padding: var(--mdst-space-2);
+      gap: var(--mdst-space-2);
+
+      .mdst-tabs-panel {
+        padding-top: 0px;
       }
     }
 
@@ -229,7 +269,6 @@ body {
       display: flex;
       flex-direction: column;
       gap: var(--mdst-space-2);
-      padding: var(--mdst-space-2);
       height: 100%;
 
       div[data-milkdown-root] {
@@ -238,7 +277,7 @@ body {
 
       .milkdown,
       .code-editor-wrapper {
-        height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 36px));
+        height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 38px));
         overflow-y: scroll;
         border-radius: var(--mdst-radius);
         border: 1px solid var(--mdst-color-border);
@@ -255,6 +294,10 @@ body {
           gap: var(--mdst-space-2);
         }
       }
+
+      .ProseMirror {
+        padding: 60px 90px;
+      }
     }
   }
 }
@@ -267,8 +310,13 @@ body {
 }
 
 @media screen and (max-width: 600px) {
-  .milkdown .ProseMirror {
-    padding: 30px;
+  .milkdown {
+    .operation-item:first-child {
+      display: none;
+    }
+    .ProseMirror {
+      padding: 30px 40px;
+    }
   }
 }
 

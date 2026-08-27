@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
 import TextEditor from "./text-editor.vue";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import CodeEditor, { editorVimEnabled } from "./code-editor.vue";
+import CodeEditor from "./code-editor.vue";
 import { titleCase } from "scule";
-import { removeOpenNote } from "@/storage/state";
+import { closeNote } from "@/storage/tabGroups";
 
 const props = defineProps<{
   id: string;
 }>();
 
-const note = await notesAPI.useNote(props.id, removeOpenNote);
+const note = await notesAPI.useNote(props.id, closeNote);
 
 const content = ref(note.value?.value.content ?? "");
 
@@ -24,7 +24,17 @@ async function save() {
   });
 }
 
-onMounted(() => {
+watchDebounced(
+  content,
+  (newVal, oldVal) => {
+    if (newVal === oldVal) return;
+
+    save();
+  },
+  { debounce: 1000 },
+);
+
+function handleFocus() {
   let title = document.head.querySelector("title");
 
   if (!title) {
@@ -34,15 +44,7 @@ onMounted(() => {
   }
 
   title.innerText = note.value?.value.name ?? "NNOOTTEESS";
-});
-
-watchDebounced(
-  content,
-  () => {
-    save();
-  },
-  { debounce: 1000 },
-);
+}
 </script>
 
 <template>
@@ -62,6 +64,7 @@ watchDebounced(
           placeholder="Please enter a name fo the note"
           v-model="note.value.name"
           @keyup.enter="save()"
+          @blur="save()"
         />
 
         <div
@@ -72,29 +75,23 @@ watchDebounced(
             class="mdst-dropdown"
             v-model="note.value.language"
             @change="save()"
+            style="min-width: 105px"
           >
             <option v-for="language in notesAPI.LANGUAGES" :value="language">
               {{ titleCase(language) }}
             </option>
           </select>
-
-          <label class="mdst-checkbox-label">
-            Vim
-            <input
-              v-model="editorVimEnabled"
-              type="checkbox"
-              class="mdst-checkbox--toggle"
-            />
-          </label>
         </div>
       </div>
 
       <TextEditor
         v-if='note.value.type === "note"'
         v-model="content"
+        @focus="handleFocus"
       />
 
       <CodeEditor
+        @focus="handleFocus"
         v-else-if='note.value.type === "code"'
         theme="nord"
         v-model="content"

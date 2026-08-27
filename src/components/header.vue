@@ -5,6 +5,8 @@ import { logout, user } from "@/storage/user";
 import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
 import DrawerToggle from "./drawer-toggle.vue";
+import { editorVimEnabled } from "./code-editor.vue";
+import CarbonUser from "~icons/carbon/user";
 
 const storage = inject(storageKey);
 
@@ -26,9 +28,17 @@ function handleLogout() {
     </div>
 
     <div class="user">
-      Logged in: <span>{{
-        user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN"
-      }}</span>
+      <label class="mdst-checkbox-label vim-toggle">
+        Vim
+        <input
+          v-model="editorVimEnabled"
+          type="checkbox"
+          class="mdst-checkbox"
+        />
+      </label>
+
+      <CarbonUser />
+      <span>{{ user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN" }}</span>
       <button
         v-if="user.id"
         class="mdst-button mdst-button--ghost mdst-button--sm user__logout tooltip tooltip--left"

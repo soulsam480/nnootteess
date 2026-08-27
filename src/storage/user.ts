@@ -7,10 +7,11 @@
 // 3. the mnemonic is stored in local storage for 15 minutes
 
 import { sm } from "@/storage/db";
-import { startState, state } from "@/storage/state";
-import { computed, reactive, toRaw, watch } from "vue";
+import { startState } from "@/storage/state";
+import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
-import { INotesState, startNotes } from "@/storage/notes";
+import { startNotes } from "@/storage/notes";
+import { startTabGroups } from "@/storage/tabGroups";
 
 interface UserState {
   id: string | null;
@@ -33,25 +34,6 @@ const user = reactive<UserState>({
 
 const isLoggedIn = computed(() => user.state === "authenticated");
 
-let syncUnsub: (() => void) | undefined;
-
-function syncStateWithNotes(notes: INotesState) {
-  let { active_note, open_notes } = toRaw(state);
-
-  if (active_note && !notes.index.has(active_note)) {
-    active_note = null;
-  }
-
-  const available = open_notes.filter((it) => notes.index.has(it));
-
-  if (available.length) {
-    open_notes = available;
-  }
-
-  state.active_note = active_note;
-  state.open_notes = open_notes;
-}
-
 sm().setSecurityStateChangeCallback((authState) => {
   if (authState.isActive && authState.activeAddress) {
     if (user.state === "copying") {
@@ -63,14 +45,9 @@ sm().setSecurityStateChangeCallback((authState) => {
 
     startState();
 
-    startNotes(isLoggedIn).then((initial) => {
-      syncStateWithNotes(initial.value);
+    startNotes(isLoggedIn);
 
-      const { stop } = watch(initial, syncStateWithNotes);
-      syncUnsub = stop;
-    });
-  } else {
-    syncUnsub?.();
+    startTabGroups(isLoggedIn);
   }
 });
 

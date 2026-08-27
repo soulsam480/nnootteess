@@ -48,6 +48,7 @@ const emit = defineEmits<{
   editorDidMount: [instance: EditorView];
   change: [value: string];
   "update:modelValue": [value: string];
+  "focus": [];
 }>();
 
 const container = ref<HTMLElement | null>(null);
@@ -138,6 +139,12 @@ function buildExtensions(): Extension[] {
     ]),
 
     EditorView.updateListener.of((update) => {
+      if (update.focusChanged) {
+        if (update.view.hasFocus) {
+          emit("focus");
+        }
+      }
+
       if (!update.docChanged) {
         return;
       }

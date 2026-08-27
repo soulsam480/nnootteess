@@ -30,7 +30,7 @@ export type Language = (typeof LANGUAGES)[number];
 
 export interface INotesState {
   notes: NodeObject<TListNote>[];
-  index: Set<string>;
+  index: Map<string, NodeObject<TListNote>>;
 }
 
 const LANGUAGE_TO_EXT = {
@@ -43,7 +43,7 @@ const LANGUAGE_TO_EXT = {
 };
 
 const notes = ref<INotesState>({
-  index: new Set(),
+  index: new Map(),
   notes: [],
 });
 
@@ -57,10 +57,10 @@ async function startNotes(isLoggedIn: Ref<boolean>) {
 
     notes.value = {
       index: state.reduce((acc, curr) => {
-        acc.add(curr.id);
+        acc.set(curr.id, curr);
 
         return acc;
-      }, new Set<string>()),
+      }, new Map<string, NodeObject<TListNote>>()),
       notes: state,
     };
   }
