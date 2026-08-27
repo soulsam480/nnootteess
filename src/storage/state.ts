@@ -4,8 +4,6 @@ import { shallowReactive, toRaw } from "vue";
 interface State {
   id?: string;
   type: "state";
-  open_notes: string[];
-  active_note: string | null;
   theme: string | null;
   drawer_open: boolean;
 }
@@ -13,9 +11,7 @@ interface State {
 const state = shallowReactive<State>({
   id: undefined,
   type: "state",
-  active_note: null,
   theme: null,
-  open_notes: [],
   drawer_open: false,
 });
 
@@ -32,9 +28,7 @@ async function bootstrap() {
   if (!result) {
     const id = await sm().put({
       type: "state",
-      active_note: null,
       theme: null,
-      open_notes: [],
       drawer_open: false,
     } satisfies State);
 

@@ -9,7 +9,7 @@ import { state } from "@/storage/state";
 import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
 import { computed, provide, Suspense, watch } from "vue";
-import { activeNoteIds } from "./storage/groups";
+import { activeNoteIds } from "./storage/tabGroups";
 
 const props = defineProps<{
   storage: LocalStorage;
@@ -32,10 +32,13 @@ watch(
       <div class="arena">
         <Sidebar />
 
-        <div class="mdst-tabs">
+        <div class="mdst-tabs" v-if="activeNoteIds.length > 0">
           <NoteTabs />
-          <div class="panels-container" :data-count="activeNoteIds.size">
-            <Suspense v-for="noteId in activeNoteIds" :key="noteId">
+          <div class="panels-container" :data-count="activeNoteIds.length">
+            <Suspense
+              v-for="[tabId, noteId] in activeNoteIds"
+              :key="`${tabId}-${noteId}`"
+            >
               <Tab :id="noteId" />
 
               <template #fallback>
@@ -46,7 +49,7 @@ watch(
                     class="mdst-spinner mdst-spinner--sm"
                     role="status"
                     aria-label="Loading"
-                  ></span>
+                  />
                   <span>Loading…</span>
                 </div>
               </template>

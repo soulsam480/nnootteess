@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { closeNote, ITabGroup, openNote, tabGroups } from "@/storage/groups";
+import { closeNote, ITabGroup, openNote, tabGroups } from "@/storage/tabGroups";
 import { notes, TListNote } from "@/storage/notes";
 import { NodeObject } from "genosdb";
 import { computed } from "vue";
@@ -44,6 +44,7 @@ function handleRemove(e: Event, id: string, groupId: string) {
           :data-state='tab.value.active === noteId ? "active" : "inactive"'
           @click="openNote(noteId)"
           :id="noteId"
+          :title="noteName"
         >
           <div class="mdst-truncate">
             {{ noteName }}

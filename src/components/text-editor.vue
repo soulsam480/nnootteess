@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: "update:modelValue", value: string): void;
+  (e: "focus"): void;
 }>();
 
 useEditor((root) => {
@@ -29,6 +30,10 @@ useEditor((root) => {
   crepe.on((listener) => {
     listener.markdownUpdated((_, md) => {
       emits("update:modelValue", md);
+    });
+
+    listener.focus(() => {
+      emits("focus");
     });
   });
 

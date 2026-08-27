@@ -11,7 +11,7 @@ import { startState } from "@/storage/state";
 import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
 import { startNotes } from "@/storage/notes";
-import { startTabGroups } from "@/storage/groups";
+import { startTabGroups } from "@/storage/tabGroups";
 
 interface UserState {
   id: string | null;

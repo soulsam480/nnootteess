@@ -6,7 +6,7 @@ import Notes from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
 import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
-import { openNote } from "@/storage/groups";
+import { openNote } from "@/storage/tabGroups";
 
 const isMakingNote = ref(false);
 

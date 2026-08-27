@@ -1,6 +1,6 @@
 import { db, sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
-import { computed, Ref, shallowRef } from "vue";
+import { computed, Ref, shallowRef, watch } from "vue";
 
 export interface ITabGroup {
   active: string;
@@ -11,14 +11,24 @@ export interface ITabGroup {
 const tabGroups = shallowRef<Array<NodeObject<ITabGroup>>>([]);
 
 const activeNoteIds = computed(() =>
-  tabGroups.value.reduce((acc, curr) => {
+  tabGroups.value.reduce<[string, string][]>((acc, curr) => {
     if (curr.value.active) {
-      acc.add(curr.value.active);
+      acc.push([curr.id, curr.value.active]);
     }
 
     return acc;
-  }, new Set<string>()),
+  }, []),
 );
+
+watch(activeNoteIds, (value) => {
+  if (value.length === 0) {
+    const title = document.head.querySelector("title");
+
+    if (title) {
+      title.innerText = "NNOOTTEESS";
+    }
+  }
+});
 
 async function all() {
   const { results } = await sm().map({
@@ -63,7 +73,7 @@ async function openNote(noteId: string, split = false) {
   if (!split) {
     const containingTab = tabGroups.value.find((it) => it.edges.includes(noteId));
 
-    if (containingTab) {
+    if (containingTab && containingTab.value.active !== noteId) {
       await sm().put(
         {
           ...containingTab.value,
@@ -103,6 +113,8 @@ async function closeNote(noteId: string, groupId?: string) {
     groupId !== undefined ? it.id === groupId : it.edges.includes(noteId),
   );
 
+  console.log({ groups });
+
   if (groups.length === 0) {
     return;
   }
@@ -125,9 +137,12 @@ async function closeNote(noteId: string, groupId?: string) {
       await db().unlink(tabGroup.id, noteId);
       // NOTE: if there's not another one
       // just remove the group
-    } else if (!another) {
+    } else {
       await db().unlink(tabGroup.id, noteId);
-      await sm().remove(tabGroup.id);
+
+      if (!another) {
+        await sm().remove(tabGroup.id);
+      }
     }
   }
 }

@@ -10,7 +10,7 @@ import { formatDate } from "@/utils/date";
 import { useMediaQuery } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
-import { activeNoteIds, closeNote, openNote } from "@/storage/groups";
+import { activeNoteIds, closeNote, openNote } from "@/storage/tabGroups";
 
 async function deleteNote(
   event: Event,
@@ -30,16 +30,17 @@ const hasNotes = computed(() => {
 const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
 function handleClick(
+  event: MouseEvent,
   note: NodeObject<noteAPI.TListNote>,
-  event: MouseEvent | boolean,
+  split?: boolean,
 ) {
-  if (event instanceof Event) {
-    event.stopPropagation();
-  }
+  event.stopPropagation();
+
+  split = split ?? (event.ctrlKey || event.metaKey);
 
   openNote(
     note.id,
-    typeof event === "boolean" ? event : event.ctrlKey || event.metaKey,
+    split,
   );
 
   if (isSmallScreen.value) {
@@ -53,8 +54,8 @@ function handleClick(
     <li
       v-for="note in noteAPI.notes.value.notes"
       class="link"
-      :class="{ active: activeNoteIds.has(note.id) }"
-      @click="handleClick(note, $event)"
+      :class="{ active: activeNoteIds.some((it) => it[1] === note.id) }"
+      @click="handleClick($event, note)"
       :title="formatDate(note.value.created_at)"
     >
       <span
@@ -74,8 +75,9 @@ function handleClick(
       </span>
       <span class="link__actions">
         <span
-          @click="handleClick(note, true)"
+          @click="handleClick($event, note, true)"
           class="link__actions--split"
+          title="Split"
         >
           <CarbonSplitScreen />
         </span>
@@ -83,6 +85,7 @@ function handleClick(
         <span
           @click="deleteNote($event, note)"
           class="link__actions--delete"
+          title="Delete"
         >
           <CarbonTrashCan />
         </span>
