@@ -1,16 +1,7 @@
-<script setup lang="ts">
-import * as noteAPI from "@/storage/notes";
-import { state } from "@/storage/state";
-import { computed, ref } from "vue";
-import Notes from "./notes.vue";
-import CarbonDocumentAdd from "~icons/carbon/document-add";
-import CarbonCode from "~icons/carbon/code";
-import DrawerToggle from "@/components/drawer-toggle.vue";
-import { openNote } from "@/storage/tabGroups";
-
+<script module lang="ts">
 const isMakingNote = ref(false);
 
-async function addNewNote() {
+export async function addNewNote() {
   if (isMakingNote.value) return;
 
   isMakingNote.value = true;
@@ -22,7 +13,7 @@ async function addNewNote() {
   isMakingNote.value = false;
 }
 
-async function addNewCode() {
+export async function addNewCode() {
   if (isMakingNote.value) return;
 
   isMakingNote.value = true;
@@ -33,6 +24,17 @@ async function addNewCode() {
 
   isMakingNote.value = false;
 }
+</script>
+
+<script setup lang="ts">
+import * as noteAPI from "@/storage/notes";
+import { state } from "@/storage/state";
+import { computed, ref } from "vue";
+import Notes from "./notes.vue";
+import CarbonDocumentAdd from "~icons/carbon/document-add";
+import CarbonCode from "~icons/carbon/code";
+import DrawerToggle from "@/components/drawer-toggle.vue";
+import { openNote } from "@/storage/tabGroups";
 
 const drawer = computed(() => state.drawer_open ?? false);
 </script>

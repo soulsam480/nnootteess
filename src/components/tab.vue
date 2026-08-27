@@ -5,10 +5,11 @@ import { ref } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import CodeEditor from "./code-editor.vue";
 import { titleCase } from "scule";
-import { closeNote } from "@/storage/tabGroups";
+import { closeNote, lastFocused } from "@/storage/tabGroups";
 
 const props = defineProps<{
   id: string;
+  tabId: string;
 }>();
 
 const note = await notesAPI.useNote(props.id, closeNote);
@@ -35,6 +36,8 @@ watchDebounced(
 );
 
 function handleFocus() {
+  lastFocused.value = props.tabId;
+
   let title = document.head.querySelector("title");
 
   if (!title) {

@@ -47,6 +47,8 @@ const notes = ref<INotesState>({
   notes: [],
 });
 
+const noteToBeDeleted = ref<NodeObject<TListNote> | null>(null);
+
 async function startNotes(isLoggedIn: Ref<boolean>) {
   async function sync() {
     if (!isLoggedIn.value) {
@@ -183,4 +185,5 @@ export {
   startNotes,
   LANGUAGE_TO_EXT,
   noteToFileName,
+  noteToBeDeleted,
 };

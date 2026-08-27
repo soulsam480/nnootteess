@@ -124,9 +124,49 @@ body {
     }
   }
 
+  .delete-note-confirmation:popover-open {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mdst-space-4);
+    max-width: 90dvw;
+
+    .delete-note-confirmation__actions {
+      display: flex;
+      justify-content: end;
+      gap: var(--mdst-space-2);
+
+      .delete-note-confirmation__delete {
+        background: color-mix(in srgb, var(--mdst-color-error) 10%, transparent);
+        color: var(--mdst-color-error);
+        border-color: var(--mdst-color-error);
+        font-weight: 600;
+      }
+    }
+  }
+
   .arena {
     flex-grow: 1;
     padding: calc(var(--spacing) * 2);
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--mdst-space-1);
+      height: 100%;
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: var(--mdst-space-1);
+      }
+
+      footer {
+        position: fixed;
+        bottom: var(--mdst-space-4);
+      }
+    }
 
     > * {
       min-width: 0;
@@ -181,8 +221,8 @@ body {
         gap: var(--mdst-space-1);
         align-items: center;
 
-        div {
-          width: calc(100% - 32px);
+        span:nth-child(2) {
+          width: calc(100% - 52px);
         }
 
         .link__actions {
@@ -194,6 +234,14 @@ body {
           top: 0;
           bottom: 0;
           right: var(--mdst-space-1);
+
+          button {
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            border: none;
+          }
 
           .link__actions--delete:hover {
             color: var(--mdst-color-error);

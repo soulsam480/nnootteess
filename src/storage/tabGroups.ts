@@ -1,6 +1,6 @@
 import { db, sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
-import { computed, Ref, shallowRef, watch } from "vue";
+import { computed, ref, Ref, shallowRef, watch } from "vue";
 
 export interface ITabGroup {
   active: string;
@@ -9,6 +9,8 @@ export interface ITabGroup {
 }
 
 const tabGroups = shallowRef<Array<NodeObject<ITabGroup>>>([]);
+
+const lastFocused = ref<string | null>(null);
 
 const activeNoteIds = computed(() =>
   tabGroups.value.reduce<[string, string][]>((acc, curr) => {
@@ -85,7 +87,9 @@ async function openNote(noteId: string, split = false) {
     }
   }
 
-  const last = tabGroups.value.at(-1);
+  const last = lastFocused.value
+    ? tabGroups.value.find((it) => it.id === lastFocused.value)
+    : tabGroups.value.at(-1);
 
   if (!last || split) {
     const groupId = await sm().put({
@@ -112,8 +116,6 @@ async function closeNote(noteId: string, groupId?: string) {
   const groups = tabGroups.value.filter((it) =>
     groupId !== undefined ? it.id === groupId : it.edges.includes(noteId),
   );
-
-  console.log({ groups });
 
   if (groups.length === 0) {
     return;
@@ -142,9 +144,12 @@ async function closeNote(noteId: string, groupId?: string) {
 
       if (!another) {
         await sm().remove(tabGroup.id);
+        if (lastFocused.value === tabGroup.id) {
+          lastFocused.value = null;
+        }
       }
     }
   }
 }
 
-export { tabGroups, startTabGroups, openNote, closeNote, activeNoteIds };
+export { tabGroups, startTabGroups, openNote, closeNote, activeNoteIds, lastFocused };

@@ -10,6 +10,8 @@ import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
 import { computed, provide, Suspense, watch } from "vue";
 import { activeNoteIds } from "./storage/tabGroups";
+import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
+import EmptyState from "./components/empty-state.vue";
 
 const props = defineProps<{
   storage: LocalStorage;
@@ -28,6 +30,8 @@ watch(
 <template>
   <MilkdownProvider>
     <template v-if='user.state === "authenticated" && user.id'>
+      <DeleteNoteConfirmation />
+
       <Header />
       <div class="arena">
         <Sidebar />
@@ -39,7 +43,7 @@ watch(
               v-for="[tabId, noteId] in activeNoteIds"
               :key="`${tabId}-${noteId}`"
             >
-              <Tab :id="noteId" />
+              <Tab :id="noteId" :tabId="tabId" />
 
               <template #fallback>
                 <div
@@ -56,6 +60,8 @@ watch(
             </Suspense>
           </div>
         </div>
+
+        <EmptyState v-else />
       </div>
     </template>
 

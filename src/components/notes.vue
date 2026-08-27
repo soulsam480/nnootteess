@@ -10,17 +10,15 @@ import { formatDate } from "@/utils/date";
 import { useMediaQuery } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
-import { activeNoteIds, closeNote, openNote } from "@/storage/tabGroups";
+import { activeNoteIds, openNote } from "@/storage/tabGroups";
 
 async function deleteNote(
   event: Event,
-  note: { id: string; value: { name: string } },
+  note: NodeObject<noteAPI.TListNote>,
 ) {
   event.stopPropagation();
 
-  closeNote(note.id);
-
-  await noteAPI.delete(note.id);
+  noteAPI.noteToBeDeleted.value = note;
 }
 
 const hasNotes = computed(() => {
@@ -74,21 +72,24 @@ function handleClick(
         {{ note.value.name }}
       </span>
       <span class="link__actions">
-        <span
+        <button
           @click="handleClick($event, note, true)"
           class="link__actions--split"
           title="Split"
+          type="button"
         >
           <CarbonSplitScreen />
-        </span>
+        </button>
 
-        <span
+        <button
           @click="deleteNote($event, note)"
           class="link__actions--delete"
           title="Delete"
+          popovertarget="delete-note-confirmation"
+          type="button"
         >
           <CarbonTrashCan />
-        </span>
+        </button>
       </span>
     </li>
     <p v-if="!hasNotes" class="mdst-p--muted">
