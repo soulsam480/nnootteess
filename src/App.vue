@@ -12,6 +12,7 @@ import { computed, provide, Suspense, watch } from "vue";
 import { activeNoteIds } from "./storage/tabGroups";
 import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
+import ImportNotes from "./components/import-notes.vue";
 
 const props = defineProps<{
   storage: LocalStorage;
@@ -31,6 +32,7 @@ watch(
   <MilkdownProvider>
     <template v-if='user.state === "authenticated" && user.id'>
       <DeleteNoteConfirmation />
+      <ImportNotes />
 
       <Header />
       <div class="arena">

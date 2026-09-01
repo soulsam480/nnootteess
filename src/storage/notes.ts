@@ -1,6 +1,6 @@
 import { db, sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
-import { camelCase, kebabCase } from "scule";
+import { kebabCase } from "scule";
 import { onBeforeUnmount, Ref, ref } from "vue";
 
 interface CommonNote {
@@ -170,8 +170,47 @@ async function delete_(id: string): Promise<void> {
   return await sm().remove(id);
 }
 
+function normalizeName(name: string): string {
+  return kebabCase(name.replaceAll(/(\s|\?|\!)+/g, "-"));
+}
+
 function noteToFileName(note: CodeNote): string {
-  return `${camelCase(kebabCase(note.name.replaceAll(/\s+/g, "-")))}.${LANGUAGE_TO_EXT[note.language]}`;
+  return `${normalizeName(note.name)}.${LANGUAGE_TO_EXT[note.language]}`;
+}
+
+async function exportNotes() {
+  const { Zip } = await import("@greggman/zipup");
+
+  const { results } = await sm().map({ query: { type: { $in: ["note", "code"] } } });
+
+  const zip = new Zip();
+
+  for (const note of results.map((it) => it.value as Note)) {
+    zip.addFile(
+      {
+        name: note.type == "code" ? noteToFileName(note) : `${normalizeName(note.name)}.md`,
+      },
+      note.content,
+    );
+  }
+
+  const blob = await zip.finalize();
+
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style.display = "none";
+
+  const url = window.URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `nnnootteess-export-${new Date().toDateString()}.zip`;
+  a.click();
+}
+
+async function importNotes(files: FileList) {
+  //@ts-expect-error old dom types
+  for (const file of files) {
+    // TODO: do
+  }
 }
 
 export {
@@ -186,4 +225,6 @@ export {
   LANGUAGE_TO_EXT,
   noteToFileName,
   noteToBeDeleted,
+  exportNotes,
+  importNotes,
 };

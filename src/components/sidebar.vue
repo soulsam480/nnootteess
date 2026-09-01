@@ -35,6 +35,8 @@ import CarbonDocumentAdd from "~icons/carbon/document-add";
 import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
 import { openNote } from "@/storage/tabGroups";
+import CarbonExport from "~icons/carbon/export";
+import CarbonDownload from "~icons/carbon/download";
 
 const drawer = computed(() => state.drawer_open ?? false);
 </script>
@@ -60,6 +62,23 @@ const drawer = computed(() => state.drawer_open ?? false);
         data-tooltip="Add code snippet"
       >
         <CarbonCode />
+      </button>
+
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+        @click="noteAPI.exportNotes()"
+        data-tooltip="Export notes"
+      >
+        <CarbonExport />
+      </button>
+
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm tooltip tooltip--right"
+        commandfor="import-notes-modal"
+        command="show-modal"
+        data-tooltip="Import notes"
+      >
+        <CarbonDownload />
       </button>
 
       <DrawerToggle />
