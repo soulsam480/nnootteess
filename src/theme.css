@@ -85,6 +85,37 @@ body {
     padding: var(--mdst-space-4);
   }
 
+  .search-dialog[open] {
+    width: auto;
+
+    .mdst-dialog-body {
+      display: flex;
+      flex-direction: column;
+
+      input {
+        width: 100%;
+        margin-bottom: var(--mdst-space-2);
+      }
+
+      .results {
+        max-height: min(80vh, 400px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .result {
+        display: flex;
+        align-items: center;
+        gap: var(--mdst-space-1);
+        padding: var(--mdst-space-1);
+        border-radius: var(--mdst-radius);
+      }
+      .result[data-active="true"] {
+        background: var(--mdst-color-subtle);
+      }
+    }
+  }
+
   .header {
     border-bottom: 1px solid var(--mdst-color-border);
     display: flex;

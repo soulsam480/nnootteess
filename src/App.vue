@@ -13,6 +13,7 @@ import { activeNoteIds } from "./storage/tabGroups";
 import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
+import Search from "./components/search.vue";
 
 const props = defineProps<{
   storage: LocalStorage;
@@ -33,6 +34,7 @@ watch(
     <template v-if='user.state === "authenticated" && user.id'>
       <DeleteNoteConfirmation />
       <ImportNotes />
+      <Search />
 
       <Header />
       <div class="arena">

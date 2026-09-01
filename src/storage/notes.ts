@@ -1,7 +1,7 @@
 import { db, sm } from "@/storage/db";
 import { NodeObject } from "genosdb";
 import { kebabCase } from "scule";
-import { onBeforeUnmount, Ref, ref } from "vue";
+import { onBeforeUnmount, Ref, ref, shallowRef } from "vue";
 
 interface CommonNote {
   name: string;
@@ -42,7 +42,7 @@ const LANGUAGE_TO_EXT = {
   markdown: "md",
 };
 
-const notes = ref<INotesState>({
+const notes = shallowRef<INotesState>({
   index: new Map(),
   notes: [],
 });
