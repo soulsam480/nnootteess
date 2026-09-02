@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
 import TextEditor from "./text-editor.vue";
-import { ref } from "vue";
+import { ref, unref } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import CodeEditor from "./code-editor.vue";
 import { titleCase } from "scule";
@@ -17,12 +17,21 @@ const note = await notesAPI.useNote(props.id, closeNote);
 const content = ref(note.value?.value.content ?? "");
 
 async function save() {
-  if (!note.value) return;
+  const inner = unref(note);
+  const cont = unref(content);
 
-  await notesAPI.update(note.value.id, {
-    ...note.value.value,
-    content: content.value,
-  });
+  if (!inner) return;
+
+  await notesAPI.update(
+    inner.id,
+    {
+      ...inner.value,
+      content: cont,
+      sec: {
+        content: cont,
+      },
+    },
+  );
 }
 
 watchDebounced(

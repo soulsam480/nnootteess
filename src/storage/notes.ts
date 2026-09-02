@@ -1,5 +1,6 @@
 import { db, sm } from "@/storage/db";
-import { NodeObject } from "genosdb";
+import { user } from "@/storage/user";
+import { NodeObject, QueryOptions } from "genosdb";
 import { kebabCase } from "scule";
 import { onBeforeUnmount, Ref, ref, shallowRef } from "vue";
 
@@ -9,6 +10,10 @@ interface CommonNote {
   created_at: number;
   updated_at: number;
   meta: Record<string, string>;
+  owner: string;
+  sec: {
+    content: string;
+  };
 }
 
 interface TextNote extends CommonNote {
@@ -49,13 +54,51 @@ const notes = shallowRef<INotesState>({
 
 const noteToBeDeleted = ref<NodeObject<TListNote> | null>(null);
 
-async function startNotes(isLoggedIn: Ref<boolean>) {
+function makeQuery(userId: string) {
+  return {
+    query: {
+      type: { $in: ["note", "code"] },
+      owner: userId,
+    },
+    field: "created_at",
+    order: "desc",
+  } satisfies QueryOptions;
+}
+
+async function unwrapNote(note: NodeObject): Promise<NodeObject<Note>> {
+  const {
+    value: { sec, ...restValue },
+    ...rest
+  } = note;
+
+  const unwrapped = await sm().decryptDataForCurrentUser(sec);
+
+  return {
+    ...rest,
+    value: {
+      ...restValue,
+      sec: unwrapped,
+      content: unwrapped.content,
+    },
+  };
+}
+
+async function wrapNote(note: Note): Promise<NodeObject["value"]> {
+  const { sec, content: _, ...restValue } = note;
+
+  return {
+    ...restValue,
+    sec: await sm().encryptDataForCurrentUser(sec),
+  };
+}
+
+async function startNotes(userId: string, isLoggedIn: Ref<boolean>) {
   async function sync() {
     if (!isLoggedIn.value) {
       return;
     }
 
-    const state = await all();
+    const state = await all(userId);
 
     notes.value = {
       index: state.reduce((acc, curr) => {
@@ -67,19 +110,13 @@ async function startNotes(isLoggedIn: Ref<boolean>) {
     };
   }
 
-  await sync();
-
-  db().map({}, ({ action }) => {
-    if (action !== "initial") {
-      sync();
-    }
-  });
+  db().map(makeQuery(userId), sync);
 
   return notes;
 }
 
 async function useNote(id: string, onRemove: (id: string) => void) {
-  const note = ref<NodeObject<Note>>();
+  const note = shallowRef<NodeObject<Note>>();
 
   let unsub: (() => void) | undefined;
 
@@ -87,17 +124,19 @@ async function useNote(id: string, onRemove: (id: string) => void) {
     unsub?.();
   });
 
-  const { unsubscribe, result } = await sm().get(id, (node) => {
+  const { unsubscribe, result } = await db().get(id, (node) => {
     if (!node?.value) {
       onRemove(id);
       return;
     }
 
-    note.value = node;
+    unwrapNote(node).then((node) => {
+      note.value = node;
+    });
   });
 
   if (result?.value) {
-    note.value = result;
+    note.value = await unwrapNote(result);
   } else {
     onRemove(id);
   }
@@ -107,67 +146,92 @@ async function useNote(id: string, onRemove: (id: string) => void) {
   return note;
 }
 
-async function all(): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
-  const { results } = await sm().map({
-    query: {
-      type: { $in: ["note", "code"] },
-    },
-    field: "created_at",
-    order: "desc",
-  });
+async function all(
+  userId: string,
+): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
+  const { results } = await db().map(makeQuery(userId));
 
-  return results.map((it: NodeObject<Note>) => {
-    const { content: _, ...rest } = it.value;
+  return results.map((it) => {
+    // NOTE: avoid loading massive data into memory for all notes
+    const { sec: _, ...rest } = it.value;
 
-    return { ...it, value: rest };
+    return { ...it, value: { ...rest, sec: {} } };
   });
 }
 
 async function createCode(name: string, language: Language): Promise<NodeObject<Note>> {
-  const noteId = await sm().put({
-    meta: {},
-    name,
-    content: "",
-    created_at: Date.now(),
-    type: "code",
-    language,
-    updated_at: Date.now(),
-  } satisfies Note);
+  const userId = user.id;
+
+  if (!userId) {
+    throw new Error("user not logged in");
+  }
+
+  const noteId = await db().put(
+    await wrapNote({
+      meta: {},
+      name,
+      created_at: Date.now(),
+      type: "code",
+      language,
+      owner: userId,
+      updated_at: Date.now(),
+      sec: { content: "" },
+      content: "",
+    } satisfies Note),
+  );
 
   return await find(noteId);
 }
 
 async function create(name: string): Promise<NodeObject<Note>> {
-  const noteId = await sm().put({
-    meta: {},
-    name,
-    content: "",
-    created_at: Date.now(),
-    type: "note",
-    updated_at: Date.now(),
-  } satisfies Note);
+  const userId = user.id;
+
+  if (!userId) {
+    throw new Error("user not logged in");
+  }
+
+  const noteId = await db().put(
+    await wrapNote({
+      meta: {},
+      name,
+      owner: userId,
+      created_at: Date.now(),
+      type: "note",
+      updated_at: Date.now(),
+      sec: {
+        content: "",
+      },
+      content: "",
+    } satisfies Note),
+  );
 
   return await find(noteId);
 }
 
 async function update(id: string, note: Note): Promise<NodeObject<Note>> {
-  await sm().put(note, id);
+  await db().put(
+    await wrapNote({
+      ...note,
+      updated_at: Date.now(),
+    }),
+    id,
+  );
 
   return await find(id);
 }
 
 async function find(id: string): Promise<NodeObject<Note>> {
-  const { result } = await sm().get(id);
+  const { result } = await db().get(id);
 
   if (!result) {
     throw new Error("note not found");
   }
 
-  return result;
+  return await unwrapNote(result);
 }
 
 async function delete_(id: string): Promise<void> {
-  return await sm().remove(id);
+  return await db().remove(id);
 }
 
 function normalizeName(name: string): string {
@@ -179,13 +243,21 @@ function noteToFileName(note: CodeNote): string {
 }
 
 async function exportNotes() {
+  const userId = user.id;
+
+  if (!userId) {
+    throw new Error("user not logged in");
+  }
+
   const { Zip } = await import("@greggman/zipup");
 
-  const { results } = await sm().map({ query: { type: { $in: ["note", "code"] } } });
+  const { results } = await db().map(makeQuery(userId));
 
   const zip = new Zip();
 
-  for (const note of results.map((it) => it.value as Note)) {
+  for (const node of await Promise.all(results.map(unwrapNote))) {
+    const { value: note } = node;
+
     zip.addFile(
       {
         name: note.type == "code" ? noteToFileName(note) : `${normalizeName(note.name)}.md`,
@@ -227,4 +299,6 @@ export {
   noteToBeDeleted,
   exportNotes,
   importNotes,
+  wrapNote,
+  unwrapNote,
 };

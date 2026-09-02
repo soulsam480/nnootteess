@@ -18,7 +18,7 @@ interface UserState {
   state: "authenticated" | "inactive" | "copying";
 }
 
-interface PersistedMemonic {
+export interface PersistedMemonic {
   mnemonic: string;
   at: number;
 }
@@ -43,11 +43,9 @@ sm().setSecurityStateChangeCallback((authState) => {
     user.id = authState.activeAddress;
     user.state = "authenticated";
 
-    startState();
-
-    startNotes(isLoggedIn);
-
-    startTabGroups(isLoggedIn);
+    startState(authState.activeAddress, isLoggedIn);
+    startNotes(authState.activeAddress, isLoggedIn);
+    startTabGroups(authState.activeAddress, isLoggedIn);
   }
 });
 
@@ -69,8 +67,6 @@ async function login(storage: LocalStorage, previousMemonic?: string) {
   }
 
   await persistMnemonicUnsafe(mnemonic, storage);
-
-  await sm().assignRole(address, "superadmin");
 
   return { address, mnemonic };
 }
@@ -110,4 +106,4 @@ async function tryRecoverAndLogin(storage: LocalStorage) {
   await login(storage, mnemonic);
 }
 
-export { login, user, tryRecoverAndLogin, logout };
+export { login, user, tryRecoverAndLogin, logout, PASS_KEY };

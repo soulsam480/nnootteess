@@ -3,17 +3,20 @@ import Header from "@/components/header.vue";
 import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";
 import Sidebar from "@/components/sidebar.vue";
-import Tab from "@/components/tab.vue";
 import { LocalStorage, storageKey } from "@/storage/local";
 import { state } from "@/storage/state";
 import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
-import { computed, provide, Suspense, watch } from "vue";
+import { defineAsyncComponent, provide, Suspense, watchEffect } from "vue";
 import { activeNoteIds } from "./storage/tabGroups";
 import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
 import Search from "./components/search.vue";
+
+const Tab = defineAsyncComponent(async () => {
+  return await import("./components/tab.vue");
+});
 
 const props = defineProps<{
   storage: LocalStorage;
@@ -21,11 +24,10 @@ const props = defineProps<{
 
 provide(storageKey, props.storage);
 
-const drawer = computed(() => state.drawer_open ?? false);
-
-watch(
-  drawer,
-  (state) => document.body.dataset.drawerOpen = state.toString(),
+watchEffect(
+  () => {
+    document.body.dataset.drawerOpen = (state.drawer_open ?? false).toString();
+  },
 );
 </script>
 

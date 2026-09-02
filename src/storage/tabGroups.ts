@@ -1,8 +1,10 @@
-import { db, sm } from "@/storage/db";
-import { NodeObject } from "genosdb";
+import { db } from "@/storage/db";
+import { user } from "@/storage/user";
+import { NodeObject, QueryOptions } from "genosdb";
 import { computed, ref, Ref, shallowRef, watch } from "vue";
 
 export interface ITabGroup {
+  owner: string;
   active: string;
   created_at: number;
   type: "tab_group";
@@ -32,32 +34,37 @@ watch(activeNoteIds, (value) => {
   }
 });
 
-async function all() {
-  const { results } = await sm().map({
+function makeQuery(userId: string) {
+  return {
     query: {
       type: "tab_group",
+      owner: { $eq: userId },
     },
     field: "created_at",
     order: "desc",
-  });
+  } satisfies QueryOptions;
+}
+
+async function all(userId: string) {
+  const { results } = await db().map(makeQuery(userId));
 
   return results;
 }
 
-async function startTabGroups(isLoggedIn: Ref<boolean>) {
+async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
   async function sync() {
     if (!isLoggedIn.value) {
       return;
     }
 
-    const state = await all();
+    const state = await all(userId);
 
     tabGroups.value = state;
   }
 
   await sync();
 
-  db().map({}, ({ action }) => {
+  db().map(makeQuery(userId), ({ action }) => {
     if (action !== "initial") {
       sync();
     }
@@ -67,6 +74,12 @@ async function startTabGroups(isLoggedIn: Ref<boolean>) {
 }
 
 async function openNote(noteId: string, split = false) {
+  const userId = user.id;
+
+  if (!userId) {
+    return;
+  }
+
   // 1. first check if it's open or not
   // 2. if open, set active
   // 3. else find last group and link + set active
@@ -76,7 +89,7 @@ async function openNote(noteId: string, split = false) {
     const containingTab = tabGroups.value.find((it) => it.edges.includes(noteId));
 
     if (containingTab && containingTab.value.active !== noteId) {
-      await sm().put(
+      await db().put(
         {
           ...containingTab.value,
           active: noteId,
@@ -92,17 +105,18 @@ async function openNote(noteId: string, split = false) {
     : tabGroups.value.at(-1);
 
   if (!last || split) {
-    const groupId = await sm().put({
+    const groupId = await db().put({
       active: noteId,
       created_at: Date.now(),
       type: "tab_group",
+      owner: userId,
     } satisfies ITabGroup);
 
     await db().link(groupId, noteId);
   } else {
     await db().link(last.id, noteId);
 
-    await sm().put(
+    await db().put(
       {
         ...last.value,
         active: noteId,
@@ -128,7 +142,7 @@ async function closeNote(noteId: string, groupId?: string) {
     // NOTE: if the current one is active in the tab and there's
     // another note to set as active, do that
     if (isActive && another) {
-      await sm().put(
+      await db().put(
         {
           ...tabGroup.value,
           active: another,
@@ -143,7 +157,7 @@ async function closeNote(noteId: string, groupId?: string) {
       await db().unlink(tabGroup.id, noteId);
 
       if (!another) {
-        await sm().remove(tabGroup.id);
+        await db().remove(tabGroup.id);
         if (lastFocused.value === tabGroup.id) {
           lastFocused.value = null;
         }
