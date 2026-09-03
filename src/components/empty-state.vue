@@ -12,6 +12,7 @@ import { migrate, migrationStatus } from "@/storage/migrator";
 import { state } from "@/storage/state";
 import { hasLegacyDB, openLegacyDb } from "@/storage/db";
 import { computedAsync } from "@vueuse/core";
+import CarbonMacCommand from "~icons/carbon/mac-command";
 
 const storage = inject(storageKey);
 
@@ -61,6 +62,15 @@ const isMigratable = computedAsync(async () => {
 
       <CarbonStackedMove v-else />
       Migrate legacy version notes on device
+    </button>
+
+    <button
+      class="mdst-button mdst-button--ghost"
+      commandfor="searchModal"
+      command="show-modal"
+    >
+      <CarbonMacCommand />
+      Open Search
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewNote">

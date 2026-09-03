@@ -86,13 +86,23 @@ body {
     .mdst-dialog-body {
       display: flex;
       flex-direction: column;
+      position: relative;
+      padding: 0;
 
-      input {
-        width: 100%;
-        margin-bottom: var(--mdst-space-2);
+      .search-dialog__input {
+        position: sticky;
+        padding: var(--mdst-space-4) var(--mdst-space-4) 0 var(--mdst-space-4);
+        top: 0;
+        background: var(--mdst-color-bg);
+
+        input {
+          width: 100%;
+          margin-bottom: var(--mdst-space-2);
+        }
       }
 
       .results {
+        padding: var(--mdst-space-4);
         max-height: min(80vh, 400px);
         display: flex;
         flex-direction: column;

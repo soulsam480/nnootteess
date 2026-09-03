@@ -61,6 +61,3 @@ function handleImport() {
     </div>
   </dialog>
 </template>
-
-<style scoped>
-</style>
