@@ -36,9 +36,35 @@ import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
 import { openNote } from "@/storage/tabGroups";
 import CarbonExport from "~icons/carbon/export";
+import { onKeyStroke } from "@vueuse/core";
+import { isTyping } from "@/utils/events";
 // import CarbonDownload from "~icons/carbon/download";
 
 const drawer = computed(() => state.drawer_open ?? false);
+
+onKeyStroke(["n"], (event) => {
+  if (isTyping(event.target)) {
+    return;
+  }
+
+  addNewNote();
+});
+
+onKeyStroke(["c"], (event) => {
+  if (isTyping(event.target)) {
+    return;
+  }
+
+  addNewCode();
+});
+
+onKeyStroke(["E"], (event) => {
+  if (isTyping(event.target)) {
+    return;
+  }
+
+  noteAPI.exportNotes();
+});
 </script>
 
 <template>

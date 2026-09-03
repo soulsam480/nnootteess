@@ -71,16 +71,25 @@ const isMigratable = computedAsync(async () => {
     >
       <CarbonMacCommand />
       Open Search
+      <span class="mdst-code">
+        &#8984 + k
+      </span>
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewNote">
       <CarbonDocumentAdd />
       Create a Note
+      <span class="mdst-code">
+        n
+      </span>
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewCode">
       <CarbonCode />
       Create a Snippet
+      <span class="mdst-code">
+        c
+      </span>
     </button>
 
     <DrawerToggle labelled />

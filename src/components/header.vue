@@ -5,8 +5,11 @@ import { logout, user } from "@/storage/user";
 import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
 import DrawerToggle from "./drawer-toggle.vue";
-import { editorVimEnabled } from "./code-editor.vue";
 import CarbonUser from "~icons/carbon/user";
+import { onKeyStroke } from "@vueuse/core";
+import { isTyping } from "@/utils/events";
+import { toggleDrawer } from "@/storage/state";
+import CarbonSettingsAdjust from "~icons/carbon/settings-adjust";
 
 const storage = inject(storageKey);
 
@@ -15,6 +18,14 @@ function handleLogout() {
 
   logout(storage);
 }
+
+onKeyStroke(["d"], (event) => {
+  if (isTyping(event.target)) {
+    return;
+  }
+
+  toggleDrawer();
+});
 </script>
 
 <template>
@@ -28,14 +39,13 @@ function handleLogout() {
     </div>
 
     <div class="user">
-      <label class="mdst-checkbox-label vim-toggle">
-        Vim
-        <input
-          v-model="editorVimEnabled"
-          type="checkbox"
-          class="mdst-checkbox"
-        />
-      </label>
+      <button
+        class="mdst-button mdst-button--ghost drawer-toggle mdst-button--sm"
+        commandfor="settingsModal"
+        command="show-modal"
+      >
+        <CarbonSettingsAdjust />
+      </button>
 
       <CarbonUser />
       <span>{{ user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN" }}</span>

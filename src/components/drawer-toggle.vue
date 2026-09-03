@@ -26,6 +26,10 @@ const props = defineProps<{
 
     <template v-if="$props.labelled">
       Toggle Drawer
+
+      <span class="mdst-code">
+        d
+      </span>
     </template>
   </button>
 </template>

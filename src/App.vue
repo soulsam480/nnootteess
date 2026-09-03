@@ -13,6 +13,7 @@ import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
 import Search from "./components/search.vue";
+import Settings from "./components/settings.vue";
 
 const Tab = defineAsyncComponent(async () => {
   return await import("./components/tab.vue");
@@ -37,6 +38,7 @@ watchEffect(
       <DeleteNoteConfirmation />
       <ImportNotes />
       <Search />
+      <Settings />
 
       <Header />
       <div class="arena">

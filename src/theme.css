@@ -80,6 +80,16 @@ body {
     padding: var(--mdst-space-4);
   }
 
+  .settings-dialog {
+    .mdst-dialog-body {
+      padding: 0;
+
+      .mdst-tabs-panel {
+        padding: var(--mdst-space-4);
+      }
+    }
+  }
+
   .search-dialog[open] {
     width: auto;
 
