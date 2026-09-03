@@ -29,7 +29,7 @@
     "@milkdown/vue": "^7.22.1",
     "@replit/codemirror-vim": "^6.4.0",
     "@vueuse/core": "^14.4.0",
-    "genosdb": "^0.33.3",
+    "genosdb": "^0.33.5",
     "mdst-ui": "^1.0.3",
     "prettier": "^3.9.6",
     "scule": "^1.3.0",

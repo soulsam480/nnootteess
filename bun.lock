@@ -23,7 +23,7 @@
         "@milkdown/vue": "^7.22.1",
         "@replit/codemirror-vim": "^6.4.0",
         "@vueuse/core": "^14.4.0",
-        "genosdb": "^0.33.3",
+        "genosdb": "^0.33.5",
         "mdst-ui": "^1.0.3",
         "prettier": "^3.9.6",
         "scule": "^1.3.0",
@@ -843,7 +843,7 @@
 
     "generator-function": ["generator-function@2.0.1", "", {}, "sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g=="],
 
-    "genosdb": ["genosdb@0.33.3", "", {}, "sha512-6n8zA/M8FVJBINYA6q5SbvWxNi4NTd5UUEmFd2rIB1k7wNZVWMdZlW+n5GfQllRTfyZv1KxxCHFi9Lf+O2Zdug=="],
+    "genosdb": ["genosdb@0.33.5", "", {}, "sha512-o12wgueH6gOAgce5feX2Sp5DSyop2DHmnuh7Qv9/rBhYQBumUXqCAWUpkT+TFWgLKcaQXGF5ck8dfRc1EXQNfw=="],
 
     "gensync": ["gensync@1.0.0-beta.2", "", {}, "sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg=="],
 
