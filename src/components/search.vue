@@ -83,7 +83,10 @@ onKeyStroke("Enter", () => {
     return;
   }
 
-  const note = notes.value.notes[currentIndex.value];
+  const note = found.value[currentIndex.value];
+
+  if (!note) return;
+
   handleOpen(note.id);
 });
 
