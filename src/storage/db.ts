@@ -6,6 +6,33 @@ const password = "The liquid solitude meandered abstractly over the glossy manus
 const V_1 = "nnootteess";
 const V_2 = "nnootteess_v2";
 
+export interface IDatabaseAPI {
+  sm: () => GDB.SecurityManager;
+  db: () => GDB.GDB;
+}
+
+export const LEGACY_HANDLE = "nnootteess_graph.msgpack";
+
+export async function clearLegacyOPFSEntry() {
+  try {
+    const root = await navigator.storage.getDirectory();
+
+    await root.removeEntry(LEGACY_HANDLE, { recursive: true });
+  } catch {}
+}
+
+export async function hasLegacyDB() {
+  try {
+    const root = await navigator.storage.getDirectory();
+
+    await root.getFileHandle(LEGACY_HANDLE);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const COMMON_CONFIG: GDB.GDBOptions = {
   password,
   rtc: true,
@@ -16,12 +43,14 @@ const COMMON_CONFIG: GDB.GDBOptions = {
   oplogSize: 500,
 };
 
-async function openLegacyDb() {
+async function openLegacyDb(): Promise<IDatabaseAPI> {
   const { gdb } =
     // @ts-expect-error esm import from url
     (await import("https://cdn.jsdelivr.net/npm/genosdb@0.26.4/dist/index.min.js")) as typeof GDB;
 
-  return await gdb(V_1, COMMON_CONFIG);
+  const db = await gdb(V_1, { ...COMMON_CONFIG, rtc: true });
+
+  return makeAPI(db);
 }
 
 function makeAPI(db: GDB.GDB) {
@@ -39,22 +68,17 @@ function makeAPI(db: GDB.GDB) {
   };
 }
 
-const [db, _legacy] = await Promise.all([
-  gdb(V_2, {
-    ...COMMON_CONFIG,
-    sm: {
-      superAdmins: [],
-      customRoles: {
-        guest: { can: ["sync"] },
-        user: { can: ["read", "write", "link", "sync"], inherits: ["guest"] },
-      },
+const db = await gdb(V_2, {
+  ...COMMON_CONFIG,
+  sm: {
+    superAdmins: [],
+    customRoles: {
+      guest: { can: ["read", "sync", "write", "link", "delete"] },
+      user: { can: ["write", "link", "sync"], inherits: ["guest"] },
     },
-  }),
-  openLegacyDb(),
-]);
+  },
+});
 
 const { db: _db, sm } = makeAPI(db);
 
-const legacyDb = makeAPI(_legacy);
-
-export { _db as db, sm, legacyDb };
+export { _db as db, sm, openLegacyDb };

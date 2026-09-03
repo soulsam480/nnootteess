@@ -1,21 +1,13 @@
-import { db, legacyDb } from "@/storage/db";
+import { clearLegacyOPFSEntry, db, IDatabaseAPI } from "@/storage/db";
 import { Note, wrapNote } from "@/storage/notes";
 import { setMigrated } from "@/storage/state";
 import { ref } from "vue";
 
 export type MigrationState = "idle" | "notes" | "state" | "tabs" | "done" | "failed";
 
-const LEGACY_HANDLE = "nnootteess_graph.msgpack";
-
 export const migrationStatus = ref<MigrationState>("idle");
 
-async function clearLegacyOPFSEntry() {
-  const root = await navigator.storage.getDirectory();
-
-  await root.removeEntry(LEGACY_HANDLE, { recursive: true });
-}
-
-async function migrateState(userId: string) {
+async function migrateState(legacyDb: IDatabaseAPI, userId: string) {
   const { results } = await legacyDb.sm().map({
     query: {
       type: { $eq: "state" },
@@ -30,7 +22,7 @@ async function migrateState(userId: string) {
   return await db().put({ ...results[0].value, owner: userId });
 }
 
-async function migrateNotes(userId: string) {
+async function migrateNotes(legacyDb: IDatabaseAPI, userId: string) {
   const identityMap = new Map<string, string>();
 
   const { results } = await legacyDb.sm().map({
@@ -63,7 +55,11 @@ async function migrateNotes(userId: string) {
   return identityMap;
 }
 
-async function migrateTabs(userId: string, notesIdentity: Map<string, string>) {
+async function migrateTabs(
+  legacyDb: IDatabaseAPI,
+  userId: string,
+  notesIdentity: Map<string, string>,
+) {
   const { results } = await legacyDb.sm().map({
     query: {
       type: "tab_group",
@@ -98,16 +94,16 @@ async function migrateTabs(userId: string, notesIdentity: Map<string, string>) {
   return moved;
 }
 
-export async function migrate(userId: string) {
+export async function migrate(legacyDb: IDatabaseAPI, userId: string) {
   try {
     migrationStatus.value = "state";
-    const stateId = await migrateState(userId);
+    const stateId = await migrateState(legacyDb, userId);
 
     migrationStatus.value = "notes";
-    const notes = await migrateNotes(userId);
+    const notes = await migrateNotes(legacyDb, userId);
 
     migrationStatus.value = "tabs";
-    const movedTabs = await migrateTabs(userId, notes);
+    const movedTabs = await migrateTabs(legacyDb, userId, notes);
 
     migrationStatus.value = "done";
 

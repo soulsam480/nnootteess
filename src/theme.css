@@ -76,11 +76,6 @@ body {
   display: flex;
   flex-direction: column;
 
-  .mdst-input,
-  .mdst-dropdown {
-    padding: var(--mdst-space-xs) var(--mdst-space-sm);
-  }
-
   &:has(.login-dialog) {
     padding: var(--mdst-space-4);
   }
@@ -352,6 +347,11 @@ body {
 
       div[data-milkdown-root] {
         overflow: hidden;
+      }
+
+      .mdst-input,
+      .mdst-dropdown {
+        padding: var(--mdst-space-xs) var(--mdst-space-sm);
       }
 
       .milkdown,

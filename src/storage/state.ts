@@ -1,4 +1,4 @@
-import { db } from "@/storage/db";
+import { clearLegacyOPFSEntry, db } from "@/storage/db";
 import { NodeObject } from "genosdb";
 import { Ref, shallowReactive, toRaw } from "vue";
 
@@ -66,6 +66,10 @@ async function startState(userId: string, isLoggedIn: Ref<boolean>) {
 
   if (!result?.value) {
     return;
+  }
+
+  if (result.value.migrated_at) {
+    clearLegacyOPFSEntry();
   }
 
   setValues(result);

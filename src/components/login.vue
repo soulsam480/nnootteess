@@ -77,13 +77,14 @@ async function handleCopy() {
 
       <div>Or</div>
 
-      <textarea
+      <input
         class="mdst-input"
         placeholder="Login with saved phrase"
         v-model="loginState.mnemonic"
         :disabled='loginState.state === "generated"'
         @keyup.enter="handleLogin"
-      ></textarea>
+        type="password"
+      />
 
       <button
         v-if='loginState.state === "generated"'

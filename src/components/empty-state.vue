@@ -5,12 +5,13 @@ import DrawerToggle from "@/components/drawer-toggle.vue";
 import CarbonLogoGithub from "~icons/carbon/logo-github";
 import CarbonStackedMove from "~icons/carbon/stacked-move";
 import { addNewCode, addNewNote } from "./sidebar.vue";
-import { legacyDb } from "@/storage/db";
 import { computed, inject } from "vue";
 import { storageKey } from "@/storage/local";
 import { PASS_KEY, PersistedMemonic } from "@/storage/user";
 import { migrate, migrationStatus } from "@/storage/migrator";
 import { state } from "@/storage/state";
+import { hasLegacyDB, openLegacyDb } from "@/storage/db";
+import { computedAsync } from "@vueuse/core";
 
 const storage = inject(storageKey);
 
@@ -23,6 +24,8 @@ async function handleMigration() {
 
   if (!previousMemonic) return;
 
+  const legacyDb = await openLegacyDb();
+
   const identity: Record<string, string> | null = await legacyDb.sm()
     .loginOrRecoverUserWithMnemonic(previousMemonic);
 
@@ -30,18 +33,22 @@ async function handleMigration() {
     return;
   }
 
-  await migrate(identity.address);
+  await migrate(legacyDb, identity.address);
 }
 
 const isLoading = computed(() =>
   ["state", "notes", "tabs"].includes(migrationStatus.value)
 );
+
+const isMigratable = computedAsync(async () => {
+  return !state.migrated_at && (await hasLegacyDB());
+}, false);
 </script>
 
 <template>
   <div class="empty-state">
     <button
-      v-if="!state.migrated_at"
+      v-if="isMigratable"
       class="mdst-button mdst-button--ghost"
       @click="handleMigration"
     >
