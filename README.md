@@ -24,41 +24,28 @@ app.
 
 ### Features
 
-- **P2P Realtime Sync** — notes sync peer-to-peer with end-to-end encryption, no
-  server holds your data; changes and deletions propagate instantly across all
-  your devices
-- **New Tab Override** — replaces your browser's new tab with a note-taking
-  workspace
-- **Markdown Editor** — rich WYSIWYG markdown editing
-- **Code Snippets** — JSON, JavaScript, and TypeScript with a per-snippet
-  language switcher
-- **Editor Extras** — line numbers, code folding, bracket matching/auto-close,
-  active line highlighting, search, undo history
-- **Vim Mode** — optional Vim keybindings for snippets, remembered between
-  sessions
-- **Prettier Formatting** — one-key formatting for code snippets
-- **Mnemonic Auth** — register once and copy/save your passphrase, reuse it to
-  log in on any device; stays valid in the browser for 15 minutes
-- **Tabbed Notes** — open up to 10 notes as closable tabs; open tabs and active
-  note stay in sync across devices
-- **Sidebar Navigation** — browse, create, rename, and delete notes from the
-  collapsible sidebar; auto-closes on small screens
-- **Auto-save** — notes save as you type, rename inline
-- **Synced State** — sidebar position and theme follow you across devices
-
-### What more can be done?
-
-- Web app? since the gdb namespace is same, users can use it as long as mnemonic
-  is same
-- better UI? sure
+- P2P realtime sync over WebRTC via GenosDB, note content end-to-end encrypted, no server stores your data
+- Mnemonic passphrase auth, same phrase works on every device and browser, session kept for 15 minutes with auto-login
+- Markdown notes with Milkdown Crepe
+- Code snippets with CodeMirror 6, per-snippet language switcher for JSON, JavaScript, TypeScript
+- Code editor with line numbers, folding, bracket matching and auto-close, active line highlight, search, undo history
+- Optional Vim mode for snippets, persisted between sessions
+- Prettier formatting for snippets with Mod-Shift-F
+- Split panes and tabs, open notes stay in sync across devices, document title follows focused note
+- Quick search with Cmd/Ctrl-K, filters by note name
+- Collapsible sidebar to browse, create, rename inline, and delete notes with confirmation
+- Auto-save with debounced writes
+- Sidebar position and theme sync across devices
+- Export all notes as zip, markdown notes as .md and snippets as .json/.js/.ts
+- PWA web app with offline cache
 
 ### Tech Stack
 
 - Vue 3 + TypeScript
-- Vite + CRXJS (Chrome Extension)
-- Milkdown (Markdown editor)
-- Monaco Editor + Shiki (code editing)
-- GenosDB (P2P sync)
+- Vite + CRXJS (Chrome Extension) + vite-plugin-pwa (web app)
+- Milkdown Crepe (markdown)
+- CodeMirror 6 + Prettier (snippets)
+- GenosDB (P2P sync + auth)
 
 ### Development
 

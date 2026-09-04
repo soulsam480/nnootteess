@@ -19,6 +19,7 @@ const BINDINGS = [
   ["d", "Toggle drawer"],
   ["E", "Export notes"],
   ["s", "Open settings"],
+  ["⌘ + Shift + F", "Format snippet"],
 ];
 
 onKeyStroke(["s"], (event) => {
