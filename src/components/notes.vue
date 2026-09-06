@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
 import { toggleDrawer } from "@/storage/state";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, useTemplateRef } from "vue";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
@@ -18,6 +18,8 @@ const hasNotes = computed(() => {
 });
 
 const isSmallScreen = useMediaQuery("(max-width: 600px)");
+
+const notesList = useTemplateRef("notesList");
 
 function noteIdFromEvent(event: MouseEvent) {
   const parent = (event.currentTarget as HTMLButtonElement).closest<
@@ -83,15 +85,17 @@ async function togglePinNote(
     return;
   }
 
-  const note = noteAPI.notes.value.index.get(noteId);
+  const note = await noteAPI.find(noteId);
 
   if (!note) {
     return;
   }
 
+  const { value } = note;
+
   await noteAPI.update(
     note.id,
-    { ...note.value, pinned: !Boolean(note.value.pinned) } as noteAPI.Note,
+    { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note,
   );
 }
 
@@ -159,7 +163,7 @@ function handleOpenActions(
   openPopover(source, note.id);
 }
 
-onLongPress(document.body, (event) => {
+onLongPress(notesList, (event) => {
   if (
     !(event.target instanceof HTMLElement &&
       event.target.matches("li.link *"))
@@ -221,7 +225,7 @@ onLongPress(document.body, (event) => {
     </button>
   </div>
 
-  <ul class="notes">
+  <ul class="notes" ref="notesList">
     <li
       v-for="note in noteAPI.notes.value.notes"
       class="link"

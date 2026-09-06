@@ -293,6 +293,7 @@ async function importNotes(files: FileList) {
 export {
   create,
   update,
+  find,
   delete_ as delete,
   createCode,
   useNote,
