@@ -103,6 +103,10 @@ const isMigratable = computedAsync(async () => {
       <CarbonLogoGithub /> GitHub
     </a>
 
+    <p class="mdst-p--muted">
+      Tip: Right click / Long press on a note to see actions
+    </p>
+
     <footer>
       <p>
         Sambit Sahoo {{ new Date().getFullYear() }}&comma; MIT License
