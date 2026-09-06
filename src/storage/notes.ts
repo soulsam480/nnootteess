@@ -11,6 +11,7 @@ interface CommonNote {
   updated_at: number;
   meta: Record<string, string>;
   owner: string;
+  pinned: boolean | undefined;
   sec: {
     content: string;
   };
@@ -151,12 +152,14 @@ async function all(
 ): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
   const { results } = await db().map(makeQuery(userId));
 
-  return results.map((it) => {
-    // NOTE: avoid loading massive data into memory for all notes
-    const { sec: _, ...rest } = it.value;
+  return results
+    .map((it) => {
+      // NOTE: avoid loading massive data into memory for all notes
+      const { sec: _, ...rest } = it.value;
 
-    return { ...it, value: { ...rest, sec: {} } };
-  });
+      return { ...it, value: { ...rest, sec: {} } };
+    })
+    .sort((a, b) => (a.value.pinned ? -1 : b.value.pinned ? 1 : 0));
 }
 
 async function createCode(name: string, language: Language): Promise<NodeObject<Note>> {
@@ -177,6 +180,7 @@ async function createCode(name: string, language: Language): Promise<NodeObject<
       updated_at: Date.now(),
       sec: { content: "" },
       content: "",
+      pinned: false,
     } satisfies Note),
   );
 
@@ -198,6 +202,7 @@ async function create(name: string): Promise<NodeObject<Note>> {
       created_at: Date.now(),
       type: "note",
       updated_at: Date.now(),
+      pinned: false,
       sec: {
         content: "",
       },
