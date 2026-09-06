@@ -214,6 +214,10 @@ async function create(name: string): Promise<NodeObject<Note>> {
 }
 
 async function update(id: string, note: Note): Promise<NodeObject<Note>> {
+  if (!("content" in note.sec)) {
+    throw new Error("content not found in sec");
+  }
+
   await db().put(
     await wrapNote({
       ...note,
