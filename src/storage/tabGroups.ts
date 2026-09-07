@@ -29,7 +29,7 @@ watch(activeNoteIds, (value) => {
     const title = document.head.querySelector("title");
 
     if (title) {
-      title.innerText = "NNOOTTEESS";
+      title.innerText = "NOTESx2";
     }
   }
 });

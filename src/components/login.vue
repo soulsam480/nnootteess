@@ -7,11 +7,13 @@ import { inject, shallowReactive } from "vue";
 interface LoginState {
   state: "generated" | "idle";
   mnemonic: string;
+  ttl: "15m" | "1h" | "8h" | "1d";
 }
 
 const loginState = shallowReactive<LoginState>({
   state: "idle",
   mnemonic: "",
+  ttl: "15m",
 });
 
 const storage = inject(storageKey);
@@ -25,7 +27,7 @@ async function handleLogin() {
     user.state = "copying";
   }
 
-  const id = await login(storage, phrase || undefined);
+  const id = await login(storage, phrase || undefined, loginState.ttl);
 
   if (!id) {
     return;
@@ -45,7 +47,7 @@ async function handleCopy() {
   await copy(loginState.mnemonic);
 
   user.state = "inactive";
-  login(storage, loginState.mnemonic);
+  login(storage, loginState.mnemonic, loginState.ttl);
 }
 </script>
 
@@ -56,7 +58,7 @@ async function handleCopy() {
     <div class="mdst-card-body">
       <div class="login-dialog__header">
         <h2 class="mdst-card-title">
-          Welcome to NNOOTTEESS
+          Welcome to NOTESx2
         </h2>
         <div>
           Your notes sync P2P with E2E encryption across devices / browsers /
@@ -86,42 +88,38 @@ async function handleCopy() {
         type="password"
       />
 
-      <button
-        v-if='loginState.state === "generated"'
-        class="mdst-button"
-        @click="handleCopy()"
-        :disabled="copyPending"
-      >
-        Copy Login Phrease, Don't Lose it!
-      </button>
+      <div class="login_dialog__actions">
+        <select
+          class="mdst-dropdown"
+          v-if="loginState.mnemonic"
+          v-model="loginState.ttl"
+        >
+          <option value="">Stay logged in for</option>
+          <option value="15m">15 Minutes</option>
+          <option value="1h">1 Hour</option>
+          <option value="8h">8 Hours</option>
+          <option value="1d">1 Day</option>
+        </select>
 
-      <button
-        v-if='loginState.state === "idle" && loginState.mnemonic'
-        class="mdst-button"
-        @click="handleLogin"
-      >
-        Login
-      </button>
+        <button
+          v-if='loginState.state === "generated"'
+          class="mdst-button mdst-button--inverted"
+          @click="handleCopy()"
+          :disabled="copyPending"
+        >
+          Copy Login Phrease, Don't Lose it!
+        </button>
+
+        <button
+          v-if='loginState.state === "idle" && loginState.mnemonic'
+          class="mdst-button mdst-button--inverted"
+          @click="handleLogin"
+        >
+          Login
+        </button>
+      </div>
+
+      <p class="mdst-p--muted">You're logged out once this tab is closed</p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.login-dialog {
-  margin: auto;
-  padding: var(--mdst-space-4);
-
-  .mdst-card-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--mdst-space-2);
-  }
-
-  .login-dialog__header {
-    text-align: center;
-    margin-bottom: var(--mdst-space-6);
-  }
-}
-</style>

@@ -34,7 +34,7 @@ onKeyStroke(["d"], (event) => {
       <DrawerToggle />
 
       <div class="home">
-        NNOOTTEESS
+        NOTESx2
       </div>
     </div>
 

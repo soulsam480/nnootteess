@@ -1,4 +1,4 @@
-nnootteess.test {
+notesx2.test {
         tls internal
 	reverse_proxy localhost:5173
 }

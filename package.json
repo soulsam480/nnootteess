@@ -1,13 +1,11 @@
 {
-  "name": "nnootteess",
+  "name": "notesx2",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:extension": "vite -c vite.extension.config.ts",
-    "build:extension": "vue-tsc -b && vite build -c vite.extension.config.ts",
-    "dev:app": "caddy run & vite -c vite.app.config.ts",
-    "build:app": "vue-tsc -b && vite build -c vite.app.config.ts",
+    "dev": "caddy run & vite -c vite.app.config.ts",
+    "build": "vue-tsc -b && vite build -c vite.app.config.ts",
     "format": "bun oxfmt"
   },
   "dependencies": {

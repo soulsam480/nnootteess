@@ -36,8 +36,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 20 * 1000 * 1000,
       },
       manifest: {
-        name: "NNOOTTEESS",
-        short_name: "NNOOTTEESS",
+        name: "NOTESx2",
+        short_name: "NOTESx2",
         description: "P2P synced and E2E encrypted note taking app",
         theme_color: "#6307E4",
         background_color: "#6307E4",
@@ -54,6 +54,6 @@ export default defineConfig({
     }),
   ],
   server: {
-    allowedHosts: ["nnootteess.test"],
+    allowedHosts: ["notesx2.test"],
   },
 });

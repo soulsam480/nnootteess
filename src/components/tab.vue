@@ -55,7 +55,7 @@ function handleFocus() {
     document.head.appendChild(title);
   }
 
-  title.innerText = note.value?.value.name ?? "NNOOTTEESS";
+  title.innerText = note.value?.value.name ?? "NOTESx2";
 }
 </script>
 

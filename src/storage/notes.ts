@@ -283,7 +283,7 @@ async function exportNotes() {
 
   const url = window.URL.createObjectURL(blob);
   a.href = url;
-  a.download = `nnnootteess-export-${new Date().toDateString()}.zip`;
+  a.download = `nnotesx2-export-${new Date().toDateString()}.zip`;
   a.click();
 }
 

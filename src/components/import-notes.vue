@@ -22,7 +22,7 @@ function handleImport() {
 <template>
   <dialog id="import-notes-modal" class="mdst-dialog" @close="files = null">
     <div class="mdst-dialog-header">
-      <h2 class="mdst-dialog-title">Import notes into nnootteess</h2>
+      <h2 class="mdst-dialog-title">Import notes into notesx2</h2>
       <button
         class="mdst-dialog-close"
         commandfor="import-notes-modal"
