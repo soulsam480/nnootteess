@@ -2,25 +2,13 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/soulsam480/nnootteess)](https://github.com/soulsam480/nnootteess/releases/latest)
 
-> P2P synced note taking in all your browsers
+> P2P synced and E2E encrypted note taking in all your browsers
 
 ### How to use
 
 - Open the web app at https://notes.sambitsahoo.com and register
 - copy/save the passphrase
 - add notes/snippets
-
-> The web app is the recommended way to use NOTESx2. Same passphrase, same
-> notes, everywhere.
-
-### Chrome extension (deprecated)
-
-The new tab extension still works but is no longer the focus. Prefer the web
-app.
-
-- Download latest release https://github.com/soulsam480/nnootteess/releases
-- turn on developer mode in chrome://extensions
-- add and then enable new tab
 
 ### Features
 
@@ -47,7 +35,6 @@ app.
 ### Tech Stack
 
 - Vue 3 + TypeScript
-- Vite + CRXJS (Chrome Extension) + vite-plugin-pwa (web app)
 - Milkdown Crepe (markdown)
 - CodeMirror 6 + Prettier (snippets)
 - GenosDB (P2P sync + auth)
@@ -56,15 +43,13 @@ app.
 
 ```bash
 bun install
-bun run dev:app
-bun run dev:extension
+bun run dev
 ```
 
 ### Build
 
 ```bash
-bun run build:extension
-bun run build:app
+bun run build
 ```
 
 Release zip will be in `release/`.

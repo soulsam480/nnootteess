@@ -21,7 +21,7 @@ Cross-Origin-Opener-Policy = "same-origin"
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [build]
-command = "bun run build:app"
+command = "bun run build"
 publish = "apps/web/dist"
 
 [[redirects]]
