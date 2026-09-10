@@ -94,7 +94,11 @@ const hasPasskey = computedAsync(async () => {
         type="password"
       />
 
-      <div v-if='loginState.state === "idle" && !loginState.mnemonic'>Or</div>
+      <div
+        v-if='loginState.state === "idle" && !loginState.mnemonic && hasPasskey'
+      >
+        Or
+      </div>
 
       <div class="login_dialog__actions">
         <select

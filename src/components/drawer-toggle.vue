@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { state, toggleDrawer } from "@/storage/state";
-import { computed } from "vue";
+import { drawerOpen, toggleDrawer } from "@/storage/state";
 import CarbonSidePanelCloseFilled from "~icons/carbon/side-panel-close-filled";
 import CarbonSidePanelOpenFilled from "~icons/carbon/side-panel-open-filled";
-
-const drawer = computed(() => state.drawer_open ?? false);
 
 const props = defineProps<{
   labelled?: boolean;
@@ -22,7 +19,7 @@ const props = defineProps<{
     @click="toggleDrawer()"
     title="Toggle drawer"
   >
-    <CarbonSidePanelOpenFilled v-if="!drawer" />
+    <CarbonSidePanelOpenFilled v-if="!drawerOpen" />
     <CarbonSidePanelCloseFilled v-else />
 
     <template v-if="$props.labelled">

@@ -28,8 +28,8 @@ export async function addNewCode() {
 
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
-import { state } from "@/storage/state";
-import { computed, ref } from "vue";
+import { drawerOpen } from "@/storage/state";
+import { ref } from "vue";
 import Notes, { notesOrder } from "./notes.vue";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
 import CarbonCode from "~icons/carbon/code";
@@ -42,8 +42,6 @@ import CarbonSortAscending from "~icons/carbon/sort-ascending";
 import CarbonSortDescending from "~icons/carbon/sort-descending";
 
 // import CarbonDownload from "~icons/carbon/download";
-
-const drawer = computed(() => state.drawer_open ?? false);
 
 onKeyStroke(["n"], (event) => {
   if (isTyping(event.target)) {
@@ -77,7 +75,7 @@ function toggleOrder() {
 <template>
   <dialog
     class="mdst-drawer mdst-drawer--left sidebar"
-    :open="drawer"
+    :open="drawerOpen"
     @close.prevent=""
   >
     <div class="sidebar__actions">

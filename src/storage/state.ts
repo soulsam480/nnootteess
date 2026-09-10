@@ -1,4 +1,5 @@
 import { clearLegacyOPFSEntry, db } from "@/storage/db";
+import { useStorage } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { Ref, shallowReactive, toRaw } from "vue";
 
@@ -7,7 +8,6 @@ interface State {
   owner: string;
   type: "state";
   theme: string | null;
-  drawer_open: boolean;
   migrated_at: null | number;
 }
 
@@ -15,10 +15,11 @@ const state = shallowReactive<State>({
   id: undefined,
   type: "state",
   theme: null,
-  drawer_open: false,
   owner: "",
   migrated_at: null,
 });
+
+const drawerOpen = useStorage("drawer_open", false);
 
 function makeQuery(userId: string) {
   return {
@@ -39,7 +40,6 @@ async function sync(userId: string) {
     const id = await db().put({
       type: "state",
       theme: null,
-      drawer_open: false,
       owner: userId,
       migrated_at: null,
     } satisfies State);
@@ -55,7 +55,6 @@ async function sync(userId: string) {
 function setValues(node: NodeObject) {
   state.id = node.id;
   state.theme = node.value.theme;
-  state.drawer_open = node.value.drawer_open;
   state.owner = node.value.owner;
   state.type = "state";
   state.migrated_at = node.value.migrated_at;
@@ -104,9 +103,7 @@ function setMigrated(): void {
 }
 
 function toggleDrawer(value?: boolean) {
-  state.drawer_open = value ?? !state.drawer_open;
-
-  updateState(toRaw(state));
+  drawerOpen.value = value ?? !drawerOpen.value;
 }
 
-export { state, setTheme, startState, toggleDrawer, setMigrated };
+export { state, setTheme, startState, toggleDrawer, setMigrated, drawerOpen };

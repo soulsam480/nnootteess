@@ -4,7 +4,7 @@ import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";
 import Drawer from "@/components/drawer.vue";
 import { LocalStorage, storageKey } from "@/storage/local";
-import { state } from "@/storage/state";
+import { drawerOpen } from "@/storage/state";
 import { user } from "@/storage/user";
 import { MilkdownProvider } from "@milkdown/vue";
 import { defineAsyncComponent, provide, Suspense, watchEffect } from "vue";
@@ -27,7 +27,7 @@ provide(storageKey, props.storage);
 
 watchEffect(
   () => {
-    document.body.dataset.drawerOpen = (state.drawer_open ?? false).toString();
+    document.body.dataset.drawerOpen = drawerOpen.value.toString();
   },
 );
 </script>
