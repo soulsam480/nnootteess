@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
 import { toggleDrawer } from "@/storage/state";
-import { computed, onMounted, useTemplateRef } from "vue";
-import CarbonTrashCan from "~icons/carbon/trash-can";
+import { computed, useTemplateRef } from "vue";
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
-import CarbonSplitScreen from "~icons/carbon/split-screen";
 import { formatDate } from "@/utils/date";
 import { onLongPress, useMediaQuery } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
 import { activeNoteIds, openNote } from "@/storage/tabGroups";
 import CarbonPin from "~icons/carbon/pin";
+import NoteActions from "./note-actions.vue";
 
 const hasNotes = computed(() => {
   return noteAPI.notes.value.notes.length > 0;
@@ -124,32 +123,7 @@ function handleClick(
     toggleDrawer(false);
   }
 }
-
 // ------------- note actions handlers -----------------
-
-onMounted(() => {
-  document.addEventListener("pointerdown", (event) => {
-    const pop = document.querySelector<HTMLElement>("#note-actions");
-
-    if (!pop?.matches(":popover-open")) return;
-
-    const target = event.target as Node;
-
-    if (!pop.contains(target)) {
-      pop.hidePopover();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-
-    const pop = document.querySelector<HTMLElement>("#note-actions");
-
-    if (pop?.matches(":popover-open")) {
-      pop.hidePopover();
-    }
-  });
-});
 
 function handleOpenActions(
   event: MouseEvent,
@@ -183,47 +157,12 @@ onLongPress(notesList, (event) => {
 </script>
 
 <template>
-  <div
-    id="note-actions"
-    class="mdst-popover mdst-popover--anchored mdst-popover--sm note-actions"
-    popover="manual"
+  <NoteActions
     @toggle="handleToggle"
-  >
-    <p class="mdst-p--muted note-actions__header">
-      ACTIONS
-    </p>
-
-    <button
-      @click="togglePinNote($event)"
-      class="mdst-button mdst-button--sm mdst-button--ghost"
-      title="Pin"
-      type="button"
-    >
-      <CarbonPin />
-      Pin/Un-pin
-    </button>
-
-    <button
-      @click="handleClick($event, undefined, true)"
-      title="Split"
-      type="button"
-      class="mdst-button mdst-button--sm mdst-button--ghost"
-    >
-      <CarbonSplitScreen />
-      Split
-    </button>
-
-    <button
-      @click="deleteNote($event)"
-      class="mdst-button note-actions__delete mdst-button--sm mdst-button--ghost"
-      title="Delete"
-      popovertarget="delete-note-confirmation"
-      type="button"
-    >
-      <CarbonTrashCan />
-      Delete
-    </button>
-  </div>
+    @togglePin="togglePinNote"
+    @click="handleClick($event, undefined, true)"
+    @delete="deleteNote"
+  />
 
   <ul class="notes" ref="notesList">
     <li
