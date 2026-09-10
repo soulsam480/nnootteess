@@ -97,7 +97,7 @@ async function handleCreatePasskey() {
           <hr class="mdst-hr mdst-hr--flush" />
 
           <div class="settings__auth">
-            <p class="mdst-p mdst-p--sm">Create a Passkey to auto log-in</p>
+            <p class="mdst-p mdst-p--sm">Setup a Passkey to auto log-in</p>
             <div>
               <p
                 style="display: inline-flex; gap: var(--mdst-space-1); align-items: center"
