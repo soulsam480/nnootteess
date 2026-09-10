@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
-import TextEditor from "./text-editor.vue";
-import { ref, unref } from "vue";
+import { defineAsyncComponent, ref, unref } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import CodeEditor from "./code-editor.vue";
 import { titleCase } from "scule";
 import { closeNote, lastFocused } from "@/storage/tabGroups";
+
+const TextEditor = defineAsyncComponent(async () =>
+  await import("@/components/text-editor.vue")
+);
+
+const CodeEditor = defineAsyncComponent(async () =>
+  await import("@/components/code-editor.vue")
+);
 
 const props = defineProps<{
   id: string;

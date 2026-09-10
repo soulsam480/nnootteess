@@ -30,7 +30,16 @@ export type Note = TextNote | CodeNote;
 
 export type TListNote = Omit<Note, "content"> & { content?: string };
 
-const LANGUAGES = ["json", "javascript", "typescript"] as const;
+const LANGUAGES = [
+  "json",
+  "javascript",
+  "typescript",
+  "jsx",
+  "tsx",
+  "css",
+  "html",
+  "markdown",
+] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 
@@ -39,13 +48,15 @@ export interface INotesState {
   index: Map<string, NodeObject<TListNote>>;
 }
 
-const LANGUAGE_TO_EXT = {
+const LANGUAGE_TO_EXT: Record<Language, string> = {
   json: "json",
   javascript: "js",
   typescript: "ts",
   css: "css",
   html: "html",
   markdown: "md",
+  jsx: "jsx",
+  tsx: "tsx",
 };
 
 const notes = shallowRef<INotesState>({
@@ -295,6 +306,7 @@ async function importNotes(files: FileList) {
 }
 
 export {
+  all as allNotes,
   create,
   update,
   find,

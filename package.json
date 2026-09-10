@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "type-check": "vue-tsc --noEmit",
     "dev": "caddy run & vite -c vite.app.config.ts",
     "build": "vue-tsc -b && vite build -c vite.app.config.ts",
     "format": "bun oxfmt"

@@ -36,10 +36,11 @@ import { getLanguageExtension } from "@/utils/codemirror";
 import { formatCode } from "@/utils/prettier";
 import { vim } from "@replit/codemirror-vim";
 import { useStorage } from "@vueuse/core";
+import { Language } from "@/storage/notes";
 
 const props = defineProps<{
   modelValue: string;
-  language: string;
+  language: Language;
   theme?: string;
 }>();
 
@@ -80,13 +81,6 @@ function formatDocument(view: EditorView): boolean {
 async function formatDocumentAsync(view: EditorView): Promise<void> {
   const { language } = props;
 
-  if (
-    language !== "json" &&
-    language !== "javascript" &&
-    language !== "typescript"
-  ) {
-    return;
-  }
   const value = view.state.doc.toString();
 
   try {

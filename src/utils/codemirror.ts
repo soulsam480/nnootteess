@@ -5,8 +5,9 @@ import { html } from "@codemirror/lang-html";
 import { markdown } from "@codemirror/lang-markdown";
 
 import type { Extension } from "@codemirror/state";
+import { Language } from "@/storage/notes";
 
-export function getLanguageExtension(language: string): Extension {
+export function getLanguageExtension(language: Language): Extension {
   switch (language.toLowerCase()) {
     case "json":
       return json();
