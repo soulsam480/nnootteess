@@ -4,7 +4,7 @@ import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
 import CarbonLogoGithub from "~icons/carbon/logo-github";
 import CarbonStackedMove from "~icons/carbon/stacked-move";
-import { addNewCode, addNewNote } from "./sidebar.vue";
+import { addNewCode, addNewNote } from "./drawer.vue";
 import { computed, inject } from "vue";
 import { storageKey } from "@/storage/local";
 import { PASS_KEY, PersistedMemonic } from "@/storage/user";

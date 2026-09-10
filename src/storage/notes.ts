@@ -163,14 +163,12 @@ async function all(
 ): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
   const { results } = await db().map(makeQuery(userId));
 
-  return results
-    .map((it) => {
-      // NOTE: avoid loading massive data into memory for all notes
-      const { sec: _, ...rest } = it.value;
+  return results.map((it) => {
+    // NOTE: avoid loading massive data into memory for all notes
+    const { sec: _, ...rest } = it.value;
 
-      return { ...it, value: { ...rest, sec: {} } };
-    })
-    .sort((a, b) => (a.value.pinned ? -1 : b.value.pinned ? 1 : 0));
+    return { ...it, value: { ...rest, sec: {} } };
+  });
 }
 
 async function createCode(name: string, language: Language): Promise<NodeObject<Note>> {

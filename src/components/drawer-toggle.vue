@@ -20,6 +20,7 @@ const props = defineProps<{
       },
     ]'
     @click="toggleDrawer()"
+    title="Toggle drawer"
   >
     <CarbonSidePanelOpenFilled v-if="!drawer" />
     <CarbonSidePanelCloseFilled v-else />

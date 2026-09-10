@@ -1,3 +1,8 @@
+<script module lang="ts">
+export type NoteOrder = "asc" | "desc";
+
+export const notesOrder = useStorage<NoteOrder>("notes_order", "desc");
+</script>
 <script setup lang="ts">
 import * as noteAPI from "@/storage/notes";
 import { toggleDrawer } from "@/storage/state";
@@ -5,7 +10,7 @@ import { computed, useTemplateRef } from "vue";
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
 import { formatDate } from "@/utils/date";
-import { onLongPress, useMediaQuery } from "@vueuse/core";
+import { onLongPress, useMediaQuery, useStorage } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
 import { activeNoteIds, openNote } from "@/storage/tabGroups";
@@ -154,6 +159,20 @@ onLongPress(notesList, (event) => {
     openPopover(event.target, noteId);
   }
 }, { modifiers: { prevent: true }, delay: 500 });
+
+const notesToShow = computed(() => {
+  return noteAPI.notes.value.notes.toSorted((a, b) => {
+    if (a.value.pinned !== b.value.pinned) {
+      return a.value.pinned ? -1 : 1;
+    }
+
+    if (notesOrder.value === "asc") {
+      return a.value.created_at - b.value.created_at;
+    }
+
+    return b.value.created_at - a.value.created_at;
+  });
+});
 </script>
 
 <template>
@@ -166,7 +185,7 @@ onLongPress(notesList, (event) => {
 
   <ul class="notes" ref="notesList">
     <li
-      v-for="note in noteAPI.notes.value.notes"
+      v-for="note in notesToShow"
       class="link"
       :class="{ active: activeNoteIds.some((it) => it[1] === note.id) }"
       @click="handleClick($event, note)"

@@ -2,7 +2,7 @@
 import Header from "@/components/header.vue";
 import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";
-import Sidebar from "@/components/sidebar.vue";
+import Drawer from "@/components/drawer.vue";
 import { LocalStorage, storageKey } from "@/storage/local";
 import { state } from "@/storage/state";
 import { user } from "@/storage/user";
@@ -42,7 +42,7 @@ watchEffect(
 
       <Header />
       <div class="arena">
-        <Sidebar />
+        <Drawer />
 
         <div class="mdst-tabs" v-if="activeNoteIds.length > 0">
           <NoteTabs />
