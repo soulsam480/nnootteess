@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { sm } from "@/storage/db";
 import { storageKey } from "@/storage/local";
 import { login, user } from "@/storage/user";
-import { useClipboard } from "@vueuse/core";
+import { computedAsync, useClipboard } from "@vueuse/core";
 import { inject, shallowReactive } from "vue";
 
 interface LoginState {
@@ -49,6 +50,14 @@ async function handleCopy() {
   user.state = "inactive";
   login(storage, loginState.mnemonic, loginState.ttl);
 }
+
+async function handleLoginWithPassKey() {
+  await sm().loginCurrentUserWithWebAuthn();
+}
+
+const hasPasskey = computedAsync(async () => {
+  return await sm().hasExistingWebAuthnRegistration();
+}, false);
 </script>
 
 <template>
@@ -66,9 +75,6 @@ async function handleCopy() {
         </div>
       </div>
 
-      <div>
-        To Get Started
-      </div>
       <button
         v-if='loginState.state === "idle"'
         class="mdst-button mdst-button--primary"
@@ -77,7 +83,7 @@ async function handleCopy() {
         Register a new account
       </button>
 
-      <div>Or</div>
+      <hr class="mdst-hr" style="width: 100%; margin: var(--mdst-space-4)" />
 
       <input
         class="mdst-input"
@@ -88,13 +94,15 @@ async function handleCopy() {
         type="password"
       />
 
+      <div v-if='loginState.state === "idle" && !loginState.mnemonic'>Or</div>
+
       <div class="login_dialog__actions">
         <select
           class="mdst-dropdown"
           v-if="loginState.mnemonic"
           v-model="loginState.ttl"
         >
-          <option value="">Stay logged in for</option>
+          <option value="">Stay logged in this tab for</option>
           <option value="15m">15 Minutes</option>
           <option value="1h">1 Hour</option>
           <option value="8h">8 Hours</option>
@@ -117,9 +125,15 @@ async function handleCopy() {
         >
           Login
         </button>
-      </div>
 
-      <p class="mdst-p--muted">You're logged out once this tab is closed</p>
+        <button
+          v-if='loginState.state === "idle" && !loginState.mnemonic && hasPasskey'
+          class="mdst-button mdst-button--inverted"
+          @click="handleLoginWithPassKey"
+        >
+          Login with Passkey
+        </button>
+      </div>
     </div>
   </div>
 </template>

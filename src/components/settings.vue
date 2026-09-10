@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { editorVimEnabled } from "./code-editor.vue";
-import { onKeyStroke } from "@vueuse/core";
+import { computedAsync, onKeyStroke } from "@vueuse/core";
 import { isTyping } from "@/utils/events";
+import { sm } from "@/storage/db";
+import CarbonIbmCloudKeyProtect from "~icons/carbon/ibm-cloud-key-protect";
+import CarbonKeychain from "~icons/carbon/keychain";
 
 type Tab = "preferences" | "keybindings";
 
@@ -31,6 +34,14 @@ onKeyStroke(["s"], (event) => {
 
   document.querySelector<HTMLDialogElement>("#settingsModal")?.showModal();
 });
+
+const hasPasskey = computedAsync(async () => {
+  return await sm().hasExistingWebAuthnRegistration();
+}, false);
+
+async function handleCreatePasskey() {
+  await sm().protectCurrentIdentityWithWebAuthn();
+}
 </script>
 
 <template>
@@ -70,7 +81,7 @@ onKeyStroke(["s"], (event) => {
           </button>
         </div>
         <div
-          class="mdst-tabs-panel"
+          class="mdst-tabs-panel settings__preferences"
           role="tabpanel"
           :data-state='state(tab, "preferences")'
         >
@@ -82,6 +93,30 @@ onKeyStroke(["s"], (event) => {
               class="mdst-checkbox"
             />
           </label>
+
+          <hr class="mdst-hr mdst-hr--flush" />
+
+          <div class="settings__auth">
+            <p class="mdst-p mdst-p--sm">Create a Passkey to auto log-in</p>
+            <div>
+              <p
+                style="display: inline-flex; gap: var(--mdst-space-1); align-items: center"
+                v-if="hasPasskey"
+              >
+                <CarbonKeychain stroke="var(--mdst-color-success)" /> <span>
+                  Passkey Set
+                </span>
+              </p>
+              <button
+                v-else
+                class="mdst-button mdst-button--sm"
+                @click="handleCreatePasskey"
+              >
+                <CarbonIbmCloudKeyProtect />
+                Create
+              </button>
+            </div>
+          </div>
         </div>
         <div
           class="mdst-tabs-panel"

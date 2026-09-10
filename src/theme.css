@@ -111,6 +111,18 @@ body {
       .mdst-tabs-panel {
         padding: var(--mdst-space-4);
       }
+
+      .settings__preferences {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mdst-space-4);
+      }
+
+      .settings__auth {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
   }
 
