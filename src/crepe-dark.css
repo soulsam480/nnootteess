@@ -1,0 +1,42 @@
+.milkdown {
+  --crepe-color-background: #0c1322;
+  --crepe-color-on-background: #e2e8f0;
+  --crepe-color-surface: #0a0f1d;
+  --crepe-color-surface-low: #0b1220;
+  --crepe-color-on-surface: #e2e8f0;
+  --crepe-color-on-surface-variant: #94a3b8;
+  --crepe-color-outline: #475a78; /* was #29344a — more contrast for checkbox/hr strokes */
+  --crepe-color-primary: #60a5fa; /* was #3b82f6 — matches CodeMirror's function blue */
+  --crepe-color-secondary: #1e293b;
+  --crepe-color-on-secondary: #e2e8f0;
+  --crepe-color-inverse: #e2e8f0;
+  --crepe-color-on-inverse: #0f172a;
+  --crepe-color-inline-code: #a78bfa; /* violet, matches CodeMirror keyword */
+  --crepe-color-error: #f87171;
+  --crepe-color-hover: #1e293b;
+  --crepe-color-selected: #24334d; /* stays muted — it's also the menu/selection bg wash */
+  --crepe-color-inline-area: #1e293b;
+  --crepe-color-success: #4ade80; /* new — matches CodeMirror strings, used below for checked tasks */
+
+  --crepe-base-font-size: 16px;
+  --crepe-font-title: Georgia, Cambria, "Times New Roman", Times, serif;
+  --crepe-font-default:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --crepe-font-code: Fira Code, Menlo, Monaco, "Courier New", Courier, monospace;
+
+  --crepe-shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --crepe-shadow-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* blockquote left bar — was inheriting the muted --crepe-color-selected, give it its own accent */
+.milkdown blockquote::before {
+  background: var(--crepe-color-primary);
+}
+
+/* checked task items — pop with the same green used for strings in code, unchecked stays dim */
+.milkdown .milkdown-list-item-block li .label-wrapper .checked {
+  color: var(--crepe-color-success);
+}
+.milkdown .milkdown-list-item-block li .label-wrapper .checked svg {
+  fill: var(--crepe-color-success);
+}

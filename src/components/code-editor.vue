@@ -31,12 +31,12 @@ import {
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { lineNumbers } from "@codemirror/view";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { getLanguageExtension } from "@/utils/codemirror";
 import { formatCode } from "@/utils/prettier";
 import { vim } from "@replit/codemirror-vim";
 import { useStorage } from "@vueuse/core";
 import { Language } from "@/storage/notes";
+import { mdstDark } from "@/utils/dark";
 
 const props = defineProps<{
   modelValue: string;
@@ -110,7 +110,7 @@ function buildExtensions(): Extension[] {
     vimCompartment.of(vim()),
     getLanguageExtension(props.language),
     history(),
-    oneDark,
+    mdstDark,
     drawSelection(),
     bracketMatching(),
     closeBrackets(),
