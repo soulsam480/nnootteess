@@ -64,30 +64,29 @@ const hasPasskey = computedAsync(async () => {
   <div
     class="mdst-card login-dialog"
   >
+    <div class="login-dialog__header">
+      <h2 class="mdst-card-title">
+        Welcome to NOTESx2
+      </h2>
+      <p>
+        You're creating a vault. Each vault has its own vault key and syncs P2P
+        with E2E encryption across devices / browsers / tabs
+      </p>
+    </div>
     <div class="mdst-card-body">
-      <div class="login-dialog__header">
-        <h2 class="mdst-card-title">
-          Welcome to NOTESx2
-        </h2>
-        <div>
-          Your notes sync P2P with E2E encryption across devices / browsers /
-          tabs
-        </div>
-      </div>
-
       <button
         v-if='loginState.state === "idle"'
         class="mdst-button mdst-button--primary"
         @click="handleLogin"
       >
-        Register a new account
+        Create a new vault
       </button>
 
       <hr class="mdst-hr" style="width: 100%; margin: var(--mdst-space-4)" />
 
       <input
         class="mdst-input"
-        placeholder="Login with saved phrase"
+        placeholder="Open vault with vault key"
         v-model="loginState.mnemonic"
         :disabled='loginState.state === "generated"'
         @keyup.enter="handleLogin"
@@ -106,7 +105,7 @@ const hasPasskey = computedAsync(async () => {
           v-if="loginState.mnemonic"
           v-model="loginState.ttl"
         >
-          <option value="">Stay logged in this tab for</option>
+          <option value="">Keep vault unlocked in this tab for</option>
           <option value="15m">15 Minutes</option>
           <option value="1h">1 Hour</option>
           <option value="8h">8 Hours</option>
@@ -119,7 +118,7 @@ const hasPasskey = computedAsync(async () => {
           @click="handleCopy()"
           :disabled="copyPending"
         >
-          Copy Login Phrease, Don't Lose it!
+          Copy vault key — don't lose it!
         </button>
 
         <button
@@ -127,7 +126,7 @@ const hasPasskey = computedAsync(async () => {
           class="mdst-button mdst-button--inverted"
           @click="handleLogin"
         >
-          Login
+          Open vault
         </button>
 
         <button
@@ -135,7 +134,7 @@ const hasPasskey = computedAsync(async () => {
           class="mdst-button mdst-button--inverted"
           @click="handleLoginWithPassKey"
         >
-          Login with Passkey
+          Open vault with passkey
         </button>
       </div>
     </div>

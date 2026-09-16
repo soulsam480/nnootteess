@@ -3,11 +3,14 @@ import { user } from "@/storage/user";
 import { NodeObject, QueryOptions } from "genosdb";
 import { computed, ref, Ref, shallowRef, watch } from "vue";
 
+const CURRENT_VERSION = 1;
+
 export interface ITabGroup {
   owner: string;
   active: string;
   created_at: number;
   type: "tab_group";
+  version: number;
 }
 
 const tabGroups = shallowRef<Array<NodeObject<ITabGroup>>>([]);
@@ -59,7 +62,10 @@ async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
 
     const state = await all(userId);
 
-    tabGroups.value = state;
+    tabGroups.value = state.map((it) => ({
+      ...it,
+      value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
+    }));
   }
 
   await sync();
@@ -110,6 +116,7 @@ async function openNote(noteId: string, split = false) {
       created_at: Date.now(),
       type: "tab_group",
       owner: userId,
+      version: CURRENT_VERSION,
     } satisfies ITabGroup);
 
     await db().link(groupId, noteId);

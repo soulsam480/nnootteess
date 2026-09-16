@@ -3,10 +3,13 @@ import { useStorage } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { Ref, shallowReactive, toRaw } from "vue";
 
+const CURRENT_VERSION = 1;
+
 interface State {
   id?: string;
   owner: string;
   type: "state";
+  version: number;
   theme: string | null;
 }
 
@@ -14,6 +17,7 @@ const state = shallowReactive<State>({
   id: undefined,
   type: "state",
   theme: null,
+  version: CURRENT_VERSION,
   owner: "",
 });
 
@@ -39,6 +43,7 @@ async function sync(userId: string) {
       type: "state",
       theme: null,
       owner: userId,
+      version: CURRENT_VERSION,
     } satisfies State);
 
     const value = await db().get(id);
@@ -54,6 +59,7 @@ function setValues(node: NodeObject) {
   state.theme = node.value.theme;
   state.owner = node.value.owner;
   state.type = "state";
+  state.version = node.value.version ?? CURRENT_VERSION;
 }
 
 async function startState(userId: string, isLoggedIn: Ref<boolean>) {

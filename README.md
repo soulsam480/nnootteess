@@ -6,38 +6,26 @@
 
 ### How to use
 
-- Open the web app at https://notes.sambitsahoo.com and register
-- copy/save the passphrase
+- Open the web app at https://notes.sambitsahoo.com and create a vault
+- copy/save the vault key
 - add notes/snippets
 
 ### Features
 
-- P2P realtime sync over WebRTC via GenosDB, note content end-to-end encrypted,
-  no server stores your data
-- Mnemonic passphrase auth, same phrase works on every device and browser,
-  session kept for 15 minutes with auto-login
-- Markdown notes with Milkdown Crepe
-- Code snippets with CodeMirror 6, per-snippet language switcher for JSON,
-  JavaScript, TypeScript
-- Code editor with line numbers, folding, bracket matching and auto-close,
-  active line highlight, search, undo history
-- Optional Vim mode for snippets, persisted between sessions
-- Prettier formatting for snippets with Mod-Shift-F
-- Split panes and tabs, open notes stay in sync across devices, document title
-  follows focused note
-- Quick search with Cmd/Ctrl-K, filters by note name
-- Collapsible sidebar to browse, create, rename inline, and delete notes with
-  confirmation
-- Auto-save with debounced writes
-- Sidebar position and theme sync across devices
-- Export all notes as zip, markdown notes as .md and snippets as .json/.js/.ts
+- Vaults open with a vault key, same key on any device, auto-unlock for 15m
+- P2P sync over WebRTC, E2E encrypted, nothing stored on a server
+- Markdown notes, JS/TS/JSON snippets
+- Vim mode, Prettier with Mod-Shift-F
+- Split panes, tabs, Cmd-K search, auto-save
+- Sidebar and theme sync across devices
+- Export all as zip
 
 ### Tech Stack
 
 - Vue 3 + TypeScript
 - Milkdown Crepe (markdown)
 - CodeMirror 6 + Prettier (snippets)
-- GenosDB (P2P sync + auth)
+- GenosDB (P2P sync + vault identity)
 
 ### Development
 

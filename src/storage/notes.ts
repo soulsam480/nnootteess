@@ -4,6 +4,8 @@ import { NodeObject, QueryOptions } from "genosdb";
 import { kebabCase } from "scule";
 import { onBeforeUnmount, Ref, ref, shallowRef } from "vue";
 
+const CURRENT_VERSION = 1;
+
 interface CommonNote {
   name: string;
   content: string;
@@ -15,6 +17,7 @@ interface CommonNote {
   sec: {
     content: string;
   };
+  version: number;
 }
 
 interface TextNote extends CommonNote {
@@ -89,6 +92,7 @@ async function unwrapNote(note: NodeObject): Promise<NodeObject<Note>> {
     ...rest,
     value: {
       ...restValue,
+      version: restValue.version ?? 1,
       sec: unwrapped,
       content: unwrapped.content,
     },
@@ -100,6 +104,8 @@ async function wrapNote(note: Note): Promise<NodeObject["value"]> {
 
   return {
     ...restValue,
+    // NOTE: for existing, if it's nothing, it's v1
+    version: restValue.version ?? 1,
     sec: await sm().encryptDataForCurrentUser(sec),
   };
 }
@@ -190,6 +196,7 @@ async function createCode(name: string, language: Language): Promise<NodeObject<
       sec: { content: "" },
       content: "",
       pinned: false,
+      version: CURRENT_VERSION,
     } satisfies Note),
   );
 
@@ -216,6 +223,7 @@ async function create(name: string): Promise<NodeObject<Note>> {
         content: "",
       },
       content: "",
+      version: CURRENT_VERSION,
     } satisfies Note),
   );
 

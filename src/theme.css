@@ -77,7 +77,6 @@ body {
   flex-direction: column;
 
   .login-dialog {
-    margin: auto;
     padding: var(--mdst-space-4);
 
     .mdst-card-body {
@@ -89,6 +88,9 @@ body {
     }
 
     .login-dialog__header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--mdst-space-1);
       text-align: center;
       margin-bottom: var(--mdst-space-6);
     }
@@ -101,6 +103,8 @@ body {
   }
 
   &:has(.login-dialog) {
+    align-items: center;
+    justify-content: center;
     padding: var(--mdst-space-4);
   }
 
@@ -493,6 +497,10 @@ body {
   [data-drawer-open="true"] .header,
   [data-drawer-open="true"] .arena {
     margin-left: 20rem;
+  }
+
+  .login-dialog {
+    width: 600px;
   }
 }
 
