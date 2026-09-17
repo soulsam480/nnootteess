@@ -36,36 +36,10 @@ import CarbonCode from "~icons/carbon/code";
 import DrawerToggle from "@/components/drawer-toggle.vue";
 import { openNote } from "@/storage/tabGroups";
 import CarbonExport from "~icons/carbon/export";
-import { onKeyStroke } from "@vueuse/core";
-import { isTyping } from "@/utils/events";
 import CarbonSortAscending from "~icons/carbon/sort-ascending";
 import CarbonSortDescending from "~icons/carbon/sort-descending";
 
 // import CarbonDownload from "~icons/carbon/download";
-
-onKeyStroke(["n"], (event) => {
-  if (isTyping(event.target)) {
-    return;
-  }
-
-  addNewNote();
-});
-
-onKeyStroke(["c"], (event) => {
-  if (isTyping(event.target)) {
-    return;
-  }
-
-  addNewCode();
-});
-
-onKeyStroke(["E"], (event) => {
-  if (isTyping(event.target)) {
-    return;
-  }
-
-  noteAPI.exportNotes();
-});
 
 function toggleOrder() {
   notesOrder.value = notesOrder.value === "asc" ? "desc" : "asc";

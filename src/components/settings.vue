@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { editorVimEnabled } from "./code-editor.vue";
-import { computedAsync, onKeyStroke } from "@vueuse/core";
-import { isTyping } from "@/utils/events";
+import { computedAsync } from "@vueuse/core";
 import { sm } from "@/storage/db";
 import CarbonIbmCloudKeyProtect from "~icons/carbon/ibm-cloud-key-protect";
 import CarbonKeychain from "~icons/carbon/keychain";
@@ -24,16 +23,6 @@ const BINDINGS = [
   ["s", "Open settings"],
   ["⌘ + Shift + F", "Format snippet"],
 ];
-
-onKeyStroke(["s"], (event) => {
-  if (isTyping(event.target)) {
-    return;
-  }
-
-  event.preventDefault();
-
-  document.querySelector<HTMLDialogElement>("#settingsModal")?.showModal();
-});
 
 const hasPasskey = computedAsync(async () => {
   return await sm().hasExistingWebAuthnRegistration();

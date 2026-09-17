@@ -12,6 +12,7 @@ import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
 import { startNotes } from "@/storage/notes";
 import { startTabGroups } from "@/storage/tabGroups";
+import { startDirectory } from "@/storage/directory";
 
 interface UserState {
   id: string | null;
@@ -54,6 +55,7 @@ sm().setSecurityStateChangeCallback((authState) => {
     startState(authState.activeAddress, isLoggedIn);
     startNotes(authState.activeAddress, isLoggedIn);
     startTabGroups(authState.activeAddress, isLoggedIn);
+    startDirectory(authState.activeAddress, isLoggedIn);
   }
 });
 

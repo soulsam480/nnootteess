@@ -31,6 +31,7 @@
     "mdst-ui": "^1.0.3",
     "prettier": "^3.9.6",
     "scule": "^1.3.0",
+    "tinykeys": "^4.0.0",
     "vue": "^3.5.42"
   },
   "devDependencies": {

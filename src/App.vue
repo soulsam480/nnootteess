@@ -12,8 +12,8 @@ import { activeNoteIds } from "./storage/tabGroups";
 import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
-import Search from "./components/search.vue";
 import Settings from "./components/settings.vue";
+import CommandBar from "./components/commands/command-bar.vue";
 
 const Tab = defineAsyncComponent(async () => {
   return await import("./components/tab.vue");
@@ -36,8 +36,8 @@ watchEffect(
   <MilkdownProvider>
     <template v-if='user.state === "authenticated" && user.id'>
       <DeleteNoteConfirmation />
+      <CommandBar />
       <ImportNotes />
-      <Search />
       <Settings />
 
       <Header />

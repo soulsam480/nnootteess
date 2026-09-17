@@ -162,10 +162,15 @@ body {
       .result {
         display: flex;
         align-items: center;
-        gap: var(--mdst-space-1);
+        gap: var(--mdst-space-2);
         padding: var(--mdst-space-1);
         border-radius: var(--mdst-radius);
+
+        .mdst-code {
+          margin-left: auto;
+        }
       }
+
       .result[data-active="true"],
       .result:hover {
         background: var(--mdst-color-subtle);
