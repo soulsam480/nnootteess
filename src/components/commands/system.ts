@@ -1,4 +1,4 @@
-import { Command } from "@/components/commands/types";
+import { CommandConfig } from "@/components/commands/types";
 import { addNewCode, addNewNote } from "@/components/drawer.vue";
 import { exportNotes } from "@/storage/notes";
 import CarbonDocumentAdd from "~icons/carbon/document-add";
@@ -7,8 +7,10 @@ import CarbonExport from "~icons/carbon/export";
 import { drawerOpen } from "@/storage/state";
 import CarbonSidePanelCloseFilled from "~icons/carbon/side-panel-close-filled";
 import CarbonSettingsAdjust from "~icons/carbon/settings-adjust";
+import { editorVimEnabled } from "@/components/code-editor.vue";
+import VscodeIconsFileTypeVim from "~icons/vscode-icons/file-type-vim";
 
-export const SYSTEM_COMMANDS: Command[] = [
+export const SYSTEM_COMMANDS: CommandConfig[] = [
   {
     id: "create-snippet",
     name: "Create snippet",
@@ -75,5 +77,18 @@ export const SYSTEM_COMMANDS: Command[] = [
       },
     },
     icon: CarbonSidePanelCloseFilled,
+  },
+  {
+    id: "toggle-vim-mode",
+    name: "Toggle Vim Mode",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyV",
+        async perform() {
+          editorVimEnabled.value = !editorVimEnabled.value;
+        },
+      },
+    },
+    icon: VscodeIconsFileTypeVim,
   },
 ];

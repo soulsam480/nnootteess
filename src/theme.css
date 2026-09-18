@@ -166,8 +166,12 @@ body {
         padding: var(--mdst-space-1);
         border-radius: var(--mdst-radius);
 
-        .mdst-code {
+        .result__shortcut {
           margin-left: auto;
+
+          .mdst-code:not(:last-child) {
+            margin-right: var(--mdst-space-1);
+          }
         }
       }
 

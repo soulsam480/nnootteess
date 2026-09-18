@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { onKeyStroke } from "@vueuse/core";
 import { computed, toRefs, watchEffect } from "vue";
-import { commands, commandState, commandTree, visibleCommands } from "./state";
-import { Command } from "./types";
+import { commands, commandState, visibleCommands } from "./state";
+import { Commandable } from "./types";
 import { createKeybindingsHandler } from "tinykeys";
+import { default as Keyboard } from "../kbd.vue";
 
 const { open: commandOpen, activeIndex, search } = toRefs(
   commandState,
 );
 
-function handleClose() {
-  activeIndex.value = 0;
-  commandOpen.value = false;
+function setActive(active: string | null) {
+  commandState.active = active;
+  commandState.activeIndex = 0;
   search.value = "";
+}
+
+function handleClose() {
+  commandOpen.value = false;
+  setActive(null);
 }
 
 function handleInput() {
@@ -29,16 +35,20 @@ function syncScroll() {
   });
 }
 
-async function execute(command: Command) {
-  const hasChildren = commandTree.value[command.id] !== undefined;
+async function execute(command: Commandable) {
+  const hasChildren = command.children.length > 0;
 
   if (hasChildren) {
-    commandState.active = command.id;
+    setActive(command.id);
   } else {
     const perform = command.actions?.default.perform;
     await perform?.(command);
     handleClose();
   }
+}
+
+function openCommandCenter() {
+  commandOpen.value = true;
 }
 
 onKeyStroke((e) => (e.metaKey || e.ctrlKey) && e.key === "k", () => {
@@ -47,6 +57,12 @@ onKeyStroke((e) => (e.metaKey || e.ctrlKey) && e.key === "k", () => {
 
 onKeyStroke("Escape", () => {
   commandOpen.value = false;
+});
+
+onKeyStroke("Backspace", () => {
+  if (!search.value && commandState.active) {
+    commandState.active = null;
+  }
 });
 
 onKeyStroke("ArrowUp", (e) => {
@@ -99,7 +115,7 @@ watchEffect(() => {
 });
 
 const handlers = computed<Record<string, () => Promise<void>>>(() => {
-  return commands.value.reduce((acc, curr) => {
+  return commands.value[0].reduce((acc, curr) => {
     if (curr.parent || !curr.actions) {
       return acc;
     }
@@ -108,10 +124,18 @@ const handlers = computed<Record<string, () => Promise<void>>>(() => {
       ...acc,
       ...Object.fromEntries(
         Object.values(curr.actions).filter((it) => it.shortcut !== undefined)
-          .map<[string, () => Promise<void>]>((
+          .map<[string, (event: Event) => Promise<void>]>((
             it,
-          ) => [it.shortcut as string, async () => {
-            await it.perform(curr);
+          ) => [it.shortcut as string, async (event) => {
+            if (it.perform) {
+              await it.perform(curr);
+            } else {
+              event.preventDefault();
+              event.stopPropagation();
+
+              openCommandCenter();
+              setActive(curr.id);
+            }
           }]),
       ),
     };
@@ -122,6 +146,14 @@ onKeyStroke((event) => {
   const handler = createKeybindingsHandler(handlers.value);
 
   handler(event);
+});
+
+const activeParent = computed(() => {
+  if (!commandState.active) {
+    return null;
+  }
+
+  return commands.value[1][commandState.active];
 });
 </script>
 
@@ -139,7 +171,7 @@ onKeyStroke((event) => {
           type="text"
           class="mdst-input"
           name="search"
-          placeholder="Search..."
+          :placeholder='activeParent?.placeholder ?? "Search..."'
           v-model="search"
           @input="handleInput"
           autofocus
@@ -161,9 +193,12 @@ onKeyStroke((event) => {
             {{ command.name }}
           </span>
 
-          <span class="mdst-code" v-if="command.actions?.default.shortcut">
-            {{ command.actions?.default.shortcut.replaceAll(/\+|Key/g, " ") }}
-          </span>
+          <div class="result__shortcut">
+            <Keyboard
+              v-if="command.actions?.default.shortcut"
+              :kbd="command.actions?.default.shortcut"
+            />
+          </div>
         </div>
       </div>
     </div>

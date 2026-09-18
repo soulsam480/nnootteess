@@ -5,6 +5,7 @@ import { computedAsync } from "@vueuse/core";
 import { sm } from "@/storage/db";
 import CarbonIbmCloudKeyProtect from "~icons/carbon/ibm-cloud-key-protect";
 import CarbonKeychain from "~icons/carbon/keychain";
+import Kbd from "./kbd.vue";
 
 type Tab = "preferences" | "keybindings";
 
@@ -15,12 +16,15 @@ function state(tab: Tab, self: Tab) {
 }
 
 const BINDINGS = [
-  ["c", "Create snippet"],
-  ["n", "Create note"],
-  ["⌘ + k", "Open search"],
-  ["d", "Toggle drawer"],
-  ["E", "Export notes"],
-  ["s", "Open settings"],
+  ["Alt+KeyP", "Pin note"],
+  ["Alt+KeyS", "Split note"],
+  ["Alt+Shift+KeyD", "Delete note"],
+  ["$mod+f", "Open search"],
+  ["Alt+KeyN", "Create new note"],
+  ["Alt+KeyC", "Create new code"],
+  ["Alt+KeyD", "Toggle drawer"],
+  ["Alt+KeyE", "Export notes"],
+  ["Alt+KeyS", "Open settings"],
   ["⌘ + Shift + F", "Format snippet"],
 ];
 
@@ -124,11 +128,9 @@ async function handleCreatePasskey() {
             <tbody>
               <tr v-for="[key, action] in BINDINGS" :key="key">
                 <td>
-                  <span
-                    class="mdst-code"
-                  >
-                    {{ key }}
-                  </span>
+                  <div style="display: flex; gap: var(--mdst-space-1)">
+                    <Kbd :kbd="key" />
+                  </div>
                 </td>
                 <td>{{ action }}</td>
               </tr>

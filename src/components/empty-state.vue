@@ -5,6 +5,7 @@ import DrawerToggle from "@/components/drawer-toggle.vue";
 import CarbonLogoGithub from "~icons/carbon/logo-github";
 import { addNewCode, addNewNote } from "./drawer.vue";
 import CarbonMacCommand from "~icons/carbon/mac-command";
+import Kbd from "./kbd.vue";
 </script>
 
 <template>
@@ -15,26 +16,21 @@ import CarbonMacCommand from "~icons/carbon/mac-command";
       command="show-modal"
     >
       <CarbonMacCommand />
-      Open Search
-      <span class="mdst-code">
-        &#8984 + k
-      </span>
+      Open Command Palette
+      <Kbd kbd="$mod+KeyK" />
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewNote">
       <CarbonDocumentAdd />
       Create a Note
-      <span class="mdst-code">
-        n
-      </span>
+      <Kbd kbd="Alt+KeyN" />
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewCode">
       <CarbonCode />
       Create a Snippet
-      <span class="mdst-code">
-        c
-      </span>
+
+      <Kbd kbd="Alt+KeyC" />
     </button>
 
     <DrawerToggle labelled />

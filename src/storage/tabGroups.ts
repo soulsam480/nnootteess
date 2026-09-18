@@ -1,4 +1,5 @@
 import { db } from "@/storage/db";
+import { lastFocusedNote } from "@/storage/notes";
 import { user } from "@/storage/user";
 import { NodeObject, QueryOptions } from "genosdb";
 import { computed, ref, Ref, shallowRef, watch } from "vue";
@@ -15,12 +16,12 @@ export interface ITabGroup {
 
 const tabGroups = shallowRef<Array<NodeObject<ITabGroup>>>([]);
 
-const lastFocused = ref<string | null>(null);
+const lastFocusedTab = ref<string | null>(null);
 
 const activeNoteIds = computed(() =>
-  tabGroups.value.reduce<[string, string][]>((acc, curr) => {
-    if (curr.value.active) {
-      acc.push([curr.id, curr.value.active]);
+  tabGroups.value.reduce<[string, string][]>((acc, tab) => {
+    if (tab.value.active) {
+      acc.push([tab.id, tab.value.active]);
     }
 
     return acc;
@@ -29,11 +30,9 @@ const activeNoteIds = computed(() =>
 
 watch(activeNoteIds, (value) => {
   if (value.length === 0) {
-    const title = document.head.querySelector("title");
-
-    if (title) {
-      title.innerText = "NOTESx2";
-    }
+    lastFocusedNote.value = null;
+  } else if (lastFocusedNote.value === null) {
+    lastFocusedNote.value = value[0][1];
   }
 });
 
@@ -86,6 +85,8 @@ async function openNote(noteId: string, split = false) {
     return;
   }
 
+  lastFocusedNote.value = noteId;
+
   // 1. first check if it's open or not
   // 2. if open, set active
   // 3. else find last group and link + set active
@@ -106,8 +107,8 @@ async function openNote(noteId: string, split = false) {
     }
   }
 
-  const last = lastFocused.value
-    ? tabGroups.value.find((it) => it.id === lastFocused.value)
+  const last = lastFocusedTab.value
+    ? tabGroups.value.find((it) => it.id === lastFocusedTab.value)
     : tabGroups.value.at(-1);
 
   if (!last || split) {
@@ -165,12 +166,12 @@ async function closeNote(noteId: string, groupId?: string) {
 
       if (!another) {
         await db().remove(tabGroup.id);
-        if (lastFocused.value === tabGroup.id) {
-          lastFocused.value = null;
+        if (lastFocusedTab.value === tabGroup.id) {
+          lastFocusedTab.value = null;
         }
       }
     }
   }
 }
 
-export { tabGroups, startTabGroups, openNote, closeNote, activeNoteIds, lastFocused };
+export { tabGroups, startTabGroups, openNote, closeNote, activeNoteIds, lastFocusedTab };

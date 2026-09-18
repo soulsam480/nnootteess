@@ -3,7 +3,7 @@ import * as notesAPI from "@/storage/notes";
 import { defineAsyncComponent, ref, unref } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import { titleCase } from "scule";
-import { closeNote, lastFocused } from "@/storage/tabGroups";
+import { closeNote, lastFocusedTab } from "@/storage/tabGroups";
 
 const TextEditor = defineAsyncComponent(async () =>
   await import("@/components/text-editor.vue")
@@ -51,17 +51,8 @@ watchDebounced(
 );
 
 function handleFocus() {
-  lastFocused.value = props.tabId;
-
-  let title = document.head.querySelector("title");
-
-  if (!title) {
-    title = document.createElement("title");
-
-    document.head.appendChild(title);
-  }
-
-  title.innerText = note.value?.value.name ?? "NOTESx2";
+  lastFocusedTab.value = props.tabId;
+  notesAPI.lastFocusedNote.value = props.id;
 }
 </script>
 

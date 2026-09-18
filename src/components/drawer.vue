@@ -51,6 +51,7 @@ function toggleOrder() {
     class="mdst-drawer mdst-drawer--left sidebar"
     :open="drawerOpen"
     @close.prevent=""
+    tabindex="-1"
   >
     <div class="sidebar__actions">
       <button

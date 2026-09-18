@@ -2,6 +2,7 @@
 import CarbonTrashCan from "~icons/carbon/trash-can";
 import CarbonSplitScreen from "~icons/carbon/split-screen";
 import { onMounted } from "vue";
+import CarbonPin from "~icons/carbon/pin";
 
 defineEmits<{
   toggle: [event: ToggleEvent];

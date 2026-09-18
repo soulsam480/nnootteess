@@ -4,9 +4,10 @@ export type NoteOrder = "asc" | "desc";
 export const notesOrder = useStorage<NoteOrder>("notes_order", "desc");
 </script>
 <script setup lang="ts">
+import { PRIORITY, useCommands } from "./commands/state";
+import { computed, markRaw, useTemplateRef, watch } from "vue";
 import * as noteAPI from "@/storage/notes";
 import { toggleDrawer } from "@/storage/state";
-import { computed, useTemplateRef } from "vue";
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
 import { formatDate } from "@/utils/date";
@@ -16,6 +17,79 @@ import { LANG_TO_COLOR } from "@/utils/codemirror";
 import { activeNoteIds, openNote } from "@/storage/tabGroups";
 import CarbonPin from "~icons/carbon/pin";
 import NoteActions from "./note-actions.vue";
+import { CommandConfig } from "./commands/types";
+import CarbonTrashCan from "~icons/carbon/trash-can";
+import CarbonSplitScreen from "~icons/carbon/split-screen";
+
+const NOTE_COMMANDS = markRaw<CommandConfig[]>([{
+  id: "pin-note",
+  name: "Pin note",
+  actions: {
+    default: {
+      shortcut: "Alt+KeyP",
+      async perform() {
+        const noteId = noteAPI.lastFocusedNote.value;
+
+        console.log({ noteId });
+
+        if (noteId === null) {
+          return;
+        }
+
+        await pinNote(noteId);
+      },
+    },
+  },
+  priority: PRIORITY.high,
+  icon: CarbonPin,
+}, {
+  id: "split-note",
+  name: "Split note",
+  actions: {
+    default: {
+      shortcut: "Alt+KeyS",
+      async perform() {
+        const noteId = noteAPI.lastFocusedNote.value;
+
+        if (noteId === null) {
+          return;
+        }
+
+        openNote(noteId, true);
+      },
+    },
+  },
+  priority: PRIORITY.high,
+  icon: CarbonSplitScreen,
+}, {
+  id: "delete-note",
+  name: "Delete note",
+  actions: {
+    default: {
+      shortcut: "Alt+Shift+KeyD",
+      async perform() {
+        const noteId = noteAPI.lastFocusedNote.value;
+
+        if (noteId === null) {
+          return;
+        }
+
+        const note = noteAPI.notes.value.index.get(noteId);
+
+        if (!note) {
+          return;
+        }
+
+        document.querySelector<HTMLElement>("#delete-note-confirmation")
+          ?.showPopover();
+
+        noteAPI.noteToBeDeleted.value = note;
+      },
+    },
+  },
+  priority: PRIORITY.high,
+  icon: CarbonTrashCan,
+}]);
 
 const hasNotes = computed(() => {
   return noteAPI.notes.value.notes.length > 0;
@@ -56,6 +130,21 @@ function closePopover() {
   pop?.hidePopover();
 }
 
+async function pinNote(noteId: string) {
+  const note = await noteAPI.find(noteId);
+
+  if (!note) {
+    return;
+  }
+
+  const { value } = note;
+
+  await noteAPI.update(
+    note.id,
+    { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note,
+  );
+}
+
 async function deleteNote(
   event: MouseEvent,
 ) {
@@ -89,18 +178,7 @@ async function togglePinNote(
     return;
   }
 
-  const note = await noteAPI.find(noteId);
-
-  if (!note) {
-    return;
-  }
-
-  const { value } = note;
-
-  await noteAPI.update(
-    note.id,
-    { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note,
-  );
+  await pinNote(noteId);
 }
 
 function handleClick(
@@ -128,6 +206,21 @@ function handleClick(
     toggleDrawer(false);
   }
 }
+
+const { register, unregister } = useCommands();
+
+watch(() => noteAPI.notes.value.notes, (notes) => {
+  register(noteAPI.makeNoteCommands(notes));
+}, { immediate: true });
+
+watch(activeNoteIds, (noteIds) => {
+  if (noteIds.length === 0) {
+    unregister(NOTE_COMMANDS);
+  } else {
+    register(NOTE_COMMANDS);
+  }
+}, { immediate: true });
+
 // ------------- note actions handlers -----------------
 
 function handleOpenActions(

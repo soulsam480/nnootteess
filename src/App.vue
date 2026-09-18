@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "@/components/commands/state";
 import Header from "@/components/header.vue";
 import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";

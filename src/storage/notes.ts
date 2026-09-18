@@ -1,8 +1,15 @@
+import { PRIORITY } from "@/components/commands/state";
+import { CommandConfig } from "@/components/commands/types";
 import { db, sm } from "@/storage/db";
+import { openNote } from "@/storage/tabGroups";
 import { user } from "@/storage/user";
 import { NodeObject, QueryOptions } from "genosdb";
 import { kebabCase } from "scule";
-import { onBeforeUnmount, Ref, ref, shallowRef } from "vue";
+import { onBeforeUnmount, Ref, ref, shallowRef, watch } from "vue";
+import CarbonSearch from "~icons/carbon/search";
+
+import CarbonDocument from "~icons/carbon/document";
+import CarbonCode from "~icons/carbon/code";
 
 const CURRENT_VERSION = 1;
 
@@ -66,6 +73,64 @@ const notes = shallowRef<INotesState>({
   index: new Map(),
   notes: [],
 });
+
+export const lastFocusedNote = ref<string | null>(null);
+
+watch(
+  lastFocusedNote,
+  (noteId) => {
+    let title = document.head.querySelector("title");
+
+    if (!title) {
+      title = document.createElement("title");
+
+      document.head.appendChild(title);
+    }
+
+    if (!noteId) {
+      title.innerText = "NOTESx2";
+      return;
+    }
+
+    const note = notes.value.index.get(noteId);
+
+    title.innerText = note?.value.name ?? "NOTESx2";
+  },
+  { immediate: true },
+);
+
+export function makeNoteCommands(notes: NodeObject<TListNote>[]): CommandConfig[] {
+  return [
+    {
+      id: "sesrch-notes",
+      name: "Search...",
+      actions: {
+        default: {
+          shortcut: "$mod+f",
+        },
+      },
+      priority: PRIORITY.regular,
+      icon: CarbonSearch,
+      placeholder: "Search notes...",
+    },
+    ...notes.map(
+      (note) =>
+        ({
+          id: note.id,
+          name: note.value.name,
+          parent: "sesrch-notes",
+          actions: {
+            default: {
+              perform: async (command) => {
+                openNote(command.id);
+              },
+            },
+          },
+          icon: note.value.type === "note" ? CarbonDocument : CarbonCode,
+        }) satisfies CommandConfig,
+    ),
+  ];
+}
 
 const noteToBeDeleted = ref<NodeObject<TListNote> | null>(null);
 
