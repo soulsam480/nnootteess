@@ -26,6 +26,7 @@ const BINDINGS = [
   ["Alt+KeyE", "Export notes"],
   ["Alt+KeyS", "Open settings"],
   ["⌘ + Shift + F", "Format snippet"],
+  ["Alt+KeyV", "Toggle Vim Mode"],
 ];
 
 const hasPasskey = computedAsync(async () => {

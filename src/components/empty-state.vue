@@ -12,7 +12,7 @@ import Kbd from "./kbd.vue";
   <div class="empty-state">
     <button
       class="mdst-button mdst-button--ghost"
-      commandfor="searchModal"
+      commandfor="commandBarDialog"
       command="show-modal"
     >
       <CarbonMacCommand />
