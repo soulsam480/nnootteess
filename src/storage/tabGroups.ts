@@ -61,14 +61,18 @@ async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
 
     const state = await all(userId);
 
-    const tabs = [
-      ...state.map((it) => ({
-        ...it,
-        value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
-      })),
-    ];
+    try {
+      const tabs = [
+        ...state.map((it) => ({
+          ...it,
+          value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
+        })),
+      ];
 
-    tabGroups.value = tabs;
+      tabGroups.value = tabs;
+    } catch {
+      //
+    }
   }
 
   await sync();
