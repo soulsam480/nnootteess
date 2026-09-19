@@ -107,7 +107,7 @@ const vimCompartment = new Compartment();
 
 function buildExtensions(): Extension[] {
   const extensions: Extension[] = [
-    vimCompartment.of(vim()),
+    vimCompartment.of(editorVimEnabled.value ? vim() : []),
     getLanguageExtension(props.language),
     history(),
     mdstDark,
@@ -240,7 +240,7 @@ watch(editorVimEnabled, (state) => {
   instance?.dispatch({
     effects: vimCompartment.reconfigure(state ? vim() : []),
   });
-});
+}, { immediate: true });
 
 onMounted(() => {
   createEditor();

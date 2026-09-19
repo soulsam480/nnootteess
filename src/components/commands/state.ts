@@ -31,16 +31,18 @@ export const visibleCommands = computed(() => {
   if (commandState.active) {
     const command = index[commandState.active];
 
-    return sortCommands(
-      command.children.filter((it) => isTermEmpty || doesMatchTerm(commandState.search, it.name)),
+    return sortCommandAndGroup(
+      command.children.filter(
+        (it) => isTermEmpty || doesMatchTerm(commandState.search, normalizeName(it)),
+      ),
     );
   }
 
-  return sortCommands(
+  return sortCommandAndGroup(
     state.filter((commandable) => {
       return (
         commandable.parent === null &&
-        (isTermEmpty || doesMatchTerm(commandState.search, commandable.name))
+        (isTermEmpty || doesMatchTerm(commandState.search, normalizeName(commandable)))
       );
     }),
   );
@@ -167,11 +169,31 @@ function doesMatchTerm(term: string, name: string): boolean {
   return name.toLowerCase().includes(term.toLowerCase());
 }
 
-function sortCommands(commands: Commandable[]): Commandable[] {
-  return commands.sort((a, b) => {
-    const aScore = a.priority ?? PRIORITY.low;
-    const bScore = b.priority ?? PRIORITY.low;
+function sortCommandAndGroup(commands: Commandable[]): Array<Commandable | string> {
+  const grouped = commands
+    .sort((a, b) => {
+      const aScore = a.priority ?? PRIORITY.low;
+      const bScore = b.priority ?? PRIORITY.low;
 
-    return aScore - bScore;
-  });
+      return aScore - bScore;
+    })
+    .reduce<Record<string, Commandable[]>>((acc, curr) => {
+      const group = curr.group ?? "Application";
+
+      acc[group] ??= [];
+
+      acc[group].push(curr);
+
+      return acc;
+    }, {});
+
+  return [
+    ...Object.entries(grouped)
+      .map(([group, actions]) => [group, ...actions])
+      .flat(),
+  ];
+}
+
+function normalizeName(command: Commandable | CommandConfig): string {
+  return typeof command.name === "function" ? command.name() : command.name;
 }

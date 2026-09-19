@@ -18,7 +18,11 @@ export type CommandStore = [Commandable[], CommandIndex];
 
 export interface CommandConfig {
   id: string;
-  name: string;
+  /**
+   * Can be a string pr a function producing a string
+   * The function has to be pure or only read refs inside
+   */
+  name: string | (() => string);
   parent?: string;
   actions?: {
     default: Execute;
@@ -27,6 +31,7 @@ export interface CommandConfig {
   icon?: FunctionalComponent<SVGAttributes, {}, any, {}>;
   placeholder?: string;
   priority?: number;
+  group?: string;
 }
 
 export interface CommandState {

@@ -9,6 +9,10 @@ import CarbonSidePanelCloseFilled from "~icons/carbon/side-panel-close-filled";
 import CarbonSettingsAdjust from "~icons/carbon/settings-adjust";
 import { editorVimEnabled } from "@/components/code-editor.vue";
 import VscodeIconsFileTypeVim from "~icons/vscode-icons/file-type-vim";
+import { notesOrder } from "@/components/notes.vue";
+import CarbonSortAscending from "~icons/carbon/sort-ascending";
+import CarbonSortDescending from "~icons/carbon/sort-descending";
+import { h } from "vue";
 
 export const SYSTEM_COMMANDS: CommandConfig[] = [
   {
@@ -51,19 +55,17 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
     icon: CarbonExport,
   },
   {
-    id: "open-settings",
-    name: "Open Settings",
+    id: "sort-notes",
+    name: () => `Sort notes (${notesOrder.value})`,
     actions: {
       default: {
-        shortcut: "Alt+KeyS",
+        shortcut: "Alt+KeyO",
         async perform() {
-          window.requestAnimationFrame(() => {
-            document.querySelector<HTMLDialogElement>("#settingsModal")?.showModal();
-          });
+          notesOrder.value = notesOrder.value === "asc" ? "desc" : "asc";
         },
       },
     },
-    icon: CarbonSettingsAdjust,
+    icon: () => (notesOrder.value === "asc" ? h(CarbonSortAscending) : h(CarbonSortDescending)),
   },
   {
     id: "toggle-drawer",
@@ -79,8 +81,25 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
     icon: CarbonSidePanelCloseFilled,
   },
   {
+    id: "open-settings",
+    name: "Open Settings",
+    group: "Settings",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyS",
+        async perform() {
+          window.requestAnimationFrame(() => {
+            document.querySelector<HTMLDialogElement>("#settingsModal")?.showModal();
+          });
+        },
+      },
+    },
+    icon: CarbonSettingsAdjust,
+  },
+  {
     id: "toggle-vim-mode",
     name: "Toggle Vim Mode",
+    group: "Settings",
     actions: {
       default: {
         shortcut: "Alt+KeyV",

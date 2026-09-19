@@ -23,7 +23,8 @@ import CarbonSplitScreen from "~icons/carbon/split-screen";
 
 const NOTE_COMMANDS = markRaw<CommandConfig[]>([{
   id: "pin-note",
-  name: "Pin note",
+  name: "Pin / Un-pin note",
+  group: "Actions",
   actions: {
     default: {
       shortcut: "Alt+KeyP",
@@ -45,6 +46,7 @@ const NOTE_COMMANDS = markRaw<CommandConfig[]>([{
 }, {
   id: "split-note",
   name: "Split note",
+  group: "Actions",
   actions: {
     default: {
       shortcut: "Alt+KeyS",
@@ -63,6 +65,7 @@ const NOTE_COMMANDS = markRaw<CommandConfig[]>([{
   icon: CarbonSplitScreen,
 }, {
   id: "delete-note",
+  group: "Actions",
   name: "Delete note",
   actions: {
     default: {

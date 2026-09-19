@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onKeyStroke } from "@vueuse/core";
-import { computed, toRefs, watchEffect } from "vue";
+import { computed, nextTick, toRefs, watch } from "vue";
 import { commands, commandState, visibleCommands } from "./state";
 import { Commandable } from "./types";
 import { createKeybindingsHandler } from "tinykeys";
@@ -10,10 +10,17 @@ const { open: commandOpen, activeIndex, search } = toRefs(
   commandState,
 );
 
+function getDefaultIndex() {
+  return typeof visibleCommands.value[0] === "string" ? 1 : 0;
+}
+
 function setActive(active: string | null) {
   commandState.active = active;
-  commandState.activeIndex = 0;
   search.value = "";
+
+  nextTick().then(() => {
+    commandState.activeIndex = getDefaultIndex();
+  });
 }
 
 function handleClose() {
@@ -22,7 +29,7 @@ function handleClose() {
 }
 
 function handleInput() {
-  activeIndex.value = 0;
+  activeIndex.value = getDefaultIndex();
 }
 
 function syncScroll() {
@@ -62,6 +69,7 @@ onKeyStroke("Escape", () => {
 onKeyStroke("Backspace", () => {
   if (!search.value && commandState.active) {
     commandState.active = null;
+    activeIndex.value = getDefaultIndex();
   }
 });
 
@@ -72,7 +80,17 @@ onKeyStroke("ArrowUp", (e) => {
 
   e.preventDefault();
 
-  activeIndex.value = Math.max(0, activeIndex.value - 1);
+  const prevIndex = activeIndex.value - 1;
+
+  const prev = visibleCommands.value[prevIndex];
+
+  if (typeof prev === "string" && prevIndex === 0) {
+    activeIndex.value = visibleCommands.value.length - 1;
+  } else if (typeof prev === "string") {
+    activeIndex.value = prevIndex - 1;
+  } else {
+    activeIndex.value = prevIndex;
+  }
 
   syncScroll();
 });
@@ -84,10 +102,16 @@ onKeyStroke("ArrowDown", (e) => {
 
   e.preventDefault();
 
-  activeIndex.value = Math.min(
-    visibleCommands.value.length - 1,
-    activeIndex.value + 1,
-  );
+  const maxIndex = visibleCommands.value.length - 1;
+  let nextIndex = activeIndex.value + 1;
+
+  if (nextIndex > maxIndex) {
+    nextIndex = 0;
+  }
+
+  activeIndex.value = typeof visibleCommands.value[nextIndex] === "string"
+    ? nextIndex + 1
+    : nextIndex;
 
   syncScroll();
 });
@@ -99,16 +123,18 @@ onKeyStroke("Enter", () => {
 
   const command = visibleCommands.value[activeIndex.value];
 
-  if (!command) return;
+  if (!command || typeof command === "string") return;
 
   execute(command);
 });
 
-watchEffect(() => {
+watch(commandOpen, (isOpen) => {
   const el = document.querySelector<HTMLDialogElement>("#commandBarDialog");
 
-  if (commandOpen.value) {
+  if (isOpen) {
     el?.showModal();
+
+    activeIndex.value = getDefaultIndex();
   } else {
     el?.close();
   }
@@ -179,27 +205,39 @@ const activeParent = computed(() => {
       </div>
 
       <div class="results">
-        <div
+        <template
           v-for="(command, index) in visibleCommands"
-          :key="command.id"
-          class="result"
-          :data-active="activeIndex === index"
-          @click="execute(command)"
+          :key='typeof command === "string" ? command : command.id'
         >
-          <span v-if="command.icon">
-            <component :is="command.icon" />
-          </span>
-          <span class="mdst-truncate">
-            {{ command.name }}
-          </span>
+          <div
+            v-if='typeof command !== "string"'
+            class="result"
+            :data-active="activeIndex === index"
+            @click="execute(command)"
+          >
+            <span v-if="command.icon">
+              <component :is="command.icon" />
+            </span>
+            <span class="mdst-truncate">
+              <template v-if='typeof command.name === "function"'>
+                <component :is="command.name" />
+              </template>
+              <template v-else>
+                {{ command.name }}
+              </template>
+            </span>
 
-          <div class="result__shortcut">
-            <Keyboard
-              v-if="command.actions?.default.shortcut"
-              :kbd="command.actions?.default.shortcut"
-            />
+            <div class="result__shortcut">
+              <Keyboard
+                v-if="command.actions?.default.shortcut"
+                :kbd="command.actions?.default.shortcut"
+              />
+            </div>
           </div>
-        </div>
+          <div class="result result--group" v-else>
+            {{ command }}
+          </div>
+        </template>
       </div>
     </div>
   </dialog>

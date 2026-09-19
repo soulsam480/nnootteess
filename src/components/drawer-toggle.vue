@@ -2,6 +2,7 @@
 import { drawerOpen, toggleDrawer } from "@/storage/state";
 import CarbonSidePanelCloseFilled from "~icons/carbon/side-panel-close-filled";
 import CarbonSidePanelOpenFilled from "~icons/carbon/side-panel-open-filled";
+import Kbd from "./kbd.vue";
 
 const props = defineProps<{
   labelled?: boolean;
@@ -25,9 +26,7 @@ const props = defineProps<{
     <template v-if="$props.labelled">
       Toggle Drawer
 
-      <span class="mdst-code">
-        d
-      </span>
+      <Kbd kbd="Alt+KeyD" />
     </template>
   </button>
 </template>

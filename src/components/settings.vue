@@ -24,8 +24,9 @@ const BINDINGS = [
   ["Alt+KeyC", "Create new code"],
   ["Alt+KeyD", "Toggle drawer"],
   ["Alt+KeyE", "Export notes"],
+  ["Alt+KeyO", "Sort notes"],
   ["Alt+KeyS", "Open settings"],
-  ["⌘ + Shift + F", "Format snippet"],
+  ["⌘ + Shift + f", "Format snippet"],
   ["Alt+KeyV", "Toggle Vim Mode"],
 ];
 
@@ -36,6 +37,10 @@ const hasPasskey = computedAsync(async () => {
 async function handleCreatePasskey() {
   await sm().protectCurrentIdentityWithWebAuthn();
 }
+
+function handleClose() {
+  tab.value = "preferences";
+}
 </script>
 
 <template>
@@ -43,6 +48,7 @@ async function handleCreatePasskey() {
     id="settingsModal"
     class="mdst-dialog settings-dialog"
     style="width: auto"
+    @close="handleClose"
   >
     <div class="mdst-dialog-header">
       <h2 class="mdst-dialog-title">Settings</h2>

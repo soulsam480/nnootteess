@@ -159,7 +159,7 @@ body {
         flex-direction: column;
       }
 
-      .result {
+      .result:not(.result--group) {
         display: flex;
         align-items: center;
         gap: var(--mdst-space-2);
@@ -175,8 +175,19 @@ body {
         }
       }
 
-      .result[data-active="true"],
-      .result:hover {
+      .result--group {
+        font-size: var(--mdst-text-xs);
+        text-transform: uppercase;
+        color: var(--mdst-color-muted);
+        margin-bottom: var(--mdst-space-1);
+
+        &:not(:first-child) {
+          margin-top: var(--mdst-space-2);
+        }
+      }
+
+      .result:not(.result--group)[data-active="true"],
+      .result:not(.result--group):hover {
         background: var(--mdst-color-subtle);
       }
     }
