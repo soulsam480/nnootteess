@@ -61,10 +61,14 @@ async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
 
     const state = await all(userId);
 
-    tabGroups.value = state.map((it) => ({
-      ...it,
-      value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
-    }));
+    const tabs = [
+      ...state.map((it) => ({
+        ...it,
+        value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
+      })),
+    ];
+
+    tabGroups.value = tabs;
   }
 
   await sync();
@@ -74,8 +78,6 @@ async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
       sync();
     }
   });
-
-  return tabGroups;
 }
 
 async function openNote(noteId: string, split = false) {

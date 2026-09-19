@@ -194,8 +194,6 @@ async function startNotes(userId: string, isLoggedIn: Ref<boolean>) {
   }
 
   db().map(makeQuery(userId), sync);
-
-  return notes;
 }
 
 async function useNote(id: string, onRemove: (id: string) => void) {

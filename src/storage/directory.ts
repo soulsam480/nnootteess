@@ -50,8 +50,6 @@ export async function startDirectory(userId: string, isLoggedIn: Ref<boolean>) {
       sync();
     }
   });
-
-  return directories;
 }
 
 export async function createDirectory(name: string): Promise<NodeObject<Directory>> {
