@@ -26,7 +26,9 @@ const props = defineProps<{
     <template v-if="$props.labelled">
       Toggle Drawer
 
-      <Kbd kbd="Alt+KeyD" />
+      <span class="kbd__wrapper">
+        <Kbd kbd="Alt+KeyD" />
+      </span>
     </template>
   </button>
 </template>

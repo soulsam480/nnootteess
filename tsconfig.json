@@ -18,6 +18,8 @@
 		"types": [
 			"vite/client",
 			"@crxjs/vite-plugin/client",
+			"vite-plugin-pwa/info",
+			"vite-plugin-pwa/vue",
 			"chrome",
 			"unplugin-icons/types/vue"
 		],

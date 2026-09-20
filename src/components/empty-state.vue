@@ -17,36 +17,44 @@ import Kbd from "./kbd.vue";
     >
       <CarbonMacCommand />
       Open Command Palette
-      <Kbd kbd="$mod+KeyK" />
+      <span class="kbd__wrapper">
+        <Kbd kbd="$mod+KeyK" />
+      </span>
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewNote">
       <CarbonDocumentAdd />
       Create a Note
-      <Kbd kbd="Alt+KeyN" />
+      <span class="kbd__wrapper">
+        <Kbd kbd="Alt+KeyN" />
+      </span>
     </button>
 
     <button class="mdst-button mdst-button--ghost" @click="addNewCode">
       <CarbonCode />
       Create a Snippet
 
-      <Kbd kbd="Alt+KeyC" />
+      <span class="kbd__wrapper">
+        <Kbd kbd="Alt+KeyC" />
+      </span>
     </button>
 
     <DrawerToggle labelled />
 
-    <a
-      href="https://github.com/soulsam480/nnootteess"
-      class="mdst-a mdst-bold"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <CarbonLogoGithub /> GitHub
-    </a>
+    <div class="empty-state__notes">
+      <a
+        href="https://github.com/soulsam480/nnootteess"
+        class="mdst-a mdst-bold"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <CarbonLogoGithub /> GitHub
+      </a>
 
-    <p class="mdst-p--muted">
-      Tip: Right click / Long press on a note to see actions
-    </p>
+      <p class="mdst-p--muted">
+        Tip: Right click / Long press on a note to see actions
+      </p>
+    </div>
 
     <footer>
       <p>

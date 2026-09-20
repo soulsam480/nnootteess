@@ -29,7 +29,7 @@ const parts = computed(() =>
 </script>
 
 <template>
-  <span class="mdst-code" v-for="keyCode in parts" :key="keyCode">
+  <kbd class="mdst-code" v-for="keyCode in parts" :key="keyCode">
     <template v-if="SHORT_TO_ICON[keyCode]">
       {{ SHORT_TO_ICON[keyCode] }}
     </template>
@@ -37,5 +37,5 @@ const parts = computed(() =>
     <template v-else>
       {{ keyCode }}
     </template>
-  </span>
+  </kbd>
 </template>

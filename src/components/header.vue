@@ -6,7 +6,7 @@ import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
 import DrawerToggle from "./drawer-toggle.vue";
 import CarbonUser from "~icons/carbon/user";
-import CarbonSettingsAdjust from "~icons/carbon/settings-adjust";
+import UpdateIndicator from "./update-indicator.vue";
 
 const storage = inject(storageKey);
 
@@ -28,14 +28,7 @@ function handleLogout() {
     </div>
 
     <div class="user">
-      <button
-        class="mdst-button mdst-button--ghost drawer-toggle mdst-button--sm"
-        commandfor="settingsModal"
-        command="show-modal"
-      >
-        <CarbonSettingsAdjust />
-      </button>
-
+      <UpdateIndicator />
       <CarbonUser />
       <span>{{ user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN" }}</span>
       <button

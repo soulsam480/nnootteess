@@ -15,6 +15,7 @@ import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
 import Settings from "./components/settings.vue";
 import CommandBar from "./components/commands/command-bar.vue";
+import Toasts from "./components/toasts.vue";
 
 const Tab = defineAsyncComponent(async () => {
   return await import("./components/tab.vue");
@@ -76,4 +77,6 @@ watchEffect(
 
     <Login v-else />
   </MilkdownProvider>
+
+  <Toasts />
 </template>

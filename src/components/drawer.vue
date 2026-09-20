@@ -38,6 +38,7 @@ import { openNote } from "@/storage/tabGroups";
 import CarbonExport from "~icons/carbon/export";
 import CarbonSortAscending from "~icons/carbon/sort-ascending";
 import CarbonSortDescending from "~icons/carbon/sort-descending";
+import CarbonSettingsAdjust from "~icons/carbon/settings-adjust";
 
 // import CarbonDownload from "~icons/carbon/download";
 
@@ -85,6 +86,14 @@ function toggleOrder() {
       >
         <CarbonSortAscending v-if='notesOrder === "asc"' />
         <CarbonSortDescending v-else />
+      </button>
+
+      <button
+        class="mdst-button mdst-button--ghost mdst-button--sm"
+        commandfor="settingsModal"
+        command="show-modal"
+      >
+        <CarbonSettingsAdjust />
       </button>
 
       <!-- <button -->

@@ -3,6 +3,7 @@ import { noteToBeDeleted } from "@/storage/notes";
 import { closeNote } from "@/storage/tabGroups";
 import { computed } from "vue";
 import * as noteAPI from "@/storage/notes";
+import { showToast } from "./toasts.vue";
 
 function handleToggle(event: ToggleEvent) {
   if (event.newState !== "open") {
@@ -18,6 +19,11 @@ async function handleDelete() {
   try {
     await closeNote(noteToBeDeleted.value.id);
     await noteAPI.delete(noteToBeDeleted.value.id);
+
+    showToast({
+      message: `Note ${noteName.value} deleted`,
+      type: "success",
+    });
   } finally {
     const el = document.querySelector<HTMLElement>("#delete-note-confirmation");
 
