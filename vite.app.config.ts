@@ -12,6 +12,9 @@ export default defineConfig({
       "@": `${path.resolve(import.meta.dirname, "src")}`,
     },
   },
+  define: {
+    __BUILT_AT__: JSON.stringify(new Date().toLocaleString()),
+  },
   publicDir: "../../public",
   build: {
     rollupOptions: {

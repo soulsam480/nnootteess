@@ -6,6 +6,12 @@ import CarbonLogoGithub from "~icons/carbon/logo-github";
 import { addNewCode, addNewNote } from "./drawer.vue";
 import CarbonMacCommand from "~icons/carbon/mac-command";
 import Kbd from "./kbd.vue";
+
+declare const __BUILT_AT__: string;
+
+const buildTime = __BUILT_AT__ ?? "";
+
+const sha = import.meta.env.COMMIT_REF;
 </script>
 
 <template>
@@ -49,6 +55,15 @@ import Kbd from "./kbd.vue";
         rel="noopener noreferrer"
       >
         <CarbonLogoGithub /> GitHub
+      </a>
+
+      <a
+        class="mdst-p--muted mdst-a"
+        :href="`https://github.com/soulsam480/nnootteess/commit/${sha}`"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Built from <b>{{ sha }}</b> at <b>{{ buildTime }}</b>
       </a>
 
       <p class="mdst-p--muted">
