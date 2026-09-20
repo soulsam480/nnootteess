@@ -8,10 +8,10 @@ import CarbonMacCommand from "~icons/carbon/mac-command";
 import Kbd from "./kbd.vue";
 
 declare const __BUILT_AT__: string;
+declare const __COMMIT_REF__: string;
 
 const buildTime = __BUILT_AT__ ?? "";
-
-const sha = import.meta.env.COMMIT_REF;
+const sha = __COMMIT_REF__ ?? "";
 </script>
 
 <template>
