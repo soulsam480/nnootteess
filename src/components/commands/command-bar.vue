@@ -1,18 +1,44 @@
-<script setup lang="ts">
-import { onKeyStroke } from "@vueuse/core";
-import { computed, nextTick, toRefs, watch } from "vue";
+<script tupe="module" lang="ts">
 import { commands, commandState, visibleCommands } from "./state";
-import { Commandable } from "./types";
-import { createKeybindingsHandler } from "tinykeys";
-import { default as Keyboard } from "../kbd.vue";
-
-const { open: commandOpen, activeIndex, search } = toRefs(
-  commandState,
-);
 
 function getDefaultIndex() {
   return typeof visibleCommands.value[0] === "string" ? 1 : 0;
 }
+
+export function triggerCommandBar(op: "open" | "close") {
+  const el = document.querySelector<HTMLDialogElement>("#commandBarDialog");
+
+  if (op === "open") {
+    el?.showModal();
+    commandState.activeIndex = getDefaultIndex();
+  } else {
+    el?.close();
+  }
+}
+
+export function toggleCommandBar() {
+  const el = document.querySelector<HTMLDialogElement>("#commandBarDialog");
+
+  if (el?.open) {
+    triggerCommandBar("close");
+  } else {
+    triggerCommandBar("open");
+  }
+}
+</script>
+
+<script setup lang="ts">
+import { onKeyStroke } from "@vueuse/core";
+import { computed, nextTick, toRefs, useTemplateRef } from "vue";
+import { Commandable } from "./types";
+import { createKeybindingsHandler } from "tinykeys";
+import { default as Keyboard } from "../kbd.vue";
+
+const { activeIndex, search } = toRefs(
+  commandState,
+);
+
+const commandBarDialog = useTemplateRef<HTMLDialogElement>("commandBarDialog");
 
 function setActive(active: string | null) {
   commandState.active = active;
@@ -24,7 +50,6 @@ function setActive(active: string | null) {
 }
 
 function handleClose() {
-  commandOpen.value = false;
   setActive(null);
 }
 
@@ -50,20 +75,14 @@ async function execute(command: Commandable) {
   } else {
     const perform = command.actions?.default.perform;
     await perform?.(command);
-    handleClose();
+    triggerCommandBar("close");
   }
 }
 
-function openCommandCenter() {
-  commandOpen.value = true;
-}
-
-onKeyStroke((e) => (e.metaKey || e.ctrlKey) && e.key === "k", () => {
-  commandOpen.value = !commandOpen.value;
-});
+onKeyStroke((e) => (e.metaKey || e.ctrlKey) && e.key === "k", toggleCommandBar);
 
 onKeyStroke("Escape", () => {
-  commandOpen.value = false;
+  triggerCommandBar("close");
 });
 
 onKeyStroke("Backspace", () => {
@@ -74,7 +93,7 @@ onKeyStroke("Backspace", () => {
 });
 
 onKeyStroke("ArrowUp", (e) => {
-  if (!commandOpen.value) {
+  if (!commandBarDialog.value?.open) {
     return;
   }
 
@@ -96,7 +115,7 @@ onKeyStroke("ArrowUp", (e) => {
 });
 
 onKeyStroke("ArrowDown", (e) => {
-  if (!commandOpen.value) {
+  if (!commandBarDialog.value?.open) {
     return;
   }
 
@@ -117,7 +136,7 @@ onKeyStroke("ArrowDown", (e) => {
 });
 
 onKeyStroke("Enter", () => {
-  if (!commandOpen.value) {
+  if (!commandBarDialog.value?.open) {
     return;
   }
 
@@ -126,18 +145,6 @@ onKeyStroke("Enter", () => {
   if (!command || typeof command === "string") return;
 
   execute(command);
-});
-
-watch(commandOpen, (isOpen) => {
-  const el = document.querySelector<HTMLDialogElement>("#commandBarDialog");
-
-  if (isOpen) {
-    el?.showModal();
-
-    activeIndex.value = getDefaultIndex();
-  } else {
-    el?.close();
-  }
 });
 
 const handlers = computed<Record<string, () => Promise<void>>>(() => {
@@ -159,7 +166,7 @@ const handlers = computed<Record<string, () => Promise<void>>>(() => {
               event.preventDefault();
               event.stopPropagation();
 
-              openCommandCenter();
+              triggerCommandBar("open");
               setActive(curr.id);
             }
           }]),
@@ -185,6 +192,7 @@ const activeParent = computed(() => {
 
 <template>
   <dialog
+    ref="commandBarDialog"
     id="commandBarDialog"
     class="mdst-dialog search-dialog"
     @close="handleClose"

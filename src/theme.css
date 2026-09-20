@@ -78,7 +78,7 @@ body {
 
   .kbd__wrapper {
     text-align: center;
-    .mdst-code:not(:first-child) {
+    .mdst-kbd:not(:first-child) {
       margin-left: var(--mdst-space-1);
     }
   }
@@ -190,7 +190,7 @@ body {
         .result__shortcut {
           margin-left: auto;
 
-          .mdst-code:not(:last-child) {
+          .mdst-kbd:not(:last-child) {
             margin-right: var(--mdst-space-1);
           }
         }
@@ -298,7 +298,7 @@ body {
     }
 
     .empty-state__notes {
-      margin-top: var(--mdst-space-6);
+      margin-top: var(--mdst-space-8);
       display: flex;
       flex-direction: column;
       align-items: center;

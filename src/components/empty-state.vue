@@ -62,10 +62,9 @@ const sha = __COMMIT_REF__ ?? "8abf7a296ec9bb4f262826d4b9e62910b247e72d";
         :href="`https://github.com/soulsam480/nnootteess/commit/${sha}`"
         target="_blank"
         rel="noopener noreferrer"
-        style="color: var(--mdst-color-muted)"
+        style="color: var(--mdst-color-muted); font-size: var(--mdst-text-xs)"
       >
-        Built from <b>{{ sha }}</b>
-        at
+        Built at
         <b>{{ buildTime }}</b>
       </a>
 

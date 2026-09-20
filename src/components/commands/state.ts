@@ -15,7 +15,6 @@ export const PRIORITY = {
 };
 
 export const commandState = shallowReactive<CommandState>({
-  open: false,
   active: null,
   search: "",
   activeIndex: 0,

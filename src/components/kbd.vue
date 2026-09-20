@@ -29,7 +29,7 @@ const parts = computed(() =>
 </script>
 
 <template>
-  <kbd class="mdst-code" v-for="keyCode in parts" :key="keyCode">
+  <kbd class="mdst-kbd" v-for="keyCode in parts" :key="keyCode">
     <template v-if="SHORT_TO_ICON[keyCode]">
       {{ SHORT_TO_ICON[keyCode] }}
     </template>

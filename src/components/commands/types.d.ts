@@ -35,7 +35,6 @@ export interface CommandConfig {
 }
 
 export interface CommandState {
-  open: boolean;
   search: string;
   active: string | null;
   activeIndex: number;
