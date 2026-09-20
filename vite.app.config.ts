@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   define: {
-    __BUILT_AT__: JSON.stringify(new Date().toLocaleString()),
+    __BUILT_AT__: JSON.stringify(new Date().toISOString()),
     __COMMIT_REF__: JSON.stringify(process.env.COMMIT_REF),
   },
   publicDir: "../../public",

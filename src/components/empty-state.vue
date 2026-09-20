@@ -10,8 +10,8 @@ import Kbd from "./kbd.vue";
 declare const __BUILT_AT__: string;
 declare const __COMMIT_REF__: string;
 
-const buildTime = __BUILT_AT__ ?? "";
-const sha = __COMMIT_REF__ ?? "";
+const buildTime = new Date(__BUILT_AT__ ?? new Date()).toLocaleString();
+const sha = __COMMIT_REF__ ?? "8abf7a296ec9bb4f262826d4b9e62910b247e72d";
 </script>
 
 <template>
@@ -62,8 +62,11 @@ const sha = __COMMIT_REF__ ?? "";
         :href="`https://github.com/soulsam480/nnootteess/commit/${sha}`"
         target="_blank"
         rel="noopener noreferrer"
+        style="color: var(--mdst-color-muted)"
       >
-        Built from <b>{{ sha }}</b> at <b>{{ buildTime }}</b>
+        Built from <b>{{ sha }}</b>
+        at
+        <b>{{ buildTime }}</b>
       </a>
 
       <p class="mdst-p--muted">
