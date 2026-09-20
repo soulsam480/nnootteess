@@ -124,6 +124,7 @@ const hasPasskey = computedAsync(async () => {
         <button
           v-if='loginState.state === "idle" && loginState.mnemonic'
           class="mdst-button mdst-button--inverted"
+          style="white-space: nowrap"
           @click="handleLogin"
         >
           Open vault

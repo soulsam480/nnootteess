@@ -13,6 +13,7 @@ import { notesOrder } from "@/components/notes.vue";
 import CarbonSortAscending from "~icons/carbon/sort-ascending";
 import CarbonSortDescending from "~icons/carbon/sort-descending";
 import { h } from "vue";
+import { showToast } from "@/components/toasts.vue";
 
 export const SYSTEM_COMMANDS: CommandConfig[] = [
   {
@@ -62,6 +63,10 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
         shortcut: "Alt+KeyO",
         async perform() {
           notesOrder.value = notesOrder.value === "asc" ? "desc" : "asc";
+
+          showToast({
+            message: `Showing notes in ${notesOrder.value === "asc" ? "ascending" : "descending"} order`,
+          });
         },
       },
     },
@@ -105,6 +110,10 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
         shortcut: "Alt+KeyV",
         async perform() {
           editorVimEnabled.value = !editorVimEnabled.value;
+
+          showToast({
+            message: "Vim mode toggled",
+          });
         },
       },
     },

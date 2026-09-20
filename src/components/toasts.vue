@@ -22,11 +22,13 @@ export function removeToast(id: string) {
     `.mdst-toast[id="${id}"]`,
   );
 
-  if (el) {
-    el.setAttribute("data-state", "hidden");
+  if (!el) {
+    return;
   }
 
-  el?.addEventListener("transitionend", (event) => {
+  el.setAttribute("data-state", "hidden");
+
+  el.addEventListener("transitionend", (event) => {
     if (event.target instanceof HTMLElement) {
       event.target.remove();
     }
@@ -35,7 +37,7 @@ export function removeToast(id: string) {
   });
 }
 
-export function showToast(toast: Toast) {
+export function showToast(toast: Toast): string {
   const id = window.crypto.randomUUID();
 
   toasts.value = [...toasts.value, { ...toast, id }];
@@ -45,6 +47,8 @@ export function showToast(toast: Toast) {
       removeToast(id);
     }, 3000);
   }
+
+  return id;
 }
 
 function handleAction(toast: IdentifiedToast) {
