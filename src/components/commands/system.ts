@@ -16,6 +16,8 @@ import { h } from "vue";
 import { showToast } from "@/components/toasts.vue";
 import CarbonWindyStrong from "~icons/carbon/windy-strong";
 import { editorReadonlyEnabled } from "@/components/text-editor.vue";
+import CarbonDebug from "~icons/carbon/debug";
+import { debugLogging } from "@/storage/db";
 
 export const SYSTEM_COMMANDS: CommandConfig[] = [
   {
@@ -141,5 +143,27 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
       },
     },
     icon: CarbonWindyStrong,
+  },
+  {
+    id: "toggle-debug-logging",
+    name: () => `${debugLogging.value ? "Disable Debug Logging" : "Enable Debug Logging [!!]"}`,
+    group: "Settings",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyL",
+        async perform() {
+          const prev = debugLogging.value;
+
+          debugLogging.value = !debugLogging.value;
+
+          showToast({
+            message: prev
+              ? "Debug logging disabled"
+              : "Debug logging enabled. Rwload to see logs in console.",
+          });
+        },
+      },
+    },
+    icon: CarbonDebug,
   },
 ];

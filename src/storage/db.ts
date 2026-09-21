@@ -1,3 +1,4 @@
+import { useStorage } from "@vueuse/core";
 import { gdb } from "genosdb";
 import type * as GDB from "genosdb";
 
@@ -12,13 +13,15 @@ export interface IDatabaseAPI {
 
 export const LEGACY_HANDLE = "nnootteess_graph.msgpack";
 
+export const debugLogging = useStorage("debug_logging", false);
+
 const COMMON_CONFIG: GDB.GDBOptions = {
   password,
   rtc: true,
   sm: {
     superAdmins: [],
   },
-  debug: import.meta.env.DEV,
+  debug: import.meta.env.DEV || debugLogging.value,
   oplogSize: 500,
 };
 
