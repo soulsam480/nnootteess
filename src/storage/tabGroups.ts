@@ -39,10 +39,14 @@ async function sync(userId = user.id) {
     return;
   }
 
+  const groups = await all(userId);
+
   try {
-    tabGroups.value = await all(userId);
+    tabGroups.value = groups;
   } catch {
-    //
+    window.setTimeout(() => {
+      tabGroups.value = groups;
+    }, 1000);
   }
 }
 
