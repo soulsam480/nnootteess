@@ -39,7 +39,11 @@ async function sync(userId = user.id) {
     return;
   }
 
-  tabGroups.value = await all(userId);
+  try {
+    tabGroups.value = await all(userId);
+  } catch {
+    //
+  }
 }
 
 async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
