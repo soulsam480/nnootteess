@@ -16,6 +16,7 @@ import ImportNotes from "./components/import-notes.vue";
 import Settings from "./components/settings.vue";
 import CommandBar from "./components/commands/command-bar.vue";
 import Toasts from "./components/toasts.vue";
+import { editorReadonlyEnabled } from "./components/text-editor.vue";
 
 const Tab = defineAsyncComponent(async () => {
   return await import("./components/tab.vue");
@@ -30,6 +31,13 @@ provide(storageKey, props.storage);
 watchEffect(
   () => {
     document.body.dataset.drawerOpen = drawerOpen.value.toString();
+  },
+);
+
+watchEffect(
+  () => {
+    document.body.dataset.editorReadonly = editorReadonlyEnabled.value
+      .toString();
   },
 );
 </script>

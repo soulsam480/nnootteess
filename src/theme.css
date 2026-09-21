@@ -543,6 +543,10 @@ body {
   }
 }
 
+body[data-editor-readonly="true"] .milkdown .ProseMirror {
+  padding: var(--mdst-space-4) var(--mdst-space-5) !important;
+}
+
 @media screen and (min-width: 600px) {
   [data-drawer-open="true"] .header,
   [data-drawer-open="true"] .arena {
@@ -555,7 +559,7 @@ body {
 }
 
 @media screen and (max-width: 600px) {
-  .milkdown {
+  body:not([data-editor-readonly="true"]) .milkdown {
     .operation-item:first-child {
       display: none;
     }

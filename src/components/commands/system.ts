@@ -14,6 +14,8 @@ import CarbonSortAscending from "~icons/carbon/sort-ascending";
 import CarbonSortDescending from "~icons/carbon/sort-descending";
 import { h } from "vue";
 import { showToast } from "@/components/toasts.vue";
+import CarbonWindyStrong from "~icons/carbon/windy-strong";
+import { editorReadonlyEnabled } from "@/components/text-editor.vue";
 
 export const SYSTEM_COMMANDS: CommandConfig[] = [
   {
@@ -103,20 +105,41 @@ export const SYSTEM_COMMANDS: CommandConfig[] = [
   },
   {
     id: "toggle-vim-mode",
-    name: "Toggle Vim Mode",
+    name: () => `${editorVimEnabled.value ? "Disable Vim Mode" : "Enable Vim Mode"}`,
     group: "Settings",
     actions: {
       default: {
         shortcut: "Alt+KeyV",
         async perform() {
+          const prev = editorVimEnabled.value;
           editorVimEnabled.value = !editorVimEnabled.value;
 
           showToast({
-            message: "Vim mode toggled",
+            message: prev ? "Vim mode disabled" : "Vim mode enabled",
           });
         },
       },
     },
     icon: VscodeIconsFileTypeVim,
+  },
+  {
+    id: "toggle-readonly-mode",
+    name: () => `${editorReadonlyEnabled.value ? "Disable Readonly Mode" : "Enable Readonly Mode"}`,
+    group: "Settings",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyR",
+        async perform() {
+          const prev = editorReadonlyEnabled.value;
+
+          editorReadonlyEnabled.value = !editorReadonlyEnabled.value;
+
+          showToast({
+            message: prev ? "Readonly mode disabled" : "Readonly mode enabled",
+          });
+        },
+      },
+    },
+    icon: CarbonWindyStrong,
   },
 ];

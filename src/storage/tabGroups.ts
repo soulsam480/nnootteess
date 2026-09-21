@@ -92,7 +92,7 @@ async function openNote(noteId: string, split = false) {
   } else {
     await indexedDb.put("tab_groups", {
       ...last,
-      notes: [...last.notes, noteId],
+      notes: [...new Set([...last.notes, noteId])],
       active: noteId,
     } satisfies ITabGroup);
   }

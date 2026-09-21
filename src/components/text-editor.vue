@@ -1,7 +1,13 @@
+<script type="module" lang="ts">
+export const editorReadonlyEnabled = useStorage("readonly_mode", false);
+</script>
+
 <script setup lang="ts">
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { Crepe } from "@milkdown/crepe";
 import { mdstDark } from "@/utils/dark";
+import { useStorage } from "@vueuse/core";
+import { watch } from "vue";
 
 const props = defineProps<{
   modelValue: string;
@@ -26,6 +32,10 @@ useEditor((root) => {
       },
     },
   });
+
+  watch(editorReadonlyEnabled, (value) => {
+    crepe.setReadonly(value);
+  }, { immediate: true });
 
   crepe.on((listener) => {
     listener.markdownUpdated((_, md) => {
