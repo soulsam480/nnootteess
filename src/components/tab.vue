@@ -15,7 +15,7 @@ const CodeEditor = defineAsyncComponent(async () =>
 
 const props = defineProps<{
   id: string;
-  tabId: string;
+  tabId: number;
 }>();
 
 const note = await notesAPI.useNote(props.id, closeNote);

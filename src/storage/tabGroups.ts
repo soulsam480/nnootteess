@@ -1,27 +1,16 @@
-import { db } from "@/storage/db";
+import { indexedDb, ITabGroup } from "@/storage/indexeddb";
 import { lastFocusedNote } from "@/storage/notes";
 import { user } from "@/storage/user";
-import { NodeObject, QueryOptions } from "genosdb";
 import { computed, ref, Ref, shallowRef, watch } from "vue";
 
-const CURRENT_VERSION = 1;
+const tabGroups = shallowRef<Array<ITabGroup>>([]);
 
-export interface ITabGroup {
-  owner: string;
-  active: string;
-  created_at: number;
-  type: "tab_group";
-  version: number;
-}
-
-const tabGroups = shallowRef<Array<NodeObject<ITabGroup>>>([]);
-
-const lastFocusedTab = ref<string | null>(null);
+const lastFocusedTab = ref<number | null>(null);
 
 const activeNoteIds = computed(() =>
-  tabGroups.value.reduce<[string, string][]>((acc, tab) => {
-    if (tab.value.active) {
-      acc.push([tab.id, tab.value.active]);
+  tabGroups.value.reduce<[number, string][]>((acc, tab) => {
+    if (tab.active && tab.id !== undefined) {
+      acc.push([tab.id, tab.active]);
     }
 
     return acc;
@@ -36,52 +25,29 @@ watch(activeNoteIds, (value) => {
   }
 });
 
-function makeQuery(userId: string) {
-  return {
-    query: {
-      type: "tab_group",
-      owner: { $eq: userId },
-    },
-    field: "created_at",
-    order: "desc",
-  } satisfies QueryOptions;
+async function all(userId: string) {
+  const data = await indexedDb
+    .transaction("tab_groups")
+    .store.index("tab_group_on_owner")
+    .getAll(userId);
+
+  return data;
 }
 
-async function all(userId: string) {
-  const { results } = await db().map(makeQuery(userId));
+async function sync(userId = user.id) {
+  if (!userId) {
+    return;
+  }
 
-  return results;
+  tabGroups.value = await all(userId);
 }
 
 async function startTabGroups(userId: string, isLoggedIn: Ref<boolean>) {
-  async function sync() {
-    if (!isLoggedIn.value) {
-      return;
-    }
-
-    const state = await all(userId);
-
-    try {
-      const tabs = [
-        ...state.map((it) => ({
-          ...it,
-          value: { ...it.value, version: it.value.version ?? CURRENT_VERSION },
-        })),
-      ];
-
-      tabGroups.value = tabs;
-    } catch {
-      //
-    }
+  if (!isLoggedIn.value) {
+    return;
   }
 
-  await sync();
-
-  db().map(makeQuery(userId), ({ action }) => {
-    if (action !== "initial") {
-      sync();
-    }
-  });
+  await sync(userId);
 }
 
 async function openNote(noteId: string, split = false) {
@@ -99,16 +65,15 @@ async function openNote(noteId: string, split = false) {
   // 4. else create new group and link + set active
 
   if (!split) {
-    const containingTab = tabGroups.value.find((it) => it.edges.includes(noteId));
+    const containingTab = tabGroups.value.find((it) => it.notes.includes(noteId));
 
-    if (containingTab && containingTab.value.active !== noteId) {
-      await db().put(
-        {
-          ...containingTab.value,
-          active: noteId,
-        } satisfies ITabGroup,
-        containingTab.id,
-      );
+    if (containingTab && containingTab.active !== noteId) {
+      await indexedDb.put("tab_groups", {
+        ...containingTab,
+        active: noteId,
+      } satisfies ITabGroup);
+
+      await sync();
       return;
     }
   }
@@ -118,31 +83,26 @@ async function openNote(noteId: string, split = false) {
     : tabGroups.value.at(-1);
 
   if (!last || split) {
-    const groupId = await db().put({
+    await indexedDb.put("tab_groups", {
       active: noteId,
       created_at: Date.now(),
-      type: "tab_group",
       owner: userId,
-      version: CURRENT_VERSION,
+      notes: [noteId],
     } satisfies ITabGroup);
-
-    await db().link(groupId, noteId);
   } else {
-    await db().link(last.id, noteId);
-
-    await db().put(
-      {
-        ...last.value,
-        active: noteId,
-      } satisfies ITabGroup,
-      last.id,
-    );
+    await indexedDb.put("tab_groups", {
+      ...last,
+      notes: [...last.notes, noteId],
+      active: noteId,
+    } satisfies ITabGroup);
   }
+
+  await sync();
 }
 
-async function closeNote(noteId: string, groupId?: string) {
+async function closeNote(noteId: string, groupId?: number) {
   const groups = tabGroups.value.filter((it) =>
-    groupId !== undefined ? it.id === groupId : it.edges.includes(noteId),
+    groupId !== undefined ? it.id === groupId : it.notes.includes(noteId),
   );
 
   if (groups.length === 0) {
@@ -150,34 +110,31 @@ async function closeNote(noteId: string, groupId?: string) {
   }
 
   for (const tabGroup of groups) {
-    const another = tabGroup?.edges.find((it) => it !== noteId);
-    const isActive = tabGroup?.value.active === noteId;
+    const another = tabGroup?.notes.find((it) => it !== noteId);
+    const isActive = tabGroup?.active === noteId;
 
     // NOTE: if the current one is active in the tab and there's
     // another note to set as active, do that
     if (isActive && another) {
-      await db().put(
-        {
-          ...tabGroup.value,
-          active: another,
-        } satisfies ITabGroup,
-        tabGroup.id,
-      );
+      await indexedDb.put("tab_groups", {
+        ...tabGroup,
+        active: another,
+        notes: tabGroup.notes.filter((it) => it !== noteId),
+      } satisfies ITabGroup);
 
-      await db().unlink(tabGroup.id, noteId);
       // NOTE: if there's not another one
       // just remove the group
     } else {
-      await db().unlink(tabGroup.id, noteId);
-
-      if (!another) {
-        await db().remove(tabGroup.id);
+      if (!another && tabGroup.id !== undefined) {
+        await indexedDb.delete("tab_groups", tabGroup.id);
         if (lastFocusedTab.value === tabGroup.id) {
           lastFocusedTab.value = null;
         }
       }
     }
   }
+
+  await sync();
 }
 
 export { tabGroups, startTabGroups, openNote, closeNote, activeNoteIds, lastFocusedTab };
