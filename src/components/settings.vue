@@ -28,6 +28,7 @@ const BINDINGS = [
   ["Alt+KeyS", "Open settings"],
   ["⌘ + Shift + f", "Format snippet"],
   ["Alt+KeyV", "Toggle Vim Mode"],
+  ["Alt+KeyR", "Toggle Readonly Mode"],
 ];
 
 const hasPasskey = computedAsync(async () => {

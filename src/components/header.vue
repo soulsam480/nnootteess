@@ -4,6 +4,7 @@ import { storageKey } from "@/storage/local";
 import { logout, user } from "@/storage/user";
 import { inject } from "vue";
 import CarbonIbmEngineeringRequirementsDoorsNext from "~icons/carbon/ibm-engineering-requirements-doors-next";
+import CarbonMacCommand from "~icons/carbon/mac-command";
 import DrawerToggle from "./drawer-toggle.vue";
 import CarbonUser from "~icons/carbon/user";
 import UpdateIndicator from "./update-indicator.vue";
@@ -28,6 +29,13 @@ function handleLogout() {
     </div>
 
     <div class="user">
+      <button
+        class="mdst-button mdst-button--sm update-reload mdst-button--ghost"
+        commandfor="commandBarDialog"
+        command="show-modal"
+      >
+        <CarbonMacCommand />
+      </button>
       <UpdateIndicator />
       <CarbonUser />
       <span>{{ user.id ? sm().abbrAddr(user.id) : "NOT LOGGED IN" }}</span>
