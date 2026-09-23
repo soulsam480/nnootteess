@@ -5,6 +5,7 @@ import type * as GDB from "genosdb";
 const password = "The liquid solitude meandered abstractly over the glossy manuscript.";
 
 const V_2 = "nnootteess_v2";
+const DEV = "nnootteess_dev";
 
 export interface IDatabaseAPI {
   sm: () => GDB.SecurityManager;
@@ -40,7 +41,7 @@ function makeAPI(db: GDB.GDB) {
   };
 }
 
-const db = await gdb(V_2, {
+const db = await gdb(import.meta.env.DEV ? DEV : V_2, {
   ...COMMON_CONFIG,
   sm: {
     superAdmins: [],

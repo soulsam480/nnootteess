@@ -123,17 +123,17 @@ async function closeNote(noteId: string, groupId?: number) {
 
     // NOTE: if the current one is active in the tab and there's
     // another note to set as active, do that
-    if (isActive && another) {
+    if (another) {
       await indexedDb.put("tab_groups", {
         ...tabGroup,
-        active: another,
+        active: isActive ? another : tabGroup.active,
         notes: tabGroup.notes.filter((it) => it !== noteId),
       } satisfies ITabGroup);
 
       // NOTE: if there's not another one
       // just remove the group
     } else {
-      if (!another && tabGroup.id !== undefined) {
+      if (tabGroup.id !== undefined) {
         await indexedDb.delete("tab_groups", tabGroup.id);
         if (lastFocusedTab.value === tabGroup.id) {
           lastFocusedTab.value = null;
