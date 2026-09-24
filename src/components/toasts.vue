@@ -18,9 +18,7 @@ interface IdentifiedToast extends Toast {
 export const toasts = shallowRef<IdentifiedToast[]>([]);
 
 export function removeToast(id: string) {
-  const el = document.querySelector<HTMLOutputElement>(
-    `.mdst-toast[id="${id}"]`,
-  );
+  const el = document.querySelector<HTMLOutputElement>(`.mdst-toast[id="${id}"]`);
 
   if (!el) {
     return;
@@ -68,7 +66,7 @@ import CarbonClose from "~icons/carbon/close";
       :key="toast.id"
       class="mdst-toast"
       data-state="visible"
-      :data-variant='toast.type ?? "info"'
+      :data-variant="toast.type ?? 'info'"
       :id="toast.id"
     >
       {{ toast.message }}

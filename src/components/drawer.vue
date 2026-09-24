@@ -84,7 +84,7 @@ function toggleOrder() {
         @click="toggleOrder"
         title="Toggle note order"
       >
-        <CarbonSortAscending v-if='notesOrder === "asc"' />
+        <CarbonSortAscending v-if="notesOrder === 'asc'" />
         <CarbonSortDescending v-else />
       </button>
 

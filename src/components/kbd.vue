@@ -3,9 +3,9 @@ import { IS_MAC } from "@/utils/platform";
 import { computed } from "vue";
 
 const SHORT_TO_ICON: Record<string, string> = {
-  "$mod": IS_MAC ? "⌘" : "Ctrl",
-  "Shift": "⇧",
-  "Alt": IS_MAC ? "⌥" : "Alt",
+  $mod: IS_MAC ? "⌘" : "Ctrl",
+  Shift: "⇧",
+  Alt: IS_MAC ? "⌥" : "Alt",
   Control: IS_MAC ? "⌃" : "Ctrl",
 };
 
@@ -24,7 +24,7 @@ const parts = computed(() =>
     }
 
     return it;
-  })
+  }),
 );
 </script>
 

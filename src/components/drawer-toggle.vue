@@ -11,12 +11,12 @@ const props = defineProps<{
 
 <template>
   <button
-    :class='[
-      "mdst-button mdst-button--ghost drawer-toggle",
+    :class="[
+      'mdst-button mdst-button--ghost drawer-toggle',
       {
-        "mdst-button--sm": $props.labelled !== true,
+        'mdst-button--sm': $props.labelled !== true,
       },
-    ]'
+    ]"
     @click="toggleDrawer()"
     title="Toggle drawer"
   >

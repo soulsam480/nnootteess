@@ -33,9 +33,13 @@ useEditor((root) => {
     },
   });
 
-  watch(editorReadonlyEnabled, (value) => {
-    crepe.setReadonly(value);
-  }, { immediate: true });
+  watch(
+    editorReadonlyEnabled,
+    (value) => {
+      crepe.setReadonly(value);
+    },
+    { immediate: true },
+  );
 
   crepe.on((listener) => {
     listener.markdownUpdated((_, md) => {

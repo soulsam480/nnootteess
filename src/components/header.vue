@@ -23,9 +23,7 @@ function handleLogout() {
     <div class="header-left">
       <DrawerToggle />
 
-      <div class="home">
-        NOTESx2
-      </div>
+      <div class="home">NOTESx2</div>
     </div>
 
     <div class="user">

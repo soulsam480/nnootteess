@@ -28,23 +28,18 @@ const props = defineProps<{
 
 provide(storageKey, props.storage);
 
-watchEffect(
-  () => {
-    document.body.dataset.drawerOpen = drawerOpen.value.toString();
-  },
-);
+watchEffect(() => {
+  document.body.dataset.drawerOpen = drawerOpen.value.toString();
+});
 
-watchEffect(
-  () => {
-    document.body.dataset.editorReadonly = editorReadonlyEnabled.value
-      .toString();
-  },
-);
+watchEffect(() => {
+  document.body.dataset.editorReadonly = editorReadonlyEnabled.value.toString();
+});
 </script>
 
 <template>
   <MilkdownProvider>
-    <template v-if='user.state === "authenticated" && user.id'>
+    <template v-if="user.state === 'authenticated' && user.id">
       <DeleteNoteConfirmation />
       <CommandBar />
       <ImportNotes />
@@ -57,21 +52,19 @@ watchEffect(
         <div class="mdst-tabs" v-if="activeNoteIds.length > 0">
           <NoteTabs />
           <div class="panels-container" :data-count="activeNoteIds.length">
-            <Suspense
-              v-for="[tabId, noteId] in activeNoteIds"
-              :key="`${tabId}-${noteId}`"
-            >
+            <Suspense v-for="[tabId, noteId] in activeNoteIds" :key="`${tabId}-${noteId}`">
               <Tab :id="noteId" :tabId="tabId" />
 
               <template #fallback>
                 <div
-                  style="display: flex; align-items: center; gap: var(--mdst-space-sm); color: var(--mdst-color-muted)"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: var(--mdst-space-sm);
+                    color: var(--mdst-color-muted);
+                  "
                 >
-                  <span
-                    class="mdst-spinner mdst-spinner--sm"
-                    role="status"
-                    aria-label="Loading"
-                  />
+                  <span class="mdst-spinner mdst-spinner--sm" role="status" aria-label="Loading" />
                   <span>Loading…</span>
                 </div>
               </template>

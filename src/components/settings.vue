@@ -53,13 +53,7 @@ function handleClose() {
   >
     <div class="mdst-dialog-header">
       <h2 class="mdst-dialog-title">Settings</h2>
-      <button
-        class="mdst-dialog-close"
-        commandfor="settingsModal"
-        command="close"
-      >
-        ✕
-      </button>
+      <button class="mdst-dialog-close" commandfor="settingsModal" command="close">✕</button>
     </div>
     <div class="mdst-dialog-body">
       <div class="mdst-tabs">
@@ -67,16 +61,16 @@ function handleClose() {
           <button
             class="mdst-tab"
             role="tab"
-            :data-state='state(tab, "preferences")'
-            @click='tab = "preferences"'
+            :data-state="state(tab, 'preferences')"
+            @click="tab = 'preferences'"
           >
             Preferences
           </button>
           <button
             class="mdst-tab"
             role="tab"
-            :data-state='state(tab, "keybindings")'
-            @click='tab = "keybindings"'
+            :data-state="state(tab, 'keybindings')"
+            @click="tab = 'keybindings'"
           >
             Keybindings
           </button>
@@ -84,48 +78,32 @@ function handleClose() {
         <div
           class="mdst-tabs-panel settings__preferences"
           role="tabpanel"
-          :data-state='state(tab, "preferences")'
+          :data-state="state(tab, 'preferences')"
         >
           <label class="mdst-checkbox-label vim-toggle">
             Enable Vim mode
-            <input
-              v-model="editorVimEnabled"
-              type="checkbox"
-              class="mdst-checkbox"
-            />
+            <input v-model="editorVimEnabled" type="checkbox" class="mdst-checkbox" />
           </label>
 
           <hr class="mdst-hr mdst-hr--flush" />
 
           <div class="settings__auth">
-            <p class="mdst-p mdst-p--sm">
-              Setup a Passkey for persistent & secure login
-            </p>
+            <p class="mdst-p mdst-p--sm">Setup a Passkey for persistent & secure login</p>
             <div>
               <p
                 style="display: inline-flex; gap: var(--mdst-space-1); align-items: center"
                 v-if="hasPasskey"
               >
-                <CarbonKeychain stroke="var(--mdst-color-success)" /> <span>
-                  Set
-                </span>
+                <CarbonKeychain stroke="var(--mdst-color-success)" /> <span> Set </span>
               </p>
-              <button
-                v-else
-                class="mdst-button mdst-button--sm"
-                @click="handleCreatePasskey"
-              >
+              <button v-else class="mdst-button mdst-button--sm" @click="handleCreatePasskey">
                 <CarbonIbmCloudKeyProtect />
                 Create
               </button>
             </div>
           </div>
         </div>
-        <div
-          class="mdst-tabs-panel"
-          role="tabpanel"
-          :data-state='state(tab, "keybindings")'
-        >
+        <div class="mdst-tabs-panel" role="tabpanel" :data-state="state(tab, 'keybindings')">
           <table class="mdst-table mdst-table--bordered">
             <thead>
               <tr>

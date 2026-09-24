@@ -68,15 +68,11 @@ const sha = __COMMIT_REF__ ?? "8abf7a296ec9bb4f262826d4b9e62910b247e72d";
         <b>{{ buildTime }}</b>
       </a>
 
-      <p class="mdst-p--muted">
-        Tip: Right click / Long press on a note to see actions
-      </p>
+      <p class="mdst-p--muted">Tip: Right click / Long press on a note to see actions</p>
     </div>
 
     <footer>
-      <p>
-        Sambit Sahoo {{ new Date().getFullYear() }}&comma; MIT License
-      </p>
+      <p>Sambit Sahoo {{ new Date().getFullYear() }}&comma; MIT License</p>
     </footer>
   </div>
 </template>

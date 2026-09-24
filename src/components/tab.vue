@@ -5,13 +5,9 @@ import { watchDebounced } from "@vueuse/core";
 import { titleCase } from "scule";
 import { closeNote, lastFocusedTab } from "@/storage/tabGroups";
 
-const TextEditor = defineAsyncComponent(async () =>
-  await import("@/components/text-editor.vue")
-);
+const TextEditor = defineAsyncComponent(async () => await import("@/components/text-editor.vue"));
 
-const CodeEditor = defineAsyncComponent(async () =>
-  await import("@/components/code-editor.vue")
-);
+const CodeEditor = defineAsyncComponent(async () => await import("@/components/code-editor.vue"));
 
 const props = defineProps<{
   id: string;
@@ -28,16 +24,13 @@ async function save() {
 
   if (!inner) return;
 
-  await notesAPI.update(
-    inner.id,
-    {
-      ...inner.value,
+  await notesAPI.update(inner.id, {
+    ...inner.value,
+    content: cont,
+    sec: {
       content: cont,
-      sec: {
-        content: cont,
-      },
     },
-  );
+  });
 }
 
 watchDebounced(
@@ -63,9 +56,7 @@ function handleFocus() {
     data-state="active"
     :data-note-type="note?.value.type"
   >
-    <template
-      v-if="note"
-    >
+    <template v-if="note">
       <div class="editor-header">
         <input
           type="text"
@@ -76,10 +67,7 @@ function handleFocus() {
           @blur="save()"
         />
 
-        <div
-          class="code-actions"
-          v-if='note.value.type === "code"'
-        >
+        <div class="code-actions" v-if="note.value.type === 'code'">
           <select
             class="mdst-dropdown"
             v-model="note.value.language"
@@ -93,23 +81,17 @@ function handleFocus() {
         </div>
       </div>
 
-      <TextEditor
-        v-if='note.value.type === "note"'
-        v-model="content"
-        @focus="handleFocus"
-      />
+      <TextEditor v-if="note.value.type === 'note'" v-model="content" @focus="handleFocus" />
 
       <CodeEditor
         @focus="handleFocus"
-        v-else-if='note.value.type === "code"'
+        v-else-if="note.value.type === 'code'"
         theme="nord"
         v-model="content"
         :language="note.value.language"
       />
     </template>
 
-    <div v-else>
-      Note is not found!!
-    </div>
+    <div v-else>Note is not found!!</div>
   </div>
 </template>

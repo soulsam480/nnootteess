@@ -4,11 +4,7 @@ import { watch } from "vue";
 import CarbonUpdateNow from "~icons/carbon/update-now";
 import { showToast } from "./toasts.vue";
 
-const {
-  needRefresh,
-  offlineReady,
-  updateServiceWorker,
-} = useRegisterSW();
+const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW();
 
 watch(needRefresh, (value) => {
   if (!value) return;

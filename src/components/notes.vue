@@ -21,78 +21,81 @@ import { CommandConfig } from "./commands/types";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 import CarbonSplitScreen from "~icons/carbon/split-screen";
 
-const NOTE_COMMANDS = markRaw<CommandConfig[]>([{
-  id: "pin-note",
-  name: "Pin / Un-pin note",
-  group: "Actions",
-  actions: {
-    default: {
-      shortcut: "Alt+KeyP",
-      async perform() {
-        const noteId = noteAPI.lastFocusedNote.value;
+const NOTE_COMMANDS = markRaw<CommandConfig[]>([
+  {
+    id: "pin-note",
+    name: "Pin / Un-pin note",
+    group: "Actions",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyP",
+        async perform() {
+          const noteId = noteAPI.lastFocusedNote.value;
 
-        console.log({ noteId });
+          console.log({ noteId });
 
-        if (noteId === null) {
-          return;
-        }
+          if (noteId === null) {
+            return;
+          }
 
-        await pinNote(noteId);
+          await pinNote(noteId);
+        },
       },
     },
+    priority: PRIORITY.high,
+    icon: CarbonPin,
   },
-  priority: PRIORITY.high,
-  icon: CarbonPin,
-}, {
-  id: "split-note",
-  name: "Split note",
-  group: "Actions",
-  actions: {
-    default: {
-      shortcut: "Alt+KeyS",
-      async perform() {
-        const noteId = noteAPI.lastFocusedNote.value;
+  {
+    id: "split-note",
+    name: "Split note",
+    group: "Actions",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyS",
+        async perform() {
+          const noteId = noteAPI.lastFocusedNote.value;
 
-        if (noteId === null) {
-          return;
-        }
+          if (noteId === null) {
+            return;
+          }
 
-        openNote(noteId, true);
+          openNote(noteId, true);
+        },
       },
     },
+    priority: PRIORITY.high,
+    icon: CarbonSplitScreen,
   },
-  priority: PRIORITY.high,
-  icon: CarbonSplitScreen,
-}, {
-  id: "delete-note",
-  group: "Actions",
-  name: "Delete note",
-  actions: {
-    default: {
-      shortcut: "Alt+Shift+KeyD",
-      async perform() {
-        const noteId = noteAPI.lastFocusedNote.value;
+  {
+    id: "delete-note",
+    group: "Actions",
+    name: "Delete note",
+    actions: {
+      default: {
+        shortcut: "Alt+Shift+KeyD",
+        async perform() {
+          const noteId = noteAPI.lastFocusedNote.value;
 
-        if (noteId === null) {
-          return;
-        }
+          if (noteId === null) {
+            return;
+          }
 
-        const note = noteAPI.notes.value.index.get(noteId);
+          const note = noteAPI.notes.value.index.get(noteId);
 
-        if (!note) {
-          return;
-        }
+          if (!note) {
+            return;
+          }
 
-        document.querySelector<HTMLElement>("#delete-note-confirmation")
-          ?.showPopover();
+          document.querySelector<HTMLElement>("#delete-note-confirmation")?.showPopover();
 
-        noteAPI.noteToBeDeleted.value = note;
+          noteAPI.noteToBeDeleted.value = note;
+        },
       },
     },
+    priority: PRIORITY.high,
+    icon: CarbonTrashCan,
   },
-  priority: PRIORITY.high,
-  icon: CarbonTrashCan,
-}]);
+]);
 
 const hasNotes = computed(() => {
   return noteAPI.notes.value.notes.length > 0;
@@ -103,9 +106,7 @@ const isSmallScreen = useMediaQuery("(max-width: 600px)");
 const notesList = useTemplateRef("notesList");
 
 function noteIdFromEvent(event: MouseEvent) {
-  const parent = (event.currentTarget as HTMLButtonElement).closest<
-    HTMLDivElement
-  >("[popover]");
+  const parent = (event.currentTarget as HTMLButtonElement).closest<HTMLDivElement>("[popover]");
 
   const noteId = parent?.getAttribute("data-note");
 
@@ -142,15 +143,10 @@ async function pinNote(noteId: string) {
 
   const { value } = note;
 
-  await noteAPI.update(
-    note.id,
-    { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note,
-  );
+  await noteAPI.update(note.id, { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note);
 }
 
-async function deleteNote(
-  event: MouseEvent,
-) {
+async function deleteNote(event: MouseEvent) {
   closePopover();
   event.stopPropagation();
 
@@ -169,9 +165,7 @@ async function deleteNote(
   noteAPI.noteToBeDeleted.value = note;
 }
 
-async function togglePinNote(
-  event: MouseEvent,
-) {
+async function togglePinNote(event: MouseEvent) {
   closePopover();
   event.stopPropagation();
 
@@ -200,10 +194,7 @@ function handleClick(
 
   split = split ?? (event.ctrlKey || event.metaKey);
 
-  openNote(
-    noteId,
-    split,
-  );
+  openNote(noteId, split);
 
   if (isSmallScreen.value) {
     toggleDrawer(false);
@@ -212,24 +203,29 @@ function handleClick(
 
 const { register, unregister } = useCommands();
 
-watch(() => noteAPI.notes.value.notes, (notes) => {
-  register(noteAPI.makeNoteCommands(notes));
-}, { immediate: true });
+watch(
+  () => noteAPI.notes.value.notes,
+  (notes) => {
+    register(noteAPI.makeNoteCommands(notes));
+  },
+  { immediate: true },
+);
 
-watch(activeNoteIds, (noteIds) => {
-  if (noteIds.length === 0) {
-    unregister(NOTE_COMMANDS);
-  } else {
-    register(NOTE_COMMANDS);
-  }
-}, { immediate: true });
+watch(
+  activeNoteIds,
+  (noteIds) => {
+    if (noteIds.length === 0) {
+      unregister(NOTE_COMMANDS);
+    } else {
+      register(NOTE_COMMANDS);
+    }
+  },
+  { immediate: true },
+);
 
 // ------------- note actions handlers -----------------
 
-function handleOpenActions(
-  event: MouseEvent,
-  note: NodeObject<noteAPI.TListNote>,
-) {
+function handleOpenActions(event: MouseEvent, note: NodeObject<noteAPI.TListNote>) {
   event.preventDefault();
   event.stopPropagation();
 
@@ -238,23 +234,21 @@ function handleOpenActions(
   openPopover(source, note.id);
 }
 
-onLongPress(notesList, (event) => {
-  if (
-    !(event.target instanceof HTMLElement &&
-      event.target.matches("li.link *"))
-  ) {
-    return;
-  }
+onLongPress(
+  notesList,
+  (event) => {
+    if (!(event.target instanceof HTMLElement && event.target.matches("li.link *"))) {
+      return;
+    }
 
-  const noteId = event.target.closest<HTMLElement>("li.link")?.id.replace(
-    "note-",
-    "",
-  );
+    const noteId = event.target.closest<HTMLElement>("li.link")?.id.replace("note-", "");
 
-  if (noteId) {
-    openPopover(event.target, noteId);
-  }
-}, { modifiers: { prevent: true }, delay: 500 });
+    if (noteId) {
+      openPopover(event.target, noteId);
+    }
+  },
+  { modifiers: { prevent: true }, delay: 500 },
+);
 
 const notesToShow = computed(() => {
   return noteAPI.notes.value.notes.toSorted((a, b) => {
@@ -292,14 +286,11 @@ const notesToShow = computed(() => {
       <span
         class="link__icon"
         :style="{
-          color: LANG_TO_COLOR[(note.value as noteAPI.CodeNote).language] ??
-            LANG_TO_COLOR.md,
+          color: LANG_TO_COLOR[(note.value as noteAPI.CodeNote).language] ?? LANG_TO_COLOR.md,
         }"
       >
-        <CarbonDocument v-if='note.value.type === "note"' />
-        <CarbonCode
-          v-else-if='note.value.type === "code"'
-        />
+        <CarbonDocument v-if="note.value.type === 'note'" />
+        <CarbonCode v-else-if="note.value.type === 'code'" />
       </span>
       <span class="mdst-truncate">
         {{ note.value.name }}
@@ -308,8 +299,6 @@ const notesToShow = computed(() => {
         <CarbonPin />
       </span>
     </li>
-    <p v-if="!hasNotes" class="mdst-p--muted">
-      No notes yet
-    </p>
+    <p v-if="!hasNotes" class="mdst-p--muted">No notes yet</p>
   </ul>
 </template>

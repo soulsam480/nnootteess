@@ -21,6 +21,15 @@ const COMMON_CONFIG: GDB.GDBOptions = {
   rtc: true,
   sm: {
     superAdmins: [],
+    customRoles: {
+      guest: {
+        can: ["read", "sync", "write", "link", "delete"],
+      },
+      user: {
+        can: ["write", "link", "sync"],
+        inherits: ["guest"],
+      },
+    },
   },
   debug: import.meta.env.DEV || debugLogging.value,
   oplogSize: 500,
@@ -43,13 +52,6 @@ function makeAPI(db: GDB.GDB) {
 
 const db = await gdb(import.meta.env.DEV ? DEV : V_2, {
   ...COMMON_CONFIG,
-  sm: {
-    superAdmins: [],
-    customRoles: {
-      guest: { can: ["read", "sync", "write", "link", "delete"] },
-      user: { can: ["write", "link", "sync"], inherits: ["guest"] },
-    },
-  },
 });
 
 const { db: _db, sm } = makeAPI(db);

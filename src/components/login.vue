@@ -61,21 +61,17 @@ const hasPasskey = computedAsync(async () => {
 </script>
 
 <template>
-  <div
-    class="mdst-card login-dialog"
-  >
+  <div class="mdst-card login-dialog">
     <div class="login-dialog__header">
-      <h2 class="mdst-card-title">
-        Welcome to NOTESx2
-      </h2>
+      <h2 class="mdst-card-title">Welcome to NOTESx2</h2>
       <p>
-        You're creating a vault. Each vault has its own vault key and syncs P2P
-        with E2E encryption across devices / browsers / tabs
+        You're creating a vault. Each vault has its own vault key and syncs P2P with E2E encryption
+        across devices / browsers / tabs
       </p>
     </div>
     <div class="mdst-card-body">
       <button
-        v-if='loginState.state === "idle"'
+        v-if="loginState.state === 'idle'"
         class="mdst-button mdst-button--primary"
         @click="handleLogin"
       >
@@ -88,23 +84,15 @@ const hasPasskey = computedAsync(async () => {
         class="mdst-input"
         placeholder="Open vault with vault key"
         v-model="loginState.mnemonic"
-        :disabled='loginState.state === "generated"'
+        :disabled="loginState.state === 'generated'"
         @keyup.enter="handleLogin"
         type="password"
       />
 
-      <div
-        v-if='loginState.state === "idle" && !loginState.mnemonic && hasPasskey'
-      >
-        Or
-      </div>
+      <div v-if="loginState.state === 'idle' && !loginState.mnemonic && hasPasskey">Or</div>
 
       <div class="login_dialog__actions">
-        <select
-          class="mdst-dropdown"
-          v-if="loginState.mnemonic"
-          v-model="loginState.ttl"
-        >
+        <select class="mdst-dropdown" v-if="loginState.mnemonic" v-model="loginState.ttl">
           <option value="">Keep vault unlocked in this tab for</option>
           <option value="15m">15 Minutes</option>
           <option value="1h">1 Hour</option>
@@ -113,7 +101,7 @@ const hasPasskey = computedAsync(async () => {
         </select>
 
         <button
-          v-if='loginState.state === "generated"'
+          v-if="loginState.state === 'generated'"
           class="mdst-button mdst-button--inverted"
           @click="handleCopy()"
           :disabled="copyPending"
@@ -122,7 +110,7 @@ const hasPasskey = computedAsync(async () => {
         </button>
 
         <button
-          v-if='loginState.state === "idle" && loginState.mnemonic'
+          v-if="loginState.state === 'idle' && loginState.mnemonic"
           class="mdst-button mdst-button--inverted"
           style="white-space: nowrap"
           @click="handleLogin"
@@ -131,7 +119,7 @@ const hasPasskey = computedAsync(async () => {
         </button>
 
         <button
-          v-if='loginState.state === "idle" && !loginState.mnemonic && hasPasskey'
+          v-if="loginState.state === 'idle' && !loginState.mnemonic && hasPasskey"
           class="mdst-button mdst-button--inverted"
           @click="handleLoginWithPassKey"
         >

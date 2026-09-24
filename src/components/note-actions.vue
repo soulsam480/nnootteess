@@ -41,14 +41,12 @@ onMounted(() => {
     id="note-actions"
     class="mdst-popover mdst-popover--anchored mdst-popover--sm note-actions"
     popover="manual"
-    @toggle='$emit("toggle", $event)'
+    @toggle="$emit('toggle', $event)"
   >
-    <p class="mdst-p--muted note-actions__header">
-      ACTIONS
-    </p>
+    <p class="mdst-p--muted note-actions__header">ACTIONS</p>
 
     <button
-      @click='$emit("togglePin", $event)'
+      @click="$emit('togglePin', $event)"
       class="mdst-button mdst-button--sm mdst-button--ghost"
       title="Pin"
       type="button"
@@ -58,7 +56,7 @@ onMounted(() => {
     </button>
 
     <button
-      @click='$emit("click", $event)'
+      @click="$emit('click', $event)"
       title="Split"
       type="button"
       class="mdst-button mdst-button--sm mdst-button--ghost"
@@ -68,7 +66,7 @@ onMounted(() => {
     </button>
 
     <button
-      @click='$emit("delete", $event)'
+      @click="$emit('delete', $event)"
       class="mdst-button note-actions__delete mdst-button--sm mdst-button--ghost"
       title="Delete"
       popovertarget="delete-note-confirmation"
@@ -80,5 +78,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

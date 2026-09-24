@@ -34,9 +34,7 @@ import { Commandable } from "./types";
 import { createKeybindingsHandler } from "tinykeys";
 import { default as Keyboard } from "../kbd.vue";
 
-const { activeIndex, search } = toRefs(
-  commandState,
-);
+const { activeIndex, search } = toRefs(commandState);
 
 const commandBarDialog = useTemplateRef<HTMLDialogElement>("commandBarDialog");
 
@@ -128,9 +126,8 @@ onKeyStroke("ArrowDown", (e) => {
     nextIndex = 0;
   }
 
-  activeIndex.value = typeof visibleCommands.value[nextIndex] === "string"
-    ? nextIndex + 1
-    : nextIndex;
+  activeIndex.value =
+    typeof visibleCommands.value[nextIndex] === "string" ? nextIndex + 1 : nextIndex;
 
   syncScroll();
 });
@@ -156,20 +153,22 @@ const handlers = computed<Record<string, () => Promise<void>>>(() => {
     return {
       ...acc,
       ...Object.fromEntries(
-        Object.values(curr.actions).filter((it) => it.shortcut !== undefined)
-          .map<[string, (event: Event) => Promise<void>]>((
-            it,
-          ) => [it.shortcut as string, async (event) => {
-            if (it.perform) {
-              await it.perform(curr);
-            } else {
-              event.preventDefault();
-              event.stopPropagation();
+        Object.values(curr.actions)
+          .filter((it) => it.shortcut !== undefined)
+          .map<[string, (event: Event) => Promise<void>]>((it) => [
+            it.shortcut as string,
+            async (event) => {
+              if (it.perform) {
+                await it.perform(curr);
+              } else {
+                event.preventDefault();
+                event.stopPropagation();
 
-              triggerCommandBar("open");
-              setActive(curr.id);
-            }
-          }]),
+                triggerCommandBar("open");
+                setActive(curr.id);
+              }
+            },
+          ]),
       ),
     };
   }, {});
@@ -205,7 +204,7 @@ const activeParent = computed(() => {
           type="text"
           class="mdst-input"
           name="search"
-          :placeholder='activeParent?.placeholder ?? "Search..."'
+          :placeholder="activeParent?.placeholder ?? 'Search...'"
           v-model="search"
           @input="handleInput"
           autofocus
@@ -215,10 +214,10 @@ const activeParent = computed(() => {
       <div class="results">
         <template
           v-for="(command, index) in visibleCommands"
-          :key='typeof command === "string" ? command : command.id'
+          :key="typeof command === 'string' ? command : command.id"
         >
           <div
-            v-if='typeof command !== "string"'
+            v-if="typeof command !== 'string'"
             class="result"
             :data-active="activeIndex === index"
             @click="execute(command)"
@@ -227,7 +226,7 @@ const activeParent = computed(() => {
               <component :is="command.icon" />
             </span>
             <span class="mdst-truncate">
-              <template v-if='typeof command.name === "function"'>
+              <template v-if="typeof command.name === 'function'">
                 <component :is="command.name" />
               </template>
               <template v-else>

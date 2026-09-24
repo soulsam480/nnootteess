@@ -4,12 +4,7 @@ export const editorVimEnabled = useStorage("vim_mode", true);
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-import {
-  Compartment,
-  EditorState,
-  type Extension,
-  StateEffect,
-} from "@codemirror/state";
+import { Compartment, EditorState, type Extension, StateEffect } from "@codemirror/state";
 import {
   drawSelection,
   EditorView,
@@ -17,17 +12,8 @@ import {
   highlightActiveLineGutter,
   keymap,
 } from "@codemirror/view";
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-} from "@codemirror/commands";
-import {
-  bracketMatching,
-  foldGutter,
-  indentOnInput,
-} from "@codemirror/language";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import { bracketMatching, foldGutter, indentOnInput } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { lineNumbers } from "@codemirror/view";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
@@ -49,7 +35,7 @@ const emit = defineEmits<{
   editorDidMount: [instance: EditorView];
   change: [value: string];
   "update:modelValue": [value: string];
-  "focus": [];
+  focus: [];
 }>();
 
 const container = ref<HTMLElement | null>(null);
@@ -63,9 +49,7 @@ function getPositionAt(offset: number) {
     return null;
   }
 
-  const line = instance.state.doc.lineAt(
-    Math.max(0, Math.min(offset, instance.state.doc.length)),
-  );
+  const line = instance.state.doc.lineAt(Math.max(0, Math.min(offset, instance.state.doc.length)));
 
   return {
     lineNumber: line.number,
@@ -216,9 +200,7 @@ function reconfigureLanguage() {
   const language = getLanguageExtension(props.language);
 
   instance.dispatch({
-    effects: StateEffect.appendConfig.of([
-      language,
-    ]),
+    effects: StateEffect.appendConfig.of([language]),
   });
 }
 
@@ -236,11 +218,15 @@ watch(
   },
 );
 
-watch(editorVimEnabled, (state) => {
-  instance?.dispatch({
-    effects: vimCompartment.reconfigure(state ? vim() : []),
-  });
-}, { immediate: true });
+watch(
+  editorVimEnabled,
+  (state) => {
+    instance?.dispatch({
+      effects: vimCompartment.reconfigure(state ? vim() : []),
+    });
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   createEditor();
@@ -265,10 +251,7 @@ defineExpose({
 </script>
 
 <template>
-  <div
-    ref="container"
-    class="code-editor-wrapper"
-  />
+  <div ref="container" class="code-editor-wrapper" />
 </template>
 
 <style>
