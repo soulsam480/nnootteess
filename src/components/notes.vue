@@ -32,8 +32,6 @@ const NOTE_COMMANDS = markRaw<CommandConfig[]>([
         async perform() {
           const noteId = noteAPI.lastFocusedNote.value;
 
-          console.log({ noteId });
-
           if (noteId === null) {
             return;
           }
@@ -86,7 +84,8 @@ const NOTE_COMMANDS = markRaw<CommandConfig[]>([
             return;
           }
 
-          document.querySelector<HTMLElement>("#delete-note-confirmation")?.showPopover();
+          document.querySelector<HTMLElement>("#delete-note-confirmation")
+            ?.showPopover();
 
           noteAPI.noteToBeDeleted.value = note;
         },
@@ -106,7 +105,9 @@ const isSmallScreen = useMediaQuery("(max-width: 600px)");
 const notesList = useTemplateRef("notesList");
 
 function noteIdFromEvent(event: MouseEvent) {
-  const parent = (event.currentTarget as HTMLButtonElement).closest<HTMLDivElement>("[popover]");
+  const parent = (event.currentTarget as HTMLButtonElement).closest<
+    HTMLDivElement
+  >("[popover]");
 
   const noteId = parent?.getAttribute("data-note");
 
@@ -143,7 +144,10 @@ async function pinNote(noteId: string) {
 
   const { value } = note;
 
-  await noteAPI.update(note.id, { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note);
+  await noteAPI.update(
+    note.id,
+    { ...value, pinned: !Boolean(value.pinned) } as noteAPI.Note,
+  );
 }
 
 async function deleteNote(event: MouseEvent) {
@@ -225,7 +229,10 @@ watch(
 
 // ------------- note actions handlers -----------------
 
-function handleOpenActions(event: MouseEvent, note: NodeObject<noteAPI.TListNote>) {
+function handleOpenActions(
+  event: MouseEvent,
+  note: NodeObject<noteAPI.TListNote>,
+) {
   event.preventDefault();
   event.stopPropagation();
 
@@ -237,11 +244,17 @@ function handleOpenActions(event: MouseEvent, note: NodeObject<noteAPI.TListNote
 onLongPress(
   notesList,
   (event) => {
-    if (!(event.target instanceof HTMLElement && event.target.matches("li.link *"))) {
+    if (
+      !(event.target instanceof HTMLElement &&
+        event.target.matches("li.link *"))
+    ) {
       return;
     }
 
-    const noteId = event.target.closest<HTMLElement>("li.link")?.id.replace("note-", "");
+    const noteId = event.target.closest<HTMLElement>("li.link")?.id.replace(
+      "note-",
+      "",
+    );
 
     if (noteId) {
       openPopover(event.target, noteId);
@@ -286,11 +299,12 @@ const notesToShow = computed(() => {
       <span
         class="link__icon"
         :style="{
-          color: LANG_TO_COLOR[(note.value as noteAPI.CodeNote).language] ?? LANG_TO_COLOR.md,
+          color: LANG_TO_COLOR[(note.value as noteAPI.CodeNote).language] ??
+            LANG_TO_COLOR.md,
         }"
       >
-        <CarbonDocument v-if="note.value.type === 'note'" />
-        <CarbonCode v-else-if="note.value.type === 'code'" />
+        <CarbonDocument v-if='note.value.type === "note"' />
+        <CarbonCode v-else-if='note.value.type === "code"' />
       </span>
       <span class="mdst-truncate">
         {{ note.value.name }}

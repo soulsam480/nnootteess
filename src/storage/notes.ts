@@ -103,7 +103,7 @@ export function makeNoteCommands(notes: NodeObject<TListNote>[]): CommandConfig[
   return [
     {
       id: "sesrch-notes",
-      name: "Search...",
+      name: "Find notes...",
       actions: {
         default: {
           shortcut: "$mod+f",

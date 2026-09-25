@@ -23,6 +23,7 @@ import { vim } from "@replit/codemirror-vim";
 import { useStorage } from "@vueuse/core";
 import { Language } from "@/storage/notes";
 import { mdstDark } from "@/utils/dark";
+import { editorReadonlyEnabled } from "./text-editor.vue";
 
 const props = defineProps<{
   modelValue: string;
@@ -89,9 +90,14 @@ async function formatDocumentAsync(view: EditorView): Promise<void> {
 
 const vimCompartment = new Compartment();
 
+const readonlyCompartment = new Compartment();
+
 function buildExtensions(): Extension[] {
   const extensions: Extension[] = [
     vimCompartment.of(editorVimEnabled.value ? vim() : []),
+    readonlyCompartment.of(
+      EditorState.readOnly.of(editorReadonlyEnabled.value),
+    ),
     getLanguageExtension(props.language),
     history(),
     mdstDark,
@@ -227,6 +233,12 @@ watch(
   },
   { immediate: true },
 );
+
+watch(editorReadonlyEnabled, (state) => {
+  instance?.dispatch({
+    effects: readonlyCompartment.reconfigure(EditorState.readOnly.of(state)),
+  });
+}, { immediate: true });
 
 onMounted(() => {
   createEditor();

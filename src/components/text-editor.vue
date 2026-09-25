@@ -3,11 +3,64 @@ export const editorReadonlyEnabled = useStorage("readonly_mode", false);
 </script>
 
 <script setup lang="ts">
-import { Milkdown, useEditor } from "@milkdown/vue";
-import { Crepe } from "@milkdown/crepe";
-import { mdstDark } from "@/utils/dark";
+import {
+  AtomicCodeMirrorEditor,
+  useAtomicEditorHandle,
+} from "@atomic-editor/editor";
+import "@atomic-editor/editor/styles.css";
+import { LanguageDescription } from "@codemirror/language";
+import { Compartment } from "@codemirror/state";
 import { useStorage } from "@vueuse/core";
-import { watch } from "vue";
+import { editorVimEnabled } from "./code-editor.vue";
+import { vim } from "@replit/codemirror-vim";
+import { markRaw } from "vue";
+import { keymap } from "@codemirror/view";
+import { searchKeymap } from "@codemirror/search";
+
+const vimCompartment = new Compartment();
+
+const LANG_DESCRIPTORS: LanguageDescription[] = [
+  LanguageDescription.of({
+    name: "JavaScript",
+    alias: ["js", "jsx"],
+    extensions: ["js", "mjs", "cjs", "jsx"],
+    load: () =>
+      import("@codemirror/lang-javascript").then((m) =>
+        m.javascript({ jsx: true })
+      ),
+  }),
+  LanguageDescription.of({
+    name: "TypeScript",
+    alias: ["ts", "tsx"],
+    extensions: ["ts", "mts", "cts", "tsx"],
+    load: () =>
+      import("@codemirror/lang-javascript").then((m) =>
+        m.javascript({ typescript: true, jsx: true })
+      ),
+  }),
+  LanguageDescription.of({
+    name: "JSON",
+    extensions: ["json"],
+    load: () => import("@codemirror/lang-json").then((m) => m.json()),
+  }),
+  LanguageDescription.of({
+    name: "CSS",
+    extensions: ["css"],
+    load: () => import("@codemirror/lang-css").then((m) => m.css()),
+  }),
+  LanguageDescription.of({
+    name: "HTML",
+    alias: ["htm"],
+    extensions: ["html", "htm"],
+    load: () => import("@codemirror/lang-html").then((m) => m.html()),
+  }),
+  LanguageDescription.of({
+    name: "Markdown",
+    alias: ["md"],
+    extensions: ["md", "markdown", "mkd"],
+    load: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
+  }),
+];
 
 const props = defineProps<{
   modelValue: string;
@@ -18,43 +71,31 @@ const emits = defineEmits<{
   (e: "focus"): void;
 }>();
 
-useEditor((root) => {
-  const crepe = new Crepe({
-    root,
-    defaultValue: props.modelValue,
-    features: {
-      [Crepe.Feature.ImageBlock]: false,
-      [Crepe.Feature.Latex]: false,
-    },
-    featureConfigs: {
-      [Crepe.Feature.CodeMirror]: {
-        extensions: [mdstDark],
-      },
-    },
-  });
+const state = props.modelValue;
 
-  watch(
-    editorReadonlyEnabled,
-    (value) => {
-      crepe.setReadonly(value);
-    },
-    { immediate: true },
-  );
+const extensions = markRaw([
+  vimCompartment.of(editorVimEnabled.value ? vim() : []),
+  keymap.of([
+    ...searchKeymap,
+  ]),
+]);
 
-  crepe.on((listener) => {
-    listener.markdownUpdated((_, md) => {
-      emits("update:modelValue", md);
-    });
+const { handle: _handle } = useAtomicEditorHandle();
 
-    listener.focus(() => {
-      emits("focus");
-    });
-  });
-
-  return crepe;
-});
+// watch(editorVimEnabled, (state) => {
+//   handle.value?.view?.dispatch({
+//     effects: vimCompartment.reconfigure(state ? vim() : []),
+//   });
+// }, { immediate: true });
 </script>
 
 <template>
-  <Milkdown />
+  <AtomicCodeMirrorEditor
+    ref="handle"
+    :markdownSource="state"
+    :readOnly="editorReadonlyEnabled"
+    @markdownChange='$emit("update:modelValue", $event)'
+    :codeLanguages="LANG_DESCRIPTORS"
+    :extensions="extensions"
+  />
 </template>

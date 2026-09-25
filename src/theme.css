@@ -471,8 +471,12 @@ body {
       gap: var(--mdst-space-2);
       height: 100%;
 
-      div[data-milkdown-root] {
+      .atomic-cm-editor {
         overflow: hidden;
+      }
+
+      .atomic-cm-editor .cm-content {
+        padding: var(--mdst-space-2);
       }
 
       .mdst-input,
@@ -480,48 +484,12 @@ body {
         padding: var(--mdst-space-xs) var(--mdst-space-sm);
       }
 
-      .milkdown,
-      .code-editor-wrapper {
+      .code-editor-wrapper,
+      .atomic-cm-editor {
         height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 38px));
         overflow-y: scroll;
         border-radius: var(--mdst-radius);
         border: 1px solid var(--mdst-color-border);
-      }
-
-      .milkdown .ProseMirror {
-        h1 {
-          margin-top: calc(2 * var(--mdst-text-base));
-          font-size: calc(2.25 * var(--mdst-text-base));
-        }
-
-        h2 {
-          margin-top: calc(1.75 * var(--mdst-text-base));
-          font-size: calc(2 * var(--mdst-text-base));
-        }
-
-        h3 {
-          margin-top: calc(1.5 * var(--mdst-text-base));
-          font-size: calc(1.75 * var(--mdst-text-base));
-        }
-
-        h4 {
-          margin-top: calc(1.25 * var(--mdst-text-base));
-          font-size: calc(1.5 * var(--mdst-text-base));
-        }
-
-        h5 {
-          margin-top: calc(1 * var(--mdst-text-base));
-          font-size: calc(1.25 * var(--mdst-text-base));
-        }
-
-        h6 {
-          margin-top: calc(0.75 * var(--mdst-text-base));
-          font-size: calc(1 * var(--mdst-text-base));
-        }
-
-        p {
-          font-size: var(--mdst-text-base);
-        }
       }
 
       &[data-note-type="code"] .editor-header {
@@ -535,16 +503,8 @@ body {
           gap: var(--mdst-space-2);
         }
       }
-
-      .ProseMirror {
-        padding: 60px 90px;
-      }
     }
   }
-}
-
-body[data-editor-readonly="true"] .milkdown .ProseMirror {
-  padding: var(--mdst-space-4) var(--mdst-space-5) !important;
 }
 
 @media screen and (min-width: 600px) {
@@ -555,17 +515,6 @@ body[data-editor-readonly="true"] .milkdown .ProseMirror {
 
   .login-dialog {
     width: 600px;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  body:not([data-editor-readonly="true"]) .milkdown {
-    .operation-item:first-child {
-      display: none;
-    }
-    .ProseMirror {
-      padding: 30px 40px;
-    }
   }
 }
 
