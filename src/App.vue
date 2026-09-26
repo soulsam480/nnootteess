@@ -48,7 +48,7 @@ watchEffect(() => {
 
 const isDark = useDark({
   attribute: "data-theme",
-  initialValue: "light",
+  initialValue: "dark",
   initOnMounted: true,
 });
 
