@@ -7,15 +7,26 @@ import Drawer from "@/components/drawer.vue";
 import { LocalStorage, storageKey } from "@/storage/local";
 import { drawerOpen } from "@/storage/state";
 import { user } from "@/storage/user";
-import { defineAsyncComponent, provide, Suspense, watchEffect } from "vue";
+import {
+  defineAsyncComponent,
+  h,
+  onMounted,
+  provide,
+  Suspense,
+  watchEffect,
+} from "vue";
 import { activeNoteIds } from "./storage/tabGroups";
 import DeleteNoteConfirmation from "./components/delete-note-confirmation.vue";
 import EmptyState from "./components/empty-state.vue";
 import ImportNotes from "./components/import-notes.vue";
 import Settings from "./components/settings.vue";
 import CommandBar from "./components/commands/command-bar.vue";
-import Toasts from "./components/toasts.vue";
+import Toasts, { showToast } from "./components/toasts.vue";
 import { editorReadonlyEnabled } from "./components/text-editor.vue";
+import { useDark } from "@vueuse/core";
+import { useCommands } from "@/components/commands/state";
+import CarbonHazeNight from "~icons/carbon/haze-night";
+import CarbonLight from "~icons/carbon/light";
 
 const Tab = defineAsyncComponent(async () => {
   return await import("./components/tab.vue");
@@ -33,6 +44,39 @@ watchEffect(() => {
 
 watchEffect(() => {
   document.body.dataset.editorReadonly = editorReadonlyEnabled.value.toString();
+});
+
+const isDark = useDark({
+  attribute: "data-theme",
+  initialValue: "light",
+  initOnMounted: true,
+});
+
+const { register } = useCommands();
+
+onMounted(() => {
+  register(
+    [{
+      id: "toggle-theme",
+      name: () => `Use ${isDark.value ? "Light" : "Dark"} Theme`,
+      group: "Settings",
+      actions: {
+        default: {
+          shortcut: "Alt+KeyT",
+          async perform() {
+            const prev = isDark.value;
+
+            isDark.value = !prev;
+
+            showToast({
+              message: prev ? "Theme set to light" : "Theme set to dark",
+            });
+          },
+        },
+      },
+      icon: () => isDark.value ? h(CarbonLight) : h(CarbonHazeNight),
+    }],
+  );
 });
 </script>
 

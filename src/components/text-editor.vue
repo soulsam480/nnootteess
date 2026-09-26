@@ -3,21 +3,13 @@ export const editorReadonlyEnabled = useStorage("readonly_mode", false);
 </script>
 
 <script setup lang="ts">
-import {
-  AtomicCodeMirrorEditor,
-  useAtomicEditorHandle,
-} from "@atomic-editor/editor";
+import { AtomicCodeMirrorEditor } from "@atomic-editor/editor";
 import "@atomic-editor/editor/styles.css";
 import { LanguageDescription } from "@codemirror/language";
-import { Compartment } from "@codemirror/state";
 import { useStorage } from "@vueuse/core";
-import { editorVimEnabled } from "./code-editor.vue";
-import { vim } from "@replit/codemirror-vim";
 import { markRaw } from "vue";
 import { keymap } from "@codemirror/view";
 import { searchKeymap } from "@codemirror/search";
-
-const vimCompartment = new Compartment();
 
 const LANG_DESCRIPTORS: LanguageDescription[] = [
   LanguageDescription.of({
@@ -74,19 +66,10 @@ const emits = defineEmits<{
 const state = props.modelValue;
 
 const extensions = markRaw([
-  vimCompartment.of(editorVimEnabled.value ? vim() : []),
   keymap.of([
     ...searchKeymap,
   ]),
 ]);
-
-const { handle: _handle } = useAtomicEditorHandle();
-
-// watch(editorVimEnabled, (state) => {
-//   handle.value?.view?.dispatch({
-//     effects: vimCompartment.reconfigure(state ? vim() : []),
-//   });
-// }, { immediate: true });
 </script>
 
 <template>

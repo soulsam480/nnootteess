@@ -1,25 +1,96 @@
 :root {
+  --atomic-editor-fg: #1a1a1a;
+  --atomic-editor-fg-muted: #6b6356;
+  --atomic-editor-fg-faint: #a39985;
+  --atomic-editor-bg: #f5f0e8;
+  --atomic-editor-bg-panel: #ebe5d9;
+  --atomic-editor-bg-surface: #ebe5d9;
+  --atomic-editor-border: #1a1a1a;
+  --atomic-editor-accent: #1a1a1a;
+  --atomic-editor-accent-bright: #6b6356;
+  --atomic-editor-accent-soft: #1a1a1a;
+  --atomic-editor-link: #1a1a1a;
+  --atomic-editor-link-hover: #6b6356;
+  --atomic-editor-code-bg: #ebe5d9;
+  --atomic-editor-radius: 0px;
+
+  --atomic-editor-initial-reveal-bg: color-mix(
+    in srgb,
+    var(--atomic-editor-accent-bright) 16%,
+    transparent 84%
+  );
+  --atomic-editor-initial-reveal-bg-strong: color-mix(
+    in srgb,
+    var(--atomic-editor-accent-bright) 30%,
+    transparent 70%
+  );
+  --atomic-editor-selection-bg: color-mix(
+    in srgb,
+    var(--atomic-editor-accent) 18%,
+    transparent 82%
+  );
+  --atomic-editor-search-bg: #d9770633;
+  --atomic-editor-search-bg-active: #d9770659;
+
+  --atomic-editor-hl-keyword: #7c3aed;
+  --atomic-editor-hl-string: #16a34a;
+  --atomic-editor-hl-number: #b45309;
+  --atomic-editor-hl-comment: #64748b;
+  --atomic-editor-hl-type: #b45309;
+  --atomic-editor-hl-function: #0284c7;
+  --atomic-editor-hl-property: #dc2626;
+  --atomic-editor-hl-regexp: #0e7490;
+  --atomic-editor-hl-escape: #0e7490;
+  --atomic-editor-hl-tag: #0284c7;
+  --atomic-editor-hl-variable: #1e293b;
+  --atomic-editor-hl-operator: #0e7490;
+  --atomic-editor-hl-invalid: #991b1b;
+}
+
+:root[data-theme="dark"] {
   --atomic-editor-fg: #e2e8f0;
   --atomic-editor-fg-muted: #94a3b8;
   --atomic-editor-fg-faint: #64748b;
   --atomic-editor-bg: #0c1322;
-  --atomic-editor-bg-panel: #0a0f1d;
+  --atomic-editor-bg-panel: #0b1220;
   --atomic-editor-bg-surface: #1e293b;
-  --atomic-editor-border: #475a78;
-  --atomic-editor-accent: #4ade80;
-  --atomic-editor-accent-bright: #86efac;
-  --atomic-editor-accent-soft: #4ade80;
-  --atomic-editor-link: #4ade80;
-  --atomic-editor-link-hover: #86efac;
+  --atomic-editor-border: #334155;
+  --atomic-editor-accent: #3b82f6;
+  --atomic-editor-accent-bright: #60a5fa;
+  --atomic-editor-accent-soft: #93c5fd;
+  --atomic-editor-link: #60a5fa;
+  --atomic-editor-link-hover: #93c5fd;
   --atomic-editor-code-bg: #1e293b;
-  --atomic-editor-selection-bg: #24334d73;
-  --atomic-editor-font-mono: "Fira Code", Menlo, Monaco, "Courier New", Courier, monospace;
-  --lab-display: "Martian Mono", "IBM Plex Mono", ui-monospace, monospace;
-  --lab-mono: "Fira Code", Menlo, Monaco, "Courier New", Courier, monospace;
-  --lab-grid: color-mix(in srgb, var(--atomic-editor-fg) 10%, transparent);
-  --lab-accent-tint: color-mix(in srgb, var(--atomic-editor-accent) 15%, transparent);
   --atomic-editor-radius: 6px;
-  --atomic-editor-measure: 100ch;
+
+  --atomic-editor-initial-reveal-bg: color-mix(
+    in srgb,
+    var(--atomic-editor-accent-bright) 20%,
+    transparent 80%
+  );
+  --atomic-editor-initial-reveal-bg-strong: color-mix(
+    in srgb,
+    var(--atomic-editor-accent-bright) 35%,
+    transparent 65%
+  );
+
+  --atomic-editor-selection-bg: #3b82f640;
+  --atomic-editor-search-bg: #3b82f633;
+  --atomic-editor-search-bg-active: #3b82f659;
+
+  --atomic-editor-hl-keyword: #a78bfa;
+  --atomic-editor-hl-string: #4ade80;
+  --atomic-editor-hl-number: #fbbf24;
+  --atomic-editor-hl-comment: #94a3b8;
+  --atomic-editor-hl-type: #fbbf24;
+  --atomic-editor-hl-function: #60a5fa;
+  --atomic-editor-hl-property: #f87171;
+  --atomic-editor-hl-regexp: #22d3ee;
+  --atomic-editor-hl-escape: #22d3ee;
+  --atomic-editor-hl-tag: #60a5fa;
+  --atomic-editor-hl-variable: #e2e8f0;
+  --atomic-editor-hl-operator: #22d3ee;
+  --atomic-editor-hl-invalid: #fca5a5;
 }
 
 body[data-editor-readonly="true"] {

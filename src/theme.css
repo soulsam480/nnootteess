@@ -41,6 +41,31 @@
 /* --mdst-transition: 100ms ease-out; */
 
 :root {
+  --mdst-color-fg: #1a1a1a;
+  --mdst-color-bg: #f5f0e8;
+  --mdst-color-border: #1a1a1a;
+  --mdst-color-muted: #6b6356;
+  --mdst-color-subtle: #ebe5d9;
+  --mdst-color-focus: #1a1a1a;
+  --mdst-color-error: #9a2c2c;
+  --mdst-color-success: #2c6e49;
+  --mdst-button-hover-bg: #1a1a1a;
+  --mdst-button-hover-color: #f5f0e8;
+  --mdst-button-hover-border: #1a1a1a;
+  --mdst-radius: 0px;
+  --mdst-border-width: 2px;
+  --mdst-color-warning: #d97706;
+  --mdst-color-editor-bg: #f5f0e8;
+  --mdst-color-panel-bg: #ebe5d9;
+  --mdst-color-tooltip-bg: #e2e8f0;
+  --mdst-color-syntax-keyword: #7c3aed;
+  --mdst-color-syntax-function: #0284c7;
+  --mdst-color-syntax-type: #b45309;
+  --mdst-color-syntax-operator: #0e7490;
+  --mdst-color-syntax-invalid: #991b1b;
+}
+
+:root[data-theme="dark"] {
   --mdst-color-fg: #e2e8f0;
   --mdst-color-bg: #0f172a;
   --mdst-color-border: #334155;
@@ -54,6 +79,15 @@
   --mdst-button-hover-border: #e2e8f0;
   --mdst-radius: 6px;
   --mdst-border-width: 1px;
+  --mdst-color-warning: #f59e0b;
+  --mdst-color-editor-bg: #0c1322;
+  --mdst-color-panel-bg: #0b1220;
+  --mdst-color-tooltip-bg: #24334d;
+  --mdst-color-syntax-keyword: #a78bfa;
+  --mdst-color-syntax-function: #60a5fa;
+  --mdst-color-syntax-type: #fbbf24;
+  --mdst-color-syntax-operator: #22d3ee;
+  --mdst-color-syntax-invalid: #fca5a5;
 }
 
 html {
