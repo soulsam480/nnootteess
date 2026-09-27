@@ -249,7 +249,7 @@ body {
   }
 
   .header {
-    border-bottom: 1px solid var(--mdst-color-border);
+    border-bottom: var(--mdst-border-width) solid var(--mdst-color-border);
     display: flex;
     align-items: center;
     padding: var(--mdst-space-1) var(--mdst-space-2);
@@ -366,7 +366,7 @@ body {
         display: flex;
         gap: var(--mdst-space-1);
         align-items: center;
-        border-bottom: 1px solid var(--mdst-color-border);
+        border-bottom: var(--mdst-border-width) solid var(--mdst-color-border);
         margin-bottom: var(--mdst-space-2);
       }
 
@@ -522,8 +522,8 @@ body {
       .atomic-cm-editor {
         height: calc(100vh - calc(var(--mdst-space-8) + var(--mdst-space-6) + 36px + 38px));
         overflow-y: scroll;
+        border: var(--mdst-border-width) solid var(--mdst-color-border);
         border-radius: var(--mdst-radius);
-        border: 1px solid var(--mdst-color-border);
       }
 
       &[data-note-type="code"] .editor-header {
