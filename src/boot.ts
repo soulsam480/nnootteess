@@ -20,5 +20,6 @@ export function boot(storage: LocalStorage) {
     app.mount(container);
   }
 
-  tryRecoverAndLogin(storage).then(mountApp);
+  mountApp();
+  void tryRecoverAndLogin(storage);
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
-import { defineAsyncComponent, ref, unref } from "vue";
+import { defineAsyncComponent, ref, unref, watch } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import { titleCase } from "scule";
 import { closeNote, lastFocusedTab } from "@/storage/tabGroups";
@@ -14,24 +14,43 @@ const props = defineProps<{
   tabId: number;
 }>();
 
-const note = await notesAPI.useNote(props.id, closeNote);
+const { note, error } = await notesAPI.useNote(props.id, closeNote);
 
 const content = ref(note.value?.value.content ?? "");
+let lastSavedContent = content.value;
 
 async function save() {
   const inner = unref(note);
   const cont = unref(content);
 
-  if (!inner) return;
+  if (!inner || error.value) return;
 
-  await notesAPI.update(inner.id, {
+  const saved = await notesAPI.update(inner.id, {
     ...inner.value,
     content: cont,
     sec: {
       content: cont,
     },
   });
+
+  lastSavedContent = cont;
+
+  if (unref(content) === cont && typeof saved.value?.content === "string") {
+    content.value = saved.value.content;
+    lastSavedContent = saved.value.content;
+  }
 }
+
+watch(note, (incoming) => {
+  const incomingContent = incoming?.value.content;
+
+  if (typeof incomingContent !== "string") return;
+  if (unref(content) !== lastSavedContent) return;
+  if (incomingContent === unref(content)) return;
+
+  content.value = incomingContent;
+  lastSavedContent = incomingContent;
+});
 
 watchDebounced(
   content,
@@ -56,7 +75,11 @@ function handleFocus() {
     data-state="active"
     :data-note-type="note?.value.type"
   >
-    <template v-if="note">
+    <div v-if="error" class="mdst-p mdst-p--sm" role="alert">
+      {{ error.message }}
+    </div>
+
+    <template v-if="note && !error">
       <div class="editor-header">
         <input
           type="text"
@@ -92,6 +115,6 @@ function handleFocus() {
       />
     </template>
 
-    <div v-else>Note is not found!!</div>
+    <div v-else-if="!error">Note is not found!!</div>
   </div>
 </template>

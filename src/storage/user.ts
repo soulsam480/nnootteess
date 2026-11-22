@@ -6,7 +6,9 @@
 //  full access to ypur data
 // 3. the mnemonic is stored in local storage for 15 minutes
 
-import { sm } from "@/storage/db";
+import { db, sm } from "@/storage/db";
+import { migrateNotesForCurrentUser } from "@/storage/migration";
+import { forgetLegacyKey } from "@/storage/notes";
 import { startState } from "@/storage/state";
 import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
@@ -36,6 +38,12 @@ const TTL_TO_MS: Record<Ttl, number> = {
 
 const PASS_KEY = "__pass__";
 
+let privateKey: string | null = null;
+
+function getPrivateKey(): string | null {
+  return privateKey;
+}
+
 const user = reactive<UserState>({
   id: null,
   state: "inactive",
@@ -43,47 +51,82 @@ const user = reactive<UserState>({
 
 const isLoggedIn = computed(() => user.state === "authenticated");
 
+let activating = false;
+
+function activate(activeAddress: string) {
+  if (user.state === "copying") {
+    return;
+  }
+
+  if (user.state === "authenticated" && user.id === activeAddress) {
+    return;
+  }
+
+  user.id = activeAddress;
+  user.state = "authenticated";
+
+  startState(activeAddress, isLoggedIn);
+  startNotes(activeAddress, isLoggedIn);
+  startTabGroups(activeAddress, isLoggedIn);
+  startDirectory(activeAddress, isLoggedIn);
+}
+
 sm().setSecurityStateChangeCallback((authState) => {
-  if (authState.isActive && authState.activeAddress) {
-    if (user.state === "copying") {
-      return;
-    }
-
-    user.id = authState.activeAddress;
-    user.state = "authenticated";
-
-    startState(authState.activeAddress, isLoggedIn);
-    startNotes(authState.activeAddress, isLoggedIn);
-    startTabGroups(authState.activeAddress, isLoggedIn);
-    startDirectory(authState.activeAddress, isLoggedIn);
+  if (authState.isActive && authState.activeAddress && !activating) {
+    activate(authState.activeAddress);
   }
 });
 
 // ============== HANDLERS ================
 
 async function login(storage: LocalStorage, previousMemonic?: string, ttl: Ttl = "15m") {
-  const identity: Record<string, string> | null = previousMemonic
-    ? await sm().loginOrRecoverUserWithMnemonic(previousMemonic)
-    : await sm().startNewUserRegistration();
+  activating = true;
+  let activatedAddress: string | null = null;
 
-  if (!identity) {
-    return;
+  try {
+    const identity: Record<string, string> | null = previousMemonic
+      ? await sm().loginOrRecoverUserWithMnemonic(previousMemonic)
+      : await sm().startNewUserRegistration();
+
+    if (!identity) {
+      return;
+    }
+
+    const { address, mnemonic } = identity;
+    activatedAddress = address;
+    let activeIdentity = identity;
+
+    if (!previousMemonic) {
+      activeIdentity = await sm().loginOrRecoverUserWithMnemonic(mnemonic);
+    }
+
+    if (activeIdentity?.privateKey) {
+      privateKey = activeIdentity.privateKey;
+
+      try {
+        await migrateNotesForCurrentUser({ db: db(), sm: sm(), address, privateKey });
+      } catch (error) {
+        console.error("[migration] sweep failed", error);
+      }
+    }
+
+    await persistMnemonicUnsafe(mnemonic, storage, ttl);
+
+    return { address, mnemonic };
+  } finally {
+    if (activatedAddress) {
+      activate(activatedAddress);
+    }
+
+    activating = false;
   }
-
-  const { address, mnemonic } = identity;
-
-  if (!previousMemonic) {
-    await sm().loginOrRecoverUserWithMnemonic(mnemonic);
-  }
-
-  await persistMnemonicUnsafe(mnemonic, storage, ttl);
-
-  return { address, mnemonic };
 }
 
 async function logout(storage: LocalStorage) {
   await sm().clearSecurity();
   await storage.remove(PASS_KEY);
+  privateKey = null;
+  forgetLegacyKey();
   user.id = null;
   user.state = "inactive";
 }
@@ -117,4 +160,4 @@ async function tryRecoverAndLogin(storage: LocalStorage) {
   await login(storage, mnemonic);
 }
 
-export { login, user, tryRecoverAndLogin, logout, PASS_KEY };
+export { login, user, tryRecoverAndLogin, logout, getPrivateKey, PASS_KEY };

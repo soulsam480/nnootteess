@@ -1,17 +1,45 @@
 import { PRIORITY } from "@/components/commands/state";
 import { CommandConfig } from "@/components/commands/types";
 import { db, sm } from "@/storage/db";
+import { decryptLegacySec, deriveLegacyKey, isLegacySec } from "@/storage/legacy-crypto";
 import { openNote } from "@/storage/tabGroups";
-import { user } from "@/storage/user";
-import { NodeObject, QueryOptions } from "genosdb";
+import { getPrivateKey, user } from "@/storage/user";
+import { NodeObject } from "genosdb";
+import { noteQuery } from "@/storage/note-query";
 import { kebabCase } from "scule";
-import { onBeforeUnmount, Ref, ref, shallowRef, watch } from "vue";
+import { onBeforeUnmount, Ref, ref, shallowRef, ShallowRef, watch } from "vue";
 import CarbonSearch from "~icons/carbon/search";
 
 import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
 
 const CURRENT_VERSION = 1;
+
+export class LegacyKeyRequiredError extends Error {
+  constructor() {
+    super("Open the vault with your vault key to finish the security upgrade");
+  }
+}
+
+let legacyCache: { privateKey: string; key: Promise<CryptoKey> } | null = null;
+
+export function forgetLegacyKey(): void {
+  legacyCache = null;
+}
+
+async function legacyKey(): Promise<CryptoKey> {
+  const privateKey = getPrivateKey();
+
+  if (!privateKey) {
+    throw new LegacyKeyRequiredError();
+  }
+
+  if (!legacyCache || legacyCache.privateKey !== privateKey) {
+    legacyCache = { privateKey, key: deriveLegacyKey(privateKey) };
+  }
+
+  return await legacyCache.key;
+}
 
 interface CommonNote {
   name: string;
@@ -134,32 +162,31 @@ export function makeNoteCommands(notes: NodeObject<TListNote>[]): CommandConfig[
 
 const noteToBeDeleted = ref<NodeObject<TListNote> | null>(null);
 
-function makeQuery(userId: string) {
-  return {
-    query: {
-      type: { $in: ["note", "code"] },
-      owner: userId,
-    },
-    field: "created_at",
-    order: "desc",
-  } satisfies QueryOptions;
-}
-
 async function unwrapNote(note: NodeObject): Promise<NodeObject<Note>> {
   const {
     value: { sec, ...restValue },
     ...rest
   } = note;
 
-  const unwrapped = await sm().decryptDataForCurrentUser(sec);
+  let unwrapped: unknown;
+
+  try {
+    unwrapped = await sm().decryptDataForCurrentUser(sec);
+  } catch (error) {
+    if (!isLegacySec(sec)) {
+      throw error;
+    }
+
+    unwrapped = await decryptLegacySec(sec, await legacyKey());
+  }
 
   return {
     ...rest,
     value: {
       ...restValue,
       version: restValue.version ?? 1,
-      sec: unwrapped,
-      content: unwrapped.content,
+      sec: unwrapped as Note["sec"],
+      content: (unwrapped as Note["sec"]).content,
     },
   };
 }
@@ -193,44 +220,105 @@ async function startNotes(userId: string, isLoggedIn: Ref<boolean>) {
     };
   }
 
-  db().map(makeQuery(userId), sync);
+  db().map(noteQuery(userId), sync);
 }
 
-async function useNote(id: string, onRemove: (id: string) => void) {
+export interface NoteView {
+  note: ShallowRef<NodeObject<Note> | undefined>;
+  error: Ref<Error | null>;
+}
+
+async function useNote(id: string, onRemove: (id: string) => void): Promise<NoteView> {
   const note = shallowRef<NodeObject<Note>>();
+  const error = ref<Error | null>(null);
 
   let unsub: (() => void) | undefined;
+  let arrived = false;
+  let removeTimer: ReturnType<typeof setTimeout> | null = null;
+  let latestTimestamp: { physical: number; logical: number } | null = null;
+
+  const isNewer = (timestamp: { physical: number; logical: number } | null | undefined) => {
+    if (!timestamp) return false;
+    if (!latestTimestamp) return true;
+    if (timestamp.physical !== latestTimestamp.physical) {
+      return timestamp.physical > latestTimestamp.physical;
+    }
+
+    return timestamp.logical > latestTimestamp.logical;
+  };
+
+  const fail = (reason: unknown) => {
+    error.value = reason instanceof Error ? reason : new Error(String(reason));
+  };
 
   onBeforeUnmount(() => {
     unsub?.();
+
+    if (removeTimer) {
+      clearTimeout(removeTimer);
+    }
   });
 
   const { unsubscribe, result } = await db().get(id, (node) => {
-    if (!node?.value) {
-      onRemove(id);
+    if (node?.value) {
+      arrived = true;
+
+      if (removeTimer) {
+        clearTimeout(removeTimer);
+        removeTimer = null;
+      }
+
+      const timestamp = node.timestamp as { physical: number; logical: number } | undefined;
+
+      if (isNewer(timestamp)) {
+        latestTimestamp = timestamp ?? null;
+      }
+
+      unwrapNote(node).then(
+        (unwrapped) => {
+          if (timestamp && latestTimestamp && timestamp !== latestTimestamp) {
+            return;
+          }
+
+          note.value = unwrapped;
+          error.value = null;
+        },
+        fail,
+      );
       return;
     }
 
-    unwrapNote(node).then((node) => {
-      note.value = node;
-    });
+    if (arrived) {
+      onRemove(id);
+    }
   });
-
-  if (result?.value) {
-    note.value = await unwrapNote(result);
-  } else {
-    onRemove(id);
-  }
 
   unsub = unsubscribe;
 
-  return note;
+  if (result?.value) {
+    arrived = true;
+    latestTimestamp = (result.timestamp as { physical: number; logical: number } | undefined) ?? null;
+
+    try {
+      note.value = await unwrapNote(result);
+    } catch (reason) {
+      fail(reason);
+    }
+  } else {
+    removeTimer = setTimeout(() => {
+      if (!arrived) {
+        onRemove(id);
+      }
+    }, 5000);
+  }
+
+  return { note, error };
 }
 
 async function all(
   userId: string,
 ): Promise<NodeObject<Omit<Note, "content"> & { content?: string }>[]> {
-  const { results } = await db().map(makeQuery(userId));
+  const { results } = await db().map(noteQuery(userId));
 
   return results.map((it) => {
     // NOTE: avoid loading massive data into memory for all notes
@@ -340,7 +428,7 @@ async function exportNotes() {
 
   const { Zip } = await import("@greggman/zipup");
 
-  const { results } = await db().map(makeQuery(userId));
+  const { results } = await db().map(noteQuery(userId));
 
   const zip = new Zip();
 

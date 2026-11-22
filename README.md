@@ -10,6 +10,12 @@
 - copy/save the vault key
 - add notes/snippets
 
+### Upgrading from 0.33.x
+
+- Update every device that opens the vault. Old tabs cannot read the new format.
+- Open with your vault key once. Notes are re-encrypted in place during login. If you close the tab, the next login finishes the rest.
+- Passkeys from the old version are not read. Create a new one in Settings after the upgrade.
+
 ### Features
 
 - Vaults open with a vault key, same key on any device, auto-unlock for 15m

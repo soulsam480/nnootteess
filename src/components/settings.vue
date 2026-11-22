@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { editorVimEnabled } from "./code-editor.vue";
-import { computedAsync } from "@vueuse/core";
 import { sm } from "@/storage/db";
+import { showToast } from "./toasts.vue";
 import CarbonIbmCloudKeyProtect from "~icons/carbon/ibm-cloud-key-protect";
 import CarbonKeychain from "~icons/carbon/keychain";
 import Kbd from "./kbd.vue";
@@ -31,12 +31,24 @@ const BINDINGS = [
   ["Alt+KeyR", "Toggle Readonly Mode"],
 ];
 
-const hasPasskey = computedAsync(async () => {
-  return await sm().hasExistingWebAuthnRegistration();
-}, false);
+const hasPasskey = ref(false);
+
+async function refreshPasskey() {
+  hasPasskey.value = await sm().hasExistingWebAuthnRegistration();
+}
+
+onMounted(refreshPasskey);
 
 async function handleCreatePasskey() {
-  await sm().protectCurrentIdentityWithWebAuthn();
+  const result = await sm().protectCurrentIdentityWithWebAuthn();
+
+  if (!result) {
+    showToast({ type: "error", message: "This authenticator cannot protect a passkey" });
+    return;
+  }
+
+  localStorage.removeItem("notesx2_legacy_passkey");
+  await refreshPasskey();
 }
 
 function handleClose() {
