@@ -186,6 +186,50 @@ body {
     }
   }
 
+  .sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mdst-space-1);
+  }
+
+  .sync-status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mdst-color-muted);
+  }
+
+  .sync-status[data-status="connected"] .sync-status__dot {
+    background: var(--mdst-color-success);
+  }
+
+  .sync-status[data-status="waiting"] .sync-status__dot {
+    background: var(--mdst-color-warning);
+  }
+
+  .sync-panel .mdst-dialog-body {
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--mdst-space-3);
+  }
+
+  .sync-panel__status {
+    font-weight: 600;
+  }
+
+  .sync-panel__status[data-status="connected"] {
+    color: var(--mdst-color-success);
+  }
+
+  .sync-panel__status[data-status="waiting"] {
+    color: var(--mdst-color-warning);
+  }
+
+  .sync-panel__error {
+    color: var(--mdst-color-error);
+  }
+
   .search-dialog[open] {
     width: auto;
 

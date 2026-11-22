@@ -38,6 +38,9 @@ mock.module("~icons/carbon/search", () => ({ default: () => null }));
 mock.module("~icons/carbon/document", () => ({ default: () => null }));
 mock.module("~icons/carbon/code", () => ({ default: () => null }));
 
+const vue = await import("vue");
+mock.module("vue", () => ({ ...vue, onBeforeUnmount: () => {} }));
+
 const { unwrapNote, useNote, LegacyKeyRequiredError, forgetLegacyKey } = await import(
   "@/storage/notes"
 );
