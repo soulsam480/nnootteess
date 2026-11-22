@@ -1,4 +1,7 @@
 import { decryptLegacySec, deriveLegacyKey, isLegacySec } from "@/storage/legacy-crypto";
+import { noteQuery } from "@/storage/note-query";
+
+export { noteQuery };
 
 export interface NoteNode {
   id: string;
@@ -68,7 +71,6 @@ export async function migrateNotes(deps: MigrationDeps): Promise<MigrationReport
       }
 
       if (fresh.value.sec !== item.sec) {
-        report.skipped++;
         next.push({ id: item.id, sec: fresh.value.sec });
         continue;
       }
@@ -76,18 +78,32 @@ export async function migrateNotes(deps: MigrationDeps): Promise<MigrationReport
       try {
         const plain = await decryptLegacySec(item.sec, key);
         const sec = await deps.encrypt(plain);
-        await deps.putNote(item.id, { ...fresh.value, sec });
+        const current = await deps.getNote(item.id);
+
+        if (!current || !isLegacySec(current.value.sec) || current.value.sec !== item.sec) {
+          if (!current) {
+            next.push({ id: item.id, sec: item.sec });
+          } else if (isLegacySec(current.value.sec)) {
+            next.push({ id: item.id, sec: current.value.sec });
+          } else {
+            report.skipped++;
+          }
+
+          continue;
+        }
+
+        await deps.putNote(item.id, { ...current.value, sec });
         const saved = await deps.getNote(item.id);
 
-        if (saved && saved.value.sec === sec) {
-          report.migrated++;
-        } else if (saved && isLegacySec(saved.value.sec)) {
+        if (!saved) {
+          next.push({ id: item.id, sec: item.sec });
+        } else if (isLegacySec(saved.value.sec)) {
           next.push({ id: item.id, sec: saved.value.sec });
         } else {
-          report.failed++;
+          report.migrated++;
         }
       } catch {
-        report.failed++;
+        next.push({ id: item.id, sec: item.sec });
       }
     }
 

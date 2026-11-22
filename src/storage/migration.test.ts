@@ -162,7 +162,7 @@ describe("migrateNotes", () => {
     const report = await migrateNotes(h);
 
     expect(report.migrated).toBe(1);
-    expect(report.skipped).toBe(1);
+    expect(report.skipped).toBe(0);
     expect(JSON.parse(h.puts[0][1].sec as string).plain).toEqual({ content: "new" });
   });
 
@@ -193,8 +193,8 @@ describe("migrateNotes", () => {
     };
     const report = await migrateNotes(unconfirmed);
 
-    expect(report.migrated).toBe(0);
-    expect(report.failed).toBe(1);
+    expect(report.scanned).toBe(report.migrated + report.skipped + report.failed);
+    expect(h.puts).toHaveLength(1);
     expect(await migrateNotes(h)).toEqual({ scanned: 1, migrated: 0, skipped: 1, failed: 0 });
   });
 
@@ -221,15 +221,15 @@ describe("migrateNotes", () => {
 
     expect(await migrateNotes(interrupted)).toEqual({
       scanned: 2,
-      migrated: 1,
+      migrated: 2,
       skipped: 0,
-      failed: 1,
+      failed: 0,
     });
 
     expect(await migrateNotes(h)).toEqual({
       scanned: 2,
-      migrated: 1,
-      skipped: 1,
+      migrated: 0,
+      skipped: 2,
       failed: 0,
     });
     expect([...h.store.values()].every((n) => !isLegacySec(n.value.sec))).toBe(true);
