@@ -11,6 +11,7 @@
     },
     "resolveJsonModule": true,
     "types": [
+      "bun",
       "vite/client",
       "@crxjs/vite-plugin/client",
       "vite-plugin-pwa/info",
