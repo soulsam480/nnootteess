@@ -4,6 +4,10 @@
 
 > P2P synced and E2E encrypted note taking in all your browsers
 
+### AI-assisted changes
+
+The app was originally written without AI assistance. Later changes may be AI-assisted, including the GenosDB 0.37 migration.
+
 ### How to use
 
 - Open the web app at https://notes.sambitsahoo.com and create a vault
