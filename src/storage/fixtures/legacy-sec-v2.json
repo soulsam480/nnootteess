@@ -1,0 +1,9 @@
+{
+  "address": "0x834083944a0812431Cb392E47646AD0efd7f0024",
+  "mnemonic": "sphere digital stool speak calm appear invest trash barely clever panic hat",
+  "privateKey": "0xc7298f235a164698ffb4494cf3410954a7d1157fa5db7927bc92eeac4febc76f",
+  "sec": "{\"iv\":\"0xf41ca082d880929523e501f9\",\"encrypted\":\"0xfed4a5490339fc7d34f64f67877e2a17a1c5c9af5071daf62b19ff455dea20ad21920ce5d665fec7272c7bb37a0d\",\"type\":\"aes-gcm-self-ssm-v2\"}",
+  "plaintext": {
+    "content": "hello legacy"
+  }
+}
