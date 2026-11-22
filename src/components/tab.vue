@@ -14,7 +14,7 @@ const props = defineProps<{
   tabId: number;
 }>();
 
-const note = await notesAPI.useNote(props.id, closeNote);
+const { note, error } = await notesAPI.useNote(props.id, closeNote);
 
 const content = ref(note.value?.value.content ?? "");
 let lastSavedContent = content.value;
@@ -23,9 +23,9 @@ async function save() {
   const inner = unref(note);
   const cont = unref(content);
 
-  if (!inner) return;
+  if (!inner || error.value) return;
 
-  await notesAPI.update(inner.id, {
+  const saved = await notesAPI.update(inner.id, {
     ...inner.value,
     content: cont,
     sec: {
@@ -34,6 +34,11 @@ async function save() {
   });
 
   lastSavedContent = cont;
+
+  if (unref(content) === cont && typeof saved.value?.content === "string") {
+    content.value = saved.value.content;
+    lastSavedContent = saved.value.content;
+  }
 }
 
 watch(note, (incoming) => {
@@ -44,6 +49,7 @@ watch(note, (incoming) => {
   if (incomingContent === unref(content)) return;
 
   content.value = incomingContent;
+  lastSavedContent = incomingContent;
 });
 
 watchDebounced(
@@ -69,7 +75,11 @@ function handleFocus() {
     data-state="active"
     :data-note-type="note?.value.type"
   >
-    <template v-if="note">
+    <div v-if="error" class="mdst-p mdst-p--sm" role="alert">
+      {{ error.message }}
+    </div>
+
+    <template v-if="note && !error">
       <div class="editor-header">
         <input
           type="text"
@@ -105,6 +115,6 @@ function handleFocus() {
       />
     </template>
 
-    <div v-else>Note is not found!!</div>
+    <div v-else-if="!error">Note is not found!!</div>
   </div>
 </template>

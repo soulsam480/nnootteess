@@ -47,6 +47,7 @@ async function handleCreatePasskey() {
     return;
   }
 
+  localStorage.removeItem("notesx2_legacy_passkey");
   await refreshPasskey();
 }
 

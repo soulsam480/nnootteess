@@ -34,6 +34,7 @@ function fakeDb(notes: NoteNode[]) {
 }
 
 const sm = {
+  getActiveEthAddress: () => fixture.address,
   encryptDataForCurrentUser: async () => '{"type":"aes-gcm-self-ssm-v3"}',
 } as unknown as SecurityManager;
 
@@ -77,6 +78,25 @@ test("a second run skips every v3 note", async () => {
     failed: 0,
   });
   expect(puts).toHaveLength(1);
+});
+
+test("a sweep of 500 notes migrates every one", async () => {
+  const notes = Array.from({ length: 500 }, (_, index) => ({
+    id: `0xabc:note-${index}`,
+    value: { owner: fixture.address, sec: fixture.sec },
+  }));
+  const { db, puts } = fakeDb(notes);
+  const started = performance.now();
+  const report = await migrateNotesForCurrentUser({
+    db,
+    sm,
+    address: fixture.address,
+    privateKey: fixture.privateKey,
+  });
+
+  expect(report).toEqual({ scanned: 500, migrated: 500, skipped: 0, failed: 0 });
+  expect(puts).toHaveLength(500);
+  expect(performance.now() - started).toBeLessThan(2000);
 });
 
 test("migrationStatus reflects a clean run and a failed run", async () => {

@@ -8,6 +8,7 @@
 
 import { db, sm } from "@/storage/db";
 import { migrateNotesForCurrentUser } from "@/storage/migration";
+import { forgetLegacyKey } from "@/storage/notes";
 import { startState } from "@/storage/state";
 import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
@@ -50,59 +51,82 @@ const user = reactive<UserState>({
 
 const isLoggedIn = computed(() => user.state === "authenticated");
 
+let activating = false;
+
+function activate(activeAddress: string) {
+  if (user.state === "copying") {
+    return;
+  }
+
+  if (user.state === "authenticated" && user.id === activeAddress) {
+    return;
+  }
+
+  user.id = activeAddress;
+  user.state = "authenticated";
+
+  startState(activeAddress, isLoggedIn);
+  startNotes(activeAddress, isLoggedIn);
+  startTabGroups(activeAddress, isLoggedIn);
+  startDirectory(activeAddress, isLoggedIn);
+}
+
 sm().setSecurityStateChangeCallback((authState) => {
-  if (authState.isActive && authState.activeAddress) {
-    if (user.state === "copying") {
-      return;
-    }
-
-    user.id = authState.activeAddress;
-    user.state = "authenticated";
-
-    startState(authState.activeAddress, isLoggedIn);
-    startNotes(authState.activeAddress, isLoggedIn);
-    startTabGroups(authState.activeAddress, isLoggedIn);
-    startDirectory(authState.activeAddress, isLoggedIn);
+  if (authState.isActive && authState.activeAddress && !activating) {
+    activate(authState.activeAddress);
   }
 });
 
 // ============== HANDLERS ================
 
 async function login(storage: LocalStorage, previousMemonic?: string, ttl: Ttl = "15m") {
-  const identity: Record<string, string> | null = previousMemonic
-    ? await sm().loginOrRecoverUserWithMnemonic(previousMemonic)
-    : await sm().startNewUserRegistration();
+  activating = true;
+  let activatedAddress: string | null = null;
 
-  if (!identity) {
-    return;
-  }
+  try {
+    const identity: Record<string, string> | null = previousMemonic
+      ? await sm().loginOrRecoverUserWithMnemonic(previousMemonic)
+      : await sm().startNewUserRegistration();
 
-  const { address, mnemonic } = identity;
-  let activeIdentity = identity;
-
-  if (!previousMemonic) {
-    activeIdentity = await sm().loginOrRecoverUserWithMnemonic(mnemonic);
-  }
-
-  if (activeIdentity?.privateKey) {
-    privateKey = activeIdentity.privateKey;
-
-    try {
-      await migrateNotesForCurrentUser({ db: db(), sm: sm(), address, privateKey });
-    } catch (error) {
-      console.error("[migration] sweep failed", error);
+    if (!identity) {
+      return;
     }
+
+    const { address, mnemonic } = identity;
+    activatedAddress = address;
+    let activeIdentity = identity;
+
+    if (!previousMemonic) {
+      activeIdentity = await sm().loginOrRecoverUserWithMnemonic(mnemonic);
+    }
+
+    if (activeIdentity?.privateKey) {
+      privateKey = activeIdentity.privateKey;
+
+      try {
+        await migrateNotesForCurrentUser({ db: db(), sm: sm(), address, privateKey });
+      } catch (error) {
+        console.error("[migration] sweep failed", error);
+      }
+    }
+
+    await persistMnemonicUnsafe(mnemonic, storage, ttl);
+
+    return { address, mnemonic };
+  } finally {
+    if (activatedAddress) {
+      activate(activatedAddress);
+    }
+
+    activating = false;
   }
-
-  await persistMnemonicUnsafe(mnemonic, storage, ttl);
-
-  return { address, mnemonic };
 }
 
 async function logout(storage: LocalStorage) {
   await sm().clearSecurity();
   await storage.remove(PASS_KEY);
   privateKey = null;
+  forgetLegacyKey();
   user.id = null;
   user.state = "inactive";
 }
@@ -120,10 +144,6 @@ async function persistMnemonicUnsafe(mnemonic: string, storage: LocalStorage, tt
 }
 
 async function tryRecoverAndLogin(storage: LocalStorage) {
-  if (user.state === "authenticated") {
-    return;
-  }
-
   const result = await storage.get<Partial<PersistedMemonic>>(PASS_KEY);
 
   const { mnemonic, at, ttl = "15m" } = result ?? {};
