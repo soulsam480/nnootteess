@@ -1,7 +1,13 @@
+import type { GDB, QueryOptions, SecurityManager } from "genosdb";
+import { ref } from "vue";
 import { decryptLegacySec, deriveLegacyKey, isLegacySec } from "@/storage/legacy-crypto";
 import { noteQuery } from "@/storage/note-query";
 
 export { noteQuery };
+
+export type MigrationStatus = "idle" | "running" | "done" | "failed";
+
+export const migrationStatus = ref<MigrationStatus>("idle");
 
 export interface NoteNode {
   id: string;
@@ -112,4 +118,43 @@ export async function migrateNotes(deps: MigrationDeps): Promise<MigrationReport
 
   report.failed += pending.length;
   return report;
+}
+
+export function noteQuery(address: string): QueryOptions {
+  return {
+    query: { type: { $in: ["note", "code"] }, owner: address },
+    field: "created_at",
+    order: "desc",
+  };
+}
+
+export async function migrateNotesForCurrentUser(deps: {
+  db: GDB;
+  sm: SecurityManager;
+  address: string;
+  privateKey: string;
+}): Promise<MigrationReport> {
+  migrationStatus.value = "running";
+
+  try {
+    const report = await migrateNotes({
+      address: deps.address,
+      privateKey: deps.privateKey,
+      listNotes: async () => (await deps.db.map(noteQuery(deps.address))).results,
+      getNote: async (id) => (await deps.db.get(id)).result ?? null,
+      putNote: async (id, value) => await deps.db.put(value, id),
+      encrypt: async (plain) => await deps.sm.encryptDataForCurrentUser(plain),
+    });
+
+    migrationStatus.value = report.failed > 0 ? "failed" : "done";
+
+    console.log(
+      `[migration] migrated=${report.migrated} skipped=${report.skipped} failed=${report.failed}`,
+    );
+
+    return report;
+  } catch (error) {
+    migrationStatus.value = "failed";
+    throw error;
+  }
 }

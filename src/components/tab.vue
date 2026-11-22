@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
-import { defineAsyncComponent, ref, unref } from "vue";
+import { defineAsyncComponent, ref, unref, watch } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import { titleCase } from "scule";
 import { closeNote, lastFocusedTab } from "@/storage/tabGroups";
@@ -17,6 +17,7 @@ const props = defineProps<{
 const note = await notesAPI.useNote(props.id, closeNote);
 
 const content = ref(note.value?.value.content ?? "");
+let lastSavedContent = content.value;
 
 async function save() {
   const inner = unref(note);
@@ -31,7 +32,19 @@ async function save() {
       content: cont,
     },
   });
+
+  lastSavedContent = cont;
 }
+
+watch(note, (incoming) => {
+  const incomingContent = incoming?.value.content;
+
+  if (typeof incomingContent !== "string") return;
+  if (unref(content) !== lastSavedContent) return;
+  if (incomingContent === unref(content)) return;
+
+  content.value = incomingContent;
+});
 
 watchDebounced(
   content,

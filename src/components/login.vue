@@ -3,7 +3,7 @@ import { sm } from "@/storage/db";
 import { storageKey } from "@/storage/local";
 import { login, user } from "@/storage/user";
 import { computedAsync, useClipboard } from "@vueuse/core";
-import { inject, shallowReactive } from "vue";
+import { inject, ref, shallowReactive } from "vue";
 
 interface LoginState {
   state: "generated" | "idle";
@@ -58,6 +58,8 @@ async function handleLoginWithPassKey() {
 const hasPasskey = computedAsync(async () => {
   return await sm().hasExistingWebAuthnRegistration();
 }, false);
+
+const needsPasskeyReset = ref(localStorage.getItem("notesx2_legacy_passkey") === "1");
 </script>
 
 <template>
@@ -79,6 +81,10 @@ const hasPasskey = computedAsync(async () => {
       </button>
 
       <hr class="mdst-hr" style="width: 100%; margin: var(--mdst-space-4)" />
+
+      <p v-if="needsPasskeyReset && !hasPasskey" class="mdst-p mdst-p--sm">
+        Passkey needs to be set up again. Open with your vault key.
+      </p>
 
       <input
         class="mdst-input"

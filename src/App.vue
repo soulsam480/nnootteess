@@ -5,6 +5,7 @@ import Login from "@/components/login.vue";
 import NoteTabs from "@/components/note-tabs.vue";
 import Drawer from "@/components/drawer.vue";
 import { LocalStorage, storageKey } from "@/storage/local";
+import { migrationStatus } from "@/storage/migration";
 import { drawerOpen } from "@/storage/state";
 import { user } from "@/storage/user";
 import {
@@ -82,6 +83,15 @@ onMounted(() => {
 
 <template>
   <template v-if='user.state === "authenticated" && user.id'>
+    <div
+      v-if="migrationStatus === 'running'"
+      style="display: flex; align-items: center; gap: var(--mdst-space-sm); padding: var(--mdst-space-3); color: var(--mdst-color-muted)"
+      role="status"
+    >
+      <span class="mdst-spinner mdst-spinner--sm" aria-hidden="true" />
+      <span>Re-encrypting your notes. Keep this tab open.</span>
+    </div>
+
     <DeleteNoteConfirmation />
     <CommandBar />
     <ImportNotes />

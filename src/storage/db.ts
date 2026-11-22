@@ -50,6 +50,15 @@ function makeAPI(db: GDB.GDB) {
   };
 }
 
+try {
+  if (localStorage.getItem("gdb_ethereum_material_encrypted_webauthn_v2")) {
+    localStorage.setItem("notesx2_legacy_passkey", "1");
+  }
+
+  localStorage.removeItem("gdb_ethereum_material_encrypted_webauthn_v2");
+  localStorage.removeItem("gdb_webauthn_registration_details_v2");
+} catch {}
+
 const db = await gdb(import.meta.env.DEV ? DEV : V_2, {
   ...COMMON_CONFIG,
 });

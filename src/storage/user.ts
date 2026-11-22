@@ -6,7 +6,8 @@
 //  full access to ypur data
 // 3. the mnemonic is stored in local storage for 15 minutes
 
-import { sm } from "@/storage/db";
+import { db, sm } from "@/storage/db";
+import { migrateNotesForCurrentUser } from "@/storage/migration";
 import { startState } from "@/storage/state";
 import { computed, reactive } from "vue";
 import { LocalStorage } from "@/storage/local";
@@ -35,6 +36,12 @@ const TTL_TO_MS: Record<Ttl, number> = {
 };
 
 const PASS_KEY = "__pass__";
+
+let privateKey: string | null = null;
+
+function getPrivateKey(): string | null {
+  return privateKey;
+}
 
 const user = reactive<UserState>({
   id: null,
@@ -71,9 +78,20 @@ async function login(storage: LocalStorage, previousMemonic?: string, ttl: Ttl =
   }
 
   const { address, mnemonic } = identity;
+  let activeIdentity = identity;
 
   if (!previousMemonic) {
-    await sm().loginOrRecoverUserWithMnemonic(mnemonic);
+    activeIdentity = await sm().loginOrRecoverUserWithMnemonic(mnemonic);
+  }
+
+  if (activeIdentity?.privateKey) {
+    privateKey = activeIdentity.privateKey;
+
+    try {
+      await migrateNotesForCurrentUser({ db: db(), sm: sm(), address, privateKey });
+    } catch (error) {
+      console.error("[migration] sweep failed", error);
+    }
   }
 
   await persistMnemonicUnsafe(mnemonic, storage, ttl);
@@ -84,6 +102,7 @@ async function login(storage: LocalStorage, previousMemonic?: string, ttl: Ttl =
 async function logout(storage: LocalStorage) {
   await sm().clearSecurity();
   await storage.remove(PASS_KEY);
+  privateKey = null;
   user.id = null;
   user.state = "inactive";
 }
@@ -101,6 +120,10 @@ async function persistMnemonicUnsafe(mnemonic: string, storage: LocalStorage, tt
 }
 
 async function tryRecoverAndLogin(storage: LocalStorage) {
+  if (user.state === "authenticated") {
+    return;
+  }
+
   const result = await storage.get<Partial<PersistedMemonic>>(PASS_KEY);
 
   const { mnemonic, at, ttl = "15m" } = result ?? {};
@@ -117,4 +140,4 @@ async function tryRecoverAndLogin(storage: LocalStorage) {
   await login(storage, mnemonic);
 }
 
-export { login, user, tryRecoverAndLogin, logout, PASS_KEY };
+export { login, user, tryRecoverAndLogin, logout, getPrivateKey, PASS_KEY };

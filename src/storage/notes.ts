@@ -1,8 +1,9 @@
 import { PRIORITY } from "@/components/commands/state";
 import { CommandConfig } from "@/components/commands/types";
 import { db, sm } from "@/storage/db";
+import { decryptLegacySec, deriveLegacyKey, isLegacySec } from "@/storage/legacy-crypto";
 import { openNote } from "@/storage/tabGroups";
-import { user } from "@/storage/user";
+import { getPrivateKey, user } from "@/storage/user";
 import { NodeObject, QueryOptions } from "genosdb";
 import { kebabCase } from "scule";
 import { onBeforeUnmount, Ref, ref, shallowRef, watch } from "vue";
@@ -12,6 +13,28 @@ import CarbonDocument from "~icons/carbon/document";
 import CarbonCode from "~icons/carbon/code";
 
 const CURRENT_VERSION = 1;
+
+export class LegacyKeyRequiredError extends Error {
+  constructor() {
+    super("Open the vault with your vault key to finish the security upgrade");
+  }
+}
+
+let legacyCache: { privateKey: string; key: Promise<CryptoKey> } | null = null;
+
+async function legacyKey(): Promise<CryptoKey> {
+  const privateKey = getPrivateKey();
+
+  if (!privateKey) {
+    throw new LegacyKeyRequiredError();
+  }
+
+  if (!legacyCache || legacyCache.privateKey !== privateKey) {
+    legacyCache = { privateKey, key: deriveLegacyKey(privateKey) };
+  }
+
+  return await legacyCache.key;
+}
 
 interface CommonNote {
   name: string;
@@ -151,15 +174,25 @@ async function unwrapNote(note: NodeObject): Promise<NodeObject<Note>> {
     ...rest
   } = note;
 
-  const unwrapped = await sm().decryptDataForCurrentUser(sec);
+  let unwrapped: unknown;
+
+  try {
+    unwrapped = await sm().decryptDataForCurrentUser(sec);
+  } catch (error) {
+    if (!isLegacySec(sec)) {
+      throw error;
+    }
+
+    unwrapped = await decryptLegacySec(sec, await legacyKey());
+  }
 
   return {
     ...rest,
     value: {
       ...restValue,
       version: restValue.version ?? 1,
-      sec: unwrapped,
-      content: unwrapped.content,
+      sec: unwrapped as Note["sec"],
+      content: (unwrapped as Note["sec"]).content,
     },
   };
 }
@@ -200,26 +233,46 @@ async function useNote(id: string, onRemove: (id: string) => void) {
   const note = shallowRef<NodeObject<Note>>();
 
   let unsub: (() => void) | undefined;
+  let arrived = false;
+  let removeTimer: ReturnType<typeof setTimeout> | null = null;
 
   onBeforeUnmount(() => {
     unsub?.();
+
+    if (removeTimer) {
+      clearTimeout(removeTimer);
+    }
   });
 
   const { unsubscribe, result } = await db().get(id, (node) => {
-    if (!node?.value) {
-      onRemove(id);
+    if (node?.value) {
+      arrived = true;
+
+      if (removeTimer) {
+        clearTimeout(removeTimer);
+        removeTimer = null;
+      }
+
+      unwrapNote(node).then((unwrapped) => {
+        note.value = unwrapped;
+      });
       return;
     }
 
-    unwrapNote(node).then((node) => {
-      note.value = node;
-    });
+    if (arrived) {
+      onRemove(id);
+    }
   });
 
   if (result?.value) {
+    arrived = true;
     note.value = await unwrapNote(result);
   } else {
-    onRemove(id);
+    removeTimer = setTimeout(() => {
+      if (!arrived) {
+        onRemove(id);
+      }
+    }, 5000);
   }
 
   unsub = unsubscribe;
