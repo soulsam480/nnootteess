@@ -6,6 +6,7 @@
 //  full access to ypur data
 // 3. the mnemonic is stored in local storage for 15 minutes
 
+import { securityAction } from "@/storage/auth-state";
 import { db, sm } from "@/storage/db";
 import { migrateNotesForCurrentUser } from "@/storage/migration";
 import { forgetLegacyKey } from "@/storage/notes";
@@ -71,9 +72,19 @@ function activate(activeAddress: string) {
   startDirectory(activeAddress, isLoggedIn);
 }
 
+function deactivate() {
+  privateKey = null;
+  user.id = null;
+  user.state = "inactive";
+}
+
 sm().setSecurityStateChangeCallback((authState) => {
-  if (authState.isActive && authState.activeAddress && !activating) {
-    activate(authState.activeAddress);
+  const action = securityAction(user.state, authState, activating);
+
+  if (action.kind === "activate") {
+    activate(action.address);
+  } else if (action.kind === "deactivate") {
+    deactivate();
   }
 });
 
@@ -125,10 +136,8 @@ async function login(storage: LocalStorage, previousMemonic?: string, ttl: Ttl =
 async function logout(storage: LocalStorage) {
   await sm().clearSecurity();
   await storage.remove(PASS_KEY);
-  privateKey = null;
+  deactivate();
   forgetLegacyKey();
-  user.id = null;
-  user.state = "inactive";
 }
 
 // UNSAFE persist memonic temporary
