@@ -16,9 +16,22 @@ export const LEGACY_HANDLE = "nnootteess_graph.msgpack";
 
 export const debugLogging = useStorage("debug_logging", false);
 
+const SIGNALING_RELAYS = [
+  "wss://relay.primal.net",
+  "wss://nos.lol",
+  "wss://relay.nostr.net",
+  "wss://offchain.pub",
+  "wss://nostr.mom",
+  "wss://nostr.bitcoiner.social",
+  "wss://nostr.hifish.org",
+  "wss://relay.nostr.com",
+  "wss://relay.mccormick.cx",
+  "wss://yabu.me",
+];
+
 const COMMON_CONFIG: GDB.GDBOptions = {
   password,
-  rtc: true,
+  rtc: { relayUrls: SIGNALING_RELAYS },
   sm: {
     superAdmins: [],
     customRoles: {
