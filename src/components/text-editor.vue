@@ -3,11 +3,16 @@ export const editorReadonlyEnabled = useStorage("readonly_mode", false);
 </script>
 
 <script setup lang="ts">
-import { AtomicCodeMirrorEditor } from "@atomic-editor/editor";
+import {
+  AtomicCodeMirrorEditor,
+  mermaidBlocks,
+  useAtomicEditorHandle,
+} from "@atomic-editor/editor";
 import "@atomic-editor/editor/styles.css";
 import { LanguageDescription } from "@codemirror/language";
+import { EditorSelection, Transaction } from "@codemirror/state";
 import { useStorage } from "@vueuse/core";
-import { markRaw } from "vue";
+import { markRaw, watch } from "vue";
 import { keymap } from "@codemirror/view";
 import { searchKeymap } from "@codemirror/search";
 
@@ -56,6 +61,7 @@ const LANG_DESCRIPTORS: LanguageDescription[] = [
 
 const props = defineProps<{
   modelValue: string;
+  noteId: string;
 }>();
 
 const emits = defineEmits<{
@@ -64,11 +70,31 @@ const emits = defineEmits<{
 }>();
 
 const state = props.modelValue;
+const { handle } = useAtomicEditorHandle();
+
+watch(
+  () => props.modelValue,
+  (incoming) => {
+    const view = handle.value?.view;
+    if (!view || incoming === view.state.doc.toString()) return;
+
+    const { anchor, head } = view.state.selection.main;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: incoming },
+      selection: EditorSelection.range(
+        Math.min(anchor, incoming.length),
+        Math.min(head, incoming.length),
+      ),
+      annotations: Transaction.addToHistory.of(false),
+    });
+  },
+);
 
 const extensions = markRaw([
   keymap.of([
     ...searchKeymap,
   ]),
+  mermaidBlocks(),
 ]);
 </script>
 
@@ -76,8 +102,10 @@ const extensions = markRaw([
   <AtomicCodeMirrorEditor
     ref="handle"
     :markdownSource="state"
+    :documentId="noteId"
     :readOnly="editorReadonlyEnabled"
     @markdownChange='$emit("update:modelValue", $event)'
+    @focusin="$emit('focus')"
     :codeLanguages="LANG_DESCRIPTORS"
     :extensions="extensions"
   />
