@@ -104,7 +104,12 @@ function handleFocus() {
         </div>
       </div>
 
-      <TextEditor v-if="note.value.type === 'note'" v-model="content" @focus="handleFocus" />
+      <TextEditor
+        v-if="note.value.type === 'note'"
+        v-model="content"
+        :note-id="id"
+        @focus="handleFocus"
+      />
 
       <CodeEditor
         @focus="handleFocus"
