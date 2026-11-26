@@ -5,7 +5,7 @@
     "": {
       "name": "notesx2",
       "dependencies": {
-        "@atomic-editor/editor": "https://github.com/soulsam480/atomic-editor#4b5da49301fe474d543fa415f0bd29a65cf44a20",
+        "@atomic-editor/editor": "https://github.com/soulsam480/atomic-editor#4df5f3966119a0bc643503359425eabb1bd2dcc5",
         "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lang-css": "^6.3.1",
@@ -58,7 +58,7 @@
 
     "@apideck/better-ajv-errors": ["@apideck/better-ajv-errors@0.3.7", "", { "dependencies": { "jsonpointer": "^5.0.1", "leven": "^3.1.0" }, "peerDependencies": { "ajv": ">=8" } }, "sha512-TajUJwGWbDwkCx/CZi7tRE8PVB7simCvKJfHUsSdvps+aTM/PDPP4gkLmKnc+x3CE//y9i/nj74GqdL/hwk7Iw=="],
 
-    "@atomic-editor/editor": ["@atomic-editor/editor@github:soulsam480/atomic-editor#4b5da49", { "dependencies": { "pele": "^1.13.0" }, "peerDependencies": { "@codemirror/autocomplete": "^6.0.0", "@codemirror/commands": "^6.0.0", "@codemirror/lang-markdown": "^6.0.0", "@codemirror/language": "^6.0.0", "@codemirror/search": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.0.0", "@lezer/common": "^1.0.0", "@lezer/highlight": "^1.0.0", "@lezer/markdown": "^1.0.0", "vue": "^3.4.0" } }, "soulsam480-atomic-editor-4b5da49", "sha512-TCB6dHUDOYzrNdpbAUhdJyjBb1WKASUTmnwR4GkMy2ftZBdU0EwpCKvpWcv70uerblpzKtuToOaJbN9VSDV2Rw=="],
+    "@atomic-editor/editor": ["@atomic-editor/editor@github:soulsam480/atomic-editor#4df5f39", { "dependencies": { "pele": "^1.13.0" }, "peerDependencies": { "@codemirror/autocomplete": "^6.0.0", "@codemirror/commands": "^6.0.0", "@codemirror/lang-markdown": "^6.0.0", "@codemirror/language": "^6.0.0", "@codemirror/search": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.0.0", "@lezer/common": "^1.0.0", "@lezer/highlight": "^1.0.0", "@lezer/markdown": "^1.0.0", "vue": "^3.4.0" } }, "soulsam480-atomic-editor-4df5f39", "sha512-cG0vPYVy6xmvOOwQBqLAr0fo+5AcS5AvrPZ/AhbuLnwlWF0mPjuITuoAsVs+DIq8CwFOZZ9GKlX0vPUxlh3/6w=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.29.7", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.29.7", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw=="],
 

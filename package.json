@@ -11,7 +11,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@atomic-editor/editor": "https://github.com/soulsam480/atomic-editor#4b5da49301fe474d543fa415f0bd29a65cf44a20",
+    "@atomic-editor/editor": "https://github.com/soulsam480/atomic-editor#4df5f3966119a0bc643503359425eabb1bd2dcc5",
     "@msgpack/msgpack": "^3.1.3",
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.11.1",
