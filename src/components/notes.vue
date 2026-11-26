@@ -14,12 +14,14 @@ import { formatDate } from "@/utils/date";
 import { onLongPress, useMediaQuery, useStorage } from "@vueuse/core";
 import { NodeObject } from "genosdb";
 import { LANG_TO_COLOR } from "@/utils/codemirror";
-import { activeNoteIds, openNote } from "@/storage/tabGroups";
+import { activeNoteIds, lastFocusedTab, openNote } from "@/storage/tabGroups";
 import CarbonPin from "~icons/carbon/pin";
 import NoteActions from "./note-actions.vue";
 import { CommandConfig } from "./commands/types";
 import CarbonTrashCan from "~icons/carbon/trash-can";
 import CarbonSplitScreen from "~icons/carbon/split-screen";
+import CarbonListTree from "~icons/carbon/list-tree";
+import { toggleOutline } from "./outline-state";
 
 const NOTE_COMMANDS = markRaw<CommandConfig[]>([
   {
@@ -93,6 +95,23 @@ const NOTE_COMMANDS = markRaw<CommandConfig[]>([
     },
     priority: PRIORITY.high,
     icon: CarbonTrashCan,
+  },
+  {
+    id: "toggle-outline",
+    group: "Actions",
+    name: "Outline: Toggle outline",
+    actions: {
+      default: {
+        shortcut: "Alt+KeyI",
+        async perform() {
+          if (lastFocusedTab.value === null) return;
+
+          toggleOutline(lastFocusedTab.value);
+        },
+      },
+    },
+    priority: PRIORITY.high,
+    icon: CarbonListTree,
   },
 ]);
 
