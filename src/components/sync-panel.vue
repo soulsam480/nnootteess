@@ -2,7 +2,6 @@
 import { computed } from "vue";
 import { sm } from "@/storage/db";
 import { syncState } from "@/storage/sync";
-import { turnState } from "@/storage/turn";
 
 const vaultLabel = computed(() => {
   const vault = syncState.self?.vault;
@@ -55,10 +54,6 @@ function ago(at: number) {
 
       <p v-if="syncState.self" class="mdst-p mdst-p--sm">
         This tab · {{ vaultLabel }} · {{ peerText }}
-      </p>
-
-      <p v-if="syncState.self" class="mdst-p mdst-p--sm">
-        Relay fallback · {{ turnState.active ? "available" : "off" }}
       </p>
 
       <table
