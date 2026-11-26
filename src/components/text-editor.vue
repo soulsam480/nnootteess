@@ -96,10 +96,6 @@ const extensions = markRaw([
   ]),
   mermaidBlocks(),
 ]);
-
-defineExpose({
-  getView: () => handle.value?.view ?? null,
-});
 </script>
 
 <template>

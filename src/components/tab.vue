@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import * as notesAPI from "@/storage/notes";
-import { computed, defineAsyncComponent, ref, unref, watch } from "vue";
+import { defineAsyncComponent, ref, unref, watch } from "vue";
 import { watchDebounced } from "@vueuse/core";
-import { EditorView } from "@codemirror/view";
 import { titleCase } from "scule";
-import CarbonListTree from "~icons/carbon/list-tree";
 import { closeNote, lastFocusedTab } from "@/storage/tabGroups";
-import { extractHeadings } from "@/utils/outline";
-import OutlinePopover from "./outline-popover.vue";
-import { closeOutline, outlineState, toggleOutline } from "./outline-state";
 
 const TextEditor = defineAsyncComponent(async () => await import("@/components/text-editor.vue"));
 
@@ -67,40 +62,10 @@ watchDebounced(
   { debounce: 1000 },
 );
 
-const editor = ref<{ getView(): EditorView | null } | null>(null);
-
-const headings = computed(() => extractHeadings(content.value));
-
-function getView(): EditorView | null {
-  return editor.value?.getView() ?? null;
-}
-
-function jumpTo(line: number) {
-  const view = getView();
-
-  if (!view) return;
-
-  outlineState.activeLine = line;
-
-  const target = view.state.doc.line(Math.max(1, Math.min(line, view.state.doc.lines)));
-
-  view.dispatch({
-    selection: { anchor: target.from },
-    effects: EditorView.scrollIntoView(target.from, { y: "start" }),
-    scrollIntoView: true,
-  });
-  view.focus();
-}
-
 function handleFocus() {
   lastFocusedTab.value = props.tabId;
   notesAPI.lastFocusedNote.value = props.id;
 }
-
-watch(
-  () => props.id,
-  () => closeOutline(props.tabId),
-);
 </script>
 
 <template>
@@ -137,36 +102,10 @@ watch(
             </option>
           </select>
         </div>
-
-        <template v-if="note.value.type === 'note'">
-          <button
-            type="button"
-            class="mdst-button mdst-button--sm mdst-button--ghost outline-toggle"
-            :id="`outline-toggle-${props.tabId}`"
-            :data-outline-toggle="props.tabId"
-            data-tooltip="Outline (Alt+I)"
-            aria-label="Outline"
-            aria-haspopup="dialog"
-            aria-controls="outline-popover"
-            :aria-expanded="outlineState.openTabId === props.tabId"
-            @click="toggleOutline(props.tabId)"
-          >
-            <CarbonListTree />
-          </button>
-
-          <OutlinePopover
-            v-if="outlineState.openTabId === props.tabId"
-            :headings="headings"
-            :tab-id="props.tabId"
-            :get-view="getView"
-            @jump="jumpTo"
-          />
-        </template>
       </div>
 
       <TextEditor
         v-if="note.value.type === 'note'"
-        ref="editor"
         v-model="content"
         :note-id="id"
         @focus="handleFocus"
