@@ -24,6 +24,16 @@ Cache-Control = "public, max-age=0, must-revalidate"
 command = "bun run build"
 publish = "apps/web/dist"
 
+[functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+
+[[redirects]]
+from = "/api/turn"
+to = "/.netlify/functions/turn"
+status = 200
+force = true
+
 [[redirects]]
 from = "/*"
 to = "/index.html"
