@@ -190,6 +190,12 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--mdst-space-1);
+    min-height: calc(1.2em + 2 * var(--mdst-space-xs) + 2 * var(--mdst-border-width));
+    line-height: 1;
+
+    span {
+      font-variant-numeric: tabular-nums;
+    }
   }
 
   .sync-status__dot {
@@ -573,6 +579,9 @@ body {
           display: flex;
           flex-direction: column;
           gap: var(--mdst-space-px);
+          margin: 0;
+          padding: 0;
+          list-style: none;
         }
 
         .outline-row {
