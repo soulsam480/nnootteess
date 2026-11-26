@@ -1,4 +1,5 @@
 const CREDENTIALS_PATH = "/api/v1/turn/credentials";
+const ALLOWED_FETCH_SITES = new Set(["same-origin", "same-site"]);
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -16,7 +17,22 @@ function turnHost(app) {
   return host.includes(".") ? host : `${host}.metered.live`;
 }
 
-export default async function turn() {
+/**
+ * The credentials are handed to any client that asks, so this is a speed bump,
+ * not a wall. It keeps other origins from minting credentials through this
+ * endpoint; the per-IP rate limit on the redirect caps hammering.
+ */
+function fromOurApp(request) {
+  const site = request?.headers?.get("sec-fetch-site");
+
+  return site === null || ALLOWED_FETCH_SITES.has(site);
+}
+
+export default async function turn(request) {
+  if (!fromOurApp(request)) {
+    return json(403, { error: "forbidden" });
+  }
+
   const app = process.env.METERED_TURN_APP;
   const apiKey = process.env.METERED_TURN_API_KEY;
 
