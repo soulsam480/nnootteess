@@ -16,7 +16,12 @@ const emit = defineEmits<{
 
 const popover = useTemplateRef<HTMLElement>("popover");
 const filterInput = useTemplateRef<HTMLInputElement>("filterInput");
+const rowButtons = ref<HTMLButtonElement[]>([]);
 const activeIndex = ref(0);
+
+function setRowButton(element: unknown, index: number) {
+  if (element instanceof HTMLButtonElement) rowButtons.value[index] = element;
+}
 
 const visible = computed(() => {
   const term = outlineState.filter.trim().toLowerCase();
@@ -49,6 +54,7 @@ function select(index: number) {
   if (total === 0) return;
 
   activeIndex.value = (index + total) % total;
+  rowButtons.value[activeIndex.value]?.focus();
 }
 
 function dismiss() {
@@ -225,6 +231,7 @@ onBeforeUnmount(() => {
     <ul v-if="visible.length" class="outline-list">
       <li v-for="(heading, index) in visible" :key="`${heading.line}-${heading.text}`">
         <button
+          :ref="(element) => setRowButton(element, index)"
           type="button"
           class="outline-row"
           :data-level="heading.level"
