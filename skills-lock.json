@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "genosdb": {
+      "source": "estebanrfp/genosdb-skill",
+      "commit": "e72518b82e36f19308fdc5057090ae6129618207",
+      "sourceType": "github",
+      "skillPath": "skills/genosdb/SKILL.md",
+      "computedHash": "16615293ece056b27e523b4e3bb7a7f02ab36ab8fce83619b45951839941a739"
+    }
+  }
+}
